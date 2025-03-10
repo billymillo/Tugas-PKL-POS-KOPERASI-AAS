@@ -1027,7 +1027,6 @@ class _AddProductPState extends State<AddProductP> {
                                         stokProdukController.text
                                             .replaceAll('.', ''),
                                       );
-
                                       addController.imagePath.value = null;
                                       namaProdukController.clear();
                                       hargaPackProdukController.clear();

@@ -12,14 +12,15 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-class TipeP extends StatefulWidget {
+class MetodeP extends StatefulWidget {
   @override
-  _TipePState createState() => _TipePState();
+  _MetodePState createState() => _MetodePState();
 }
 
-class _TipePState extends State<TipeP> {
-  final LibraryController tipeController = Get.put(LibraryController());
-  final TextEditingController newtipeController = TextEditingController();
+class _MetodePState extends State<MetodeP> {
+  final LibraryController metodeController = Get.put(LibraryController());
+  final TextEditingController newMetodeController = TextEditingController();
+  final TextEditingController poinController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -34,7 +35,7 @@ class _TipePState extends State<TipeP> {
               padding: const EdgeInsets.only(top: 70),
               child: RefreshIndicator(
                 onRefresh: () async {
-                  await tipeController.refresh();
+                  await metodeController.refresh();
                 },
                 child: NotificationListener<ScrollNotification>(
                   child: CustomScrollView(
@@ -59,7 +60,7 @@ class _TipePState extends State<TipeP> {
                                               color: PrimaryColor().blue),
                                           SizedBox(width: 10),
                                           Text(
-                                            'Tipe Barang',
+                                            'Metode Pembayaran',
                                             style: GoogleFonts.roboto(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20,
@@ -70,7 +71,7 @@ class _TipePState extends State<TipeP> {
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(right: 16),
-                                        child: buildNewTipeDialog(),
+                                        child: buildNewMetodeDialog(),
                                       ),
                                     ],
                                   ),
@@ -82,16 +83,17 @@ class _TipePState extends State<TipeP> {
                                   padding: EdgeInsets.only(top: 10),
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
-                                    itemCount: tipeController.tipe.length,
+                                    itemCount: metodeController.metode.length,
                                     itemBuilder: (context, index) {
-                                      var tipe = tipeController.tipe[index];
+                                      var metode =
+                                          metodeController.metode[index];
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 5),
                                         child: Stack(
                                           children: [
-                                            buildTipeDialog(
-                                                tipe['id'], tipe['tipe']),
+                                            buildMetodeDialog(
+                                                metode['id'], metode['metode']),
                                             Positioned(
                                               right: 4,
                                               top: 0,
@@ -166,7 +168,7 @@ class _TipePState extends State<TipeP> {
                                                                       height:
                                                                           25),
                                                                   Text(
-                                                                    "Hapus Tipe",
+                                                                    "Hapus Metode",
                                                                     style:
                                                                         TextStyle(
                                                                       color: Colors
@@ -182,7 +184,7 @@ class _TipePState extends State<TipeP> {
                                                                       height:
                                                                           10),
                                                                   Text(
-                                                                    "Apakah anda yakin untuk menghapus Tipe ini?",
+                                                                    "Apakah anda yakin untuk menghapus Metode ini?",
                                                                     style:
                                                                         TextStyle(
                                                                       color: Colors
@@ -207,15 +209,15 @@ class _TipePState extends State<TipeP> {
                                                                   ElevatedButton(
                                                                     onPressed:
                                                                         () async {
-                                                                      await tipeController.deleteTipe(
-                                                                          tipe[
+                                                                      await metodeController.deleteMetode(
+                                                                          metode[
                                                                               'id'],
                                                                           fromButton:
                                                                               true);
-                                                                      await tipeController
+                                                                      await metodeController
                                                                           .refresh();
                                                                       Get.to(
-                                                                          TipeP());
+                                                                          MetodeP());
                                                                       Navigator.pop(
                                                                           context);
                                                                     },
@@ -338,8 +340,31 @@ class _TipePState extends State<TipeP> {
                         }),
                       ),
                       SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0, top: 32),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(CupertinoIcons.star_circle_fill,
+                                      size: 25, color: PrimaryColor().blue),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Konfigurasi Poin Member',
+                                    style: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
                         child: Obx(() {
-                          if (tipeController.isLoading.value) {
+                          if (metodeController.isLoading.value) {
                             return Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Center(child: CircularProgressIndicator()),
@@ -372,7 +397,7 @@ class _TipePState extends State<TipeP> {
     );
   }
 
-  Widget buildNewTipeDialog() {
+  Widget buildNewMetodeDialog() {
     return ElevatedButton(
       onPressed: () {
         showDialog(
@@ -400,7 +425,7 @@ class _TipePState extends State<TipeP> {
                           ),
                           SizedBox(width: 12),
                           Text(
-                            "Tambah Tipe ",
+                            "Tambahkan Metode Pembayaran ",
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 18,
@@ -412,12 +437,12 @@ class _TipePState extends State<TipeP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Tipe', " *"),
+                          buildInputLabel('Nama Metode Pembayaran', " *"),
                           buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
-                            controller: newtipeController,
-                            hintText: 'Tipe',
-                            prefixIcon: CupertinoIcons.person_2_alt,
+                            controller: newMetodeController,
+                            hintText: 'Metode Pembayaran',
+                            prefixIcon: FontAwesomeIcons.moneyCheck,
                             type: TextInputType.name,
                           ),
                         ],
@@ -438,22 +463,22 @@ class _TipePState extends State<TipeP> {
                           ),
                           SizedBox(width: 12),
                           Obx(() => ElevatedButton(
-                                onPressed: tipeController.isLoading.value
+                                onPressed: metodeController.isLoading.value
                                     ? null
                                     : () async {
-                                        tipeController.isLoading.value = true;
+                                        metodeController.isLoading.value = true;
                                         try {
-                                          await tipeController.addTipe(
-                                            newtipeController.text,
+                                          await metodeController.addMetode(
+                                            newMetodeController.text,
                                           );
-                                          newtipeController.clear();
-                                          await tipeController.refresh();
+                                          newMetodeController.clear();
+                                          await metodeController.refresh();
                                           Navigator.pop(context);
-                                          newtipeController.clear();
+                                          newMetodeController.clear();
                                         } catch (e) {
                                           Get.snackbar("Error", e.toString());
                                         } finally {
-                                          tipeController.isLoading.value =
+                                          metodeController.isLoading.value =
                                               false;
                                         }
                                       },
@@ -463,7 +488,7 @@ class _TipePState extends State<TipeP> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: tipeController.isLoading.value
+                                child: metodeController.isLoading.value
                                     ? SizedBox(
                                         width: 15,
                                         height: 15,
@@ -514,7 +539,7 @@ class _TipePState extends State<TipeP> {
           Icon(Icons.add, color: Colors.white, size: 20),
           SizedBox(width: 8),
           Text(
-            'Tambah Tipe',
+            'Tambah Metode',
             style: TextStyle(
               color: Colors.white,
               fontSize: 14,
@@ -526,9 +551,9 @@ class _TipePState extends State<TipeP> {
     );
   }
 
-  Widget buildTipeDialog(String id, String tipeLama) {
-    final TextEditingController namatipeController =
-        TextEditingController(text: tipeLama);
+  Widget buildMetodeDialog(String id, String metodeLama) {
+    final TextEditingController namaMetodeController =
+        TextEditingController(text: metodeLama);
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -550,13 +575,13 @@ class _TipePState extends State<TipeP> {
                       Row(
                         children: [
                           Icon(
-                            CupertinoIcons.person_2,
+                            FontAwesomeIcons.moneyCheck,
                             color: PrimaryColor().blue,
                             size: 24,
                           ),
                           SizedBox(width: 12),
                           Text(
-                            "Edit Tipe ",
+                            "Edit Metode Pembayaran ",
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 18,
@@ -568,12 +593,12 @@ class _TipePState extends State<TipeP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Tipe', " *"),
+                          buildInputLabel('Nama Metode Pembayaran', " *"),
                           buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
-                            controller: namatipeController,
-                            hintText: 'Tipe',
-                            prefixIcon: CupertinoIcons.person_2_alt,
+                            controller: namaMetodeController,
+                            hintText: 'Metode Pembayaran',
+                            prefixIcon: FontAwesomeIcons.moneyCheck,
                             type: TextInputType.name,
                           ),
                         ],
@@ -595,14 +620,14 @@ class _TipePState extends State<TipeP> {
                           SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: () async {
-                              await tipeController.editTipe(
+                              await metodeController.editMetode(
                                 id,
-                                namatipeController.text,
+                                namaMetodeController.text,
                                 fromButton: true,
                               );
-                              await tipeController.refresh();
+                              await metodeController.refresh();
                               Navigator.pop(context);
-                              namatipeController.clear();
+                              namaMetodeController.clear();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: PrimaryColor().blue,
@@ -643,15 +668,28 @@ class _TipePState extends State<TipeP> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        color: Colors.white,
+        color: Colors.black,
         elevation: 2,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Center(
-            child: Text(
-              tipeLama,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+            child: Row(
+              children: [
+                Icon(
+                  FontAwesomeIcons.creditCard,
+                  color: Colors.amber.shade300,
+                  size: 24,
+                ),
+                SizedBox(width: 12),
+                Text(
+                  metodeLama,
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ),

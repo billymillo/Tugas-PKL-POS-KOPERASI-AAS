@@ -114,6 +114,23 @@ Widget buildDrawer(BuildContext context) {
                   Get.toNamed(Routes.TIPEP);
                 },
               ),
+              ListTile(
+                leading: Icon(
+                  FontAwesomeIcons.creditCard,
+                  color: DarkColor().grey,
+                  size: 20,
+                ),
+                title: Text(
+                  "Metode Pembayaran",
+                  style: TextStyle(
+                    color: DarkColor().grey,
+                    fontSize: 17,
+                  ),
+                ),
+                onTap: () {
+                  Get.toNamed(Routes.METODEP);
+                },
+              ),
             ],
             collapsedShape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -221,7 +238,7 @@ Widget buildDrawer(BuildContext context) {
             ),
           ),
           onTap: () {
-            Navigator.pop(context);
+            Get.toNamed(Routes.MEMBERP);
           },
         ),
       ],

@@ -12,19 +12,19 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-class MitraP extends StatefulWidget {
+class MemberP extends StatefulWidget {
   @override
-  _MitraPState createState() => _MitraPState();
+  _MemberPState createState() => _MemberPState();
 }
 
-class _MitraPState extends State<MitraP> {
-  final LibraryController mitraController = Get.put(LibraryController());
-
-  final TextEditingController newTipeController = TextEditingController();
+class _MemberPState extends State<MemberP> {
+  final LibraryController memberController = Get.put(LibraryController());
 
   final TextEditingController newNameController = TextEditingController();
+  final TextEditingController newIdPegController = TextEditingController();
   final TextEditingController newNoController = TextEditingController();
-  final TextEditingController newEmailController = TextEditingController();
+  final TextEditingController newSaldoController = TextEditingController();
+  final TextEditingController newPoinController = TextEditingController();
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final gambarProdukController = FileImage(File(''));
@@ -41,7 +41,7 @@ class _MitraPState extends State<MitraP> {
               padding: const EdgeInsets.only(top: 130),
               child: RefreshIndicator(
                 onRefresh: () async {
-                  await mitraController.refresh();
+                  await memberController.refresh();
                 },
                 child: NotificationListener<ScrollNotification>(
                   child: CustomScrollView(
@@ -50,12 +50,12 @@ class _MitraPState extends State<MitraP> {
                       SliverPadding(
                         padding: EdgeInsets.all(16),
                         sliver: Obx(() {
-                          if (mitraController.isLoading.value &&
-                              mitraController.mitra.isEmpty) {
+                          if (memberController.isLoading.value &&
+                              memberController.member.isEmpty) {
                             return SliverFillRemaining(
                               child: Center(child: CircularProgressIndicator()),
                             );
-                          } else if (mitraController.mitra.isEmpty) {
+                          } else if (memberController.member.isEmpty) {
                             return SliverFillRemaining(
                               child: Center(
                                 child: Column(
@@ -65,7 +65,7 @@ class _MitraPState extends State<MitraP> {
                                         size: 64, color: Colors.grey),
                                     SizedBox(height: 16),
                                     Text(
-                                      "Tidak Ada Mitra Tersedia",
+                                      "Tidak Ada Member Tersedia",
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: Colors.grey[600],
@@ -86,17 +86,17 @@ class _MitraPState extends State<MitraP> {
                             ),
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
-                                var item = mitraController.mitra[index];
+                                var item = memberController.member[index];
                                 return buildProductCard(item, context);
                               },
-                              childCount: mitraController.mitra.length,
+                              childCount: memberController.member.length,
                             ),
                           );
                         }),
                       ),
                       SliverToBoxAdapter(
                         child: Obx(() {
-                          if (mitraController.isLoading.value) {
+                          if (memberController.isLoading.value) {
                             return Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Center(child: CircularProgressIndicator()),
@@ -133,7 +133,7 @@ class _MitraPState extends State<MitraP> {
                           size: 25, color: PrimaryColor().blue),
                       SizedBox(width: 10),
                       Text(
-                        'Mitra Barang',
+                        'Member',
                         style: GoogleFonts.roboto(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
@@ -162,7 +162,7 @@ class _MitraPState extends State<MitraP> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.green,
+              color: Color.fromARGB(255, 243, 208, 35),
               borderRadius: BorderRadius.circular(20),
             ),
             child: ClipPath(
@@ -170,7 +170,7 @@ class _MitraPState extends State<MitraP> {
               child: Container(
                 width: MediaQuery.of(context).size.width * 1,
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade800,
+                  color: Color.fromARGB(255, 166, 31, 31),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
@@ -198,11 +198,11 @@ class _MitraPState extends State<MitraP> {
                         radius: 35,
                         backgroundColor: Colors.white,
                         child: Icon(Icons.person,
-                            color: PrimaryColor().blue, size: 45),
+                            color: Color.fromARGB(255, 166, 31, 31), size: 45),
                       ),
                       SizedBox(height: 10),
                       Text(
-                        item['nama'],
+                        'Member : ' + item['nama'],
                         style: GoogleFonts.nunito(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -211,7 +211,8 @@ class _MitraPState extends State<MitraP> {
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        item['no_tlp'],
+                        "Saldo : " +
+                            "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(item['saldo'].toString()))}",
                         style: GoogleFonts.nunito(
                           fontSize: 12,
                           color: Colors.white,
@@ -219,7 +220,15 @@ class _MitraPState extends State<MitraP> {
                         textAlign: TextAlign.center,
                       ),
                       Text(
-                        item['email'],
+                        'Poin : ' + item['poin'] + ' poin',
+                        style: GoogleFonts.nunito(
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        item['no_tlp'],
                         style: GoogleFonts.nunito(
                           fontSize: 12,
                           color: Colors.white,
@@ -247,11 +256,13 @@ class _MitraPState extends State<MitraP> {
                               ),
                               onTap: () {
                                 showEditDialog(
-                                    context,
-                                    item['id'],
-                                    item['nama'],
-                                    item['no_tlp'],
-                                    item['email']);
+                                  context,
+                                  item['id'],
+                                  item['nama'],
+                                  item['no_tlp'],
+                                  item['saldo'],
+                                  item['poin'],
+                                );
                               },
                             ),
                           ),
@@ -314,7 +325,7 @@ class _MitraPState extends State<MitraP> {
                                                 ),
                                                 SizedBox(height: 25),
                                                 Text(
-                                                  "Hapus Mitra",
+                                                  "Hapus Member",
                                                   style: TextStyle(
                                                     color: Colors.black87,
                                                     fontSize: 25,
@@ -323,7 +334,7 @@ class _MitraPState extends State<MitraP> {
                                                 ),
                                                 SizedBox(height: 10),
                                                 Text(
-                                                  "Apakah anda yakin untuk menghapus Mitra ini?",
+                                                  "Apakah anda yakin untuk menghapus Member ini?",
                                                   style: TextStyle(
                                                     color: Colors.grey.shade400,
                                                     fontSize: 15,
@@ -339,12 +350,15 @@ class _MitraPState extends State<MitraP> {
                                               children: [
                                                 ElevatedButton(
                                                   onPressed: () async {
-                                                    await mitraController
-                                                        .deleteMitra(item['id'],
+                                                    await memberController
+                                                        .deleteMember(
+                                                            item['id'],
                                                             fromButton: true);
-                                                    await mitraController
+                                                    await memberController
                                                         .refresh();
-                                                    Get.to(MitraP());
+                                                    await memberController
+                                                        .fetchMember();
+                                                    Get.to(MemberP());
                                                     Navigator.pop(context);
                                                   },
                                                   style:
@@ -461,7 +475,7 @@ class _MitraPState extends State<MitraP> {
                           ),
                           SizedBox(width: 12),
                           Text(
-                            "Tambah Mitra Baru",
+                            "Tambah Member Baru",
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 18,
@@ -473,11 +487,19 @@ class _MitraPState extends State<MitraP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Mitra', " *"),
+                          buildInputLabel('Nama Member', " *"),
                           buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newNameController,
-                            hintText: 'Toko Kue XXXX',
+                            hintText: 'Nama',
+                            prefixIcon: CupertinoIcons.person_2_alt,
+                            type: TextInputType.name,
+                          ),
+                          buildInputLabel('Id Pegawai', " *"),
+                          buildTextField(
+                            inputFormat: LengthLimitingTextInputFormatter(200),
+                            controller: newIdPegController,
+                            hintText: 'ID : 1',
                             prefixIcon: CupertinoIcons.person_2_alt,
                             type: TextInputType.name,
                           ),
@@ -490,14 +512,24 @@ class _MitraPState extends State<MitraP> {
                             prefixIcon: CupertinoIcons.phone_circle,
                             type: TextInputType.phone,
                           ),
-                          SizedBox(height: 10),
-                          buildInputLabel('Email Mitra (opsional)', " "),
+                          buildInputLabel('Saldo', ' *'),
                           buildTextField(
-                            inputFormat: LengthLimitingTextInputFormatter(200),
-                            controller: newEmailController,
-                            hintText: 'contoh: 3yL6A@example.com',
-                            prefixIcon: Icons.alternate_email,
-                            type: TextInputType.emailAddress,
+                            controller: newSaldoController,
+                            hintText: 'Rp. 50.000',
+                            prefixIcon: FontAwesomeIcons.moneyBill,
+                            type: TextInputType.number,
+                            inputFormat:
+                                FilteringTextInputFormatter.singleLineFormatter,
+                          ),
+                          SizedBox(height: 15),
+                          buildInputLabel('Poin User', ' *'),
+                          buildTextField(
+                            controller: newPoinController,
+                            hintText: '500 poin',
+                            prefixIcon: Icons.star,
+                            type: TextInputType.number,
+                            inputFormat:
+                                FilteringTextInputFormatter.singleLineFormatter,
                           ),
                         ],
                       ),
@@ -517,26 +549,31 @@ class _MitraPState extends State<MitraP> {
                           ),
                           SizedBox(width: 12),
                           Obx(() => ElevatedButton(
-                                onPressed: mitraController.isLoading.value
+                                onPressed: memberController.isLoading.value
                                     ? null
                                     : () async {
-                                        mitraController.isLoading.value = true;
+                                        memberController.isLoading.value = true;
                                         try {
-                                          await mitraController.addNewMitra(
+                                          await memberController.addNewMember(
                                             newNameController.text,
+                                            newIdPegController.text,
                                             newNoController.text,
-                                            newEmailController.text,
+                                            newSaldoController.text,
+                                            newPoinController.text,
                                             fromButton: true,
                                           );
-                                          await mitraController.refresh();
+                                          await memberController.refresh();
                                           Navigator.pop(context);
                                           newNameController.clear();
                                           newNoController.clear();
-                                          newEmailController.clear();
+                                          newSaldoController.clear();
+                                          newPoinController.clear();
                                         } catch (e) {
+                                          print(
+                                              "Error saat menambahkan member: $e");
                                           Get.snackbar("Error", e.toString());
                                         } finally {
-                                          mitraController.isLoading.value =
+                                          memberController.isLoading.value =
                                               false;
                                         }
                                       },
@@ -546,7 +583,7 @@ class _MitraPState extends State<MitraP> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: mitraController.isLoading.value
+                                child: memberController.isLoading.value
                                     ? SizedBox(
                                         width: 15,
                                         height: 15,
@@ -597,7 +634,7 @@ class _MitraPState extends State<MitraP> {
           Icon(Icons.add, color: Colors.white, size: 20),
           SizedBox(width: 8),
           Text(
-            'Tambah Mitra',
+            'Tambah Member',
             style: TextStyle(
               color: Colors.white,
               fontSize: 14,
@@ -609,14 +646,16 @@ class _MitraPState extends State<MitraP> {
     );
   }
 
-  void showEditDialog(BuildContext context, String id, String mitraLama,
-      String no_tlp, String email) {
-    final TextEditingController namaMitraController =
-        TextEditingController(text: mitraLama);
-    final TextEditingController noMitraController =
+  void showEditDialog(BuildContext context, String id, String memberLama,
+      String no_tlp, String saldo, String poin) {
+    final TextEditingController namaMemberController =
+        TextEditingController(text: memberLama);
+    final TextEditingController noMemberController =
         TextEditingController(text: no_tlp);
-    final TextEditingController emailMitraController =
-        TextEditingController(text: email);
+    final TextEditingController saldoMemberController =
+        TextEditingController(text: saldo);
+    final TextEditingController poinMemberController =
+        TextEditingController(text: poin);
 
     showDialog(
       context: context,
@@ -632,9 +671,9 @@ class _MitraPState extends State<MitraP> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  buildInputLabel('Nama Mitra', ' *'),
+                  buildInputLabel('Nama Member', ' *'),
                   buildTextField(
-                    controller: namaMitraController,
+                    controller: namaMemberController,
                     hintText: 'Toko Kue XXXX',
                     prefixIcon: CupertinoIcons.person_2_alt,
                     type: TextInputType.name,
@@ -644,7 +683,7 @@ class _MitraPState extends State<MitraP> {
                   SizedBox(height: 15),
                   buildInputLabel('No. Whatsapp', ' *'),
                   buildTextField(
-                    controller: noMitraController,
+                    controller: noMemberController,
                     hintText: '0891-XXXX-XXXX',
                     prefixIcon: CupertinoIcons.phone_circle,
                     type: TextInputType.number,
@@ -652,12 +691,22 @@ class _MitraPState extends State<MitraP> {
                         FilteringTextInputFormatter.singleLineFormatter,
                   ),
                   SizedBox(height: 15),
-                  buildInputLabel('Email Mitra(opsional)', ' *'),
+                  buildInputLabel('Saldo', ' *'),
                   buildTextField(
-                    controller: emailMitraController,
-                    hintText: 'contoh: 3yL6A@example.com',
-                    prefixIcon: Icons.alternate_email,
-                    type: TextInputType.emailAddress,
+                    controller: saldoMemberController,
+                    hintText: 'Rp. 50.000',
+                    prefixIcon: FontAwesomeIcons.moneyBill,
+                    type: TextInputType.number,
+                    inputFormat:
+                        FilteringTextInputFormatter.singleLineFormatter,
+                  ),
+                  SizedBox(height: 15),
+                  buildInputLabel('Poin User', ' *'),
+                  buildTextField(
+                    controller: poinMemberController,
+                    hintText: '500 poin',
+                    prefixIcon: Icons.star,
+                    type: TextInputType.number,
                     inputFormat:
                         FilteringTextInputFormatter.singleLineFormatter,
                   ),
@@ -675,16 +724,17 @@ class _MitraPState extends State<MitraP> {
                       SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () async {
-                          await mitraController.editMitra(
+                          await memberController.editMember(
                             id,
-                            namaMitraController.text,
-                            noMitraController.text,
-                            emailMitraController.text,
+                            namaMemberController.text,
+                            noMemberController.text,
+                            saldoMemberController.text,
+                            poinMemberController.text,
                             fromButton: true,
                           );
                           Navigator.pop(context);
-                          await mitraController.fetchMitra();
-                          await mitraController.refresh();
+                          await memberController.fetchMember();
+                          await memberController.refresh();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: PrimaryColor().blue,
@@ -787,12 +837,18 @@ class WaveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
-    path.lineTo(0, size.height - 40);
+
+    path.moveTo(0, 20);
+    path.quadraticBezierTo(size.width * 0.25, 0, size.width * 0.5, 40);
+    path.quadraticBezierTo(size.width * 0.75, 70, size.width, 40);
+
+    path.lineTo(size.width, size.height - 40);
+
     path.quadraticBezierTo(
-        size.width / 4, size.height, size.width / 2, size.height - 30);
+        size.width * 0.75, size.height, size.width * 0.5, size.height - 40);
     path.quadraticBezierTo(
-        size.width * 3 / 4, size.height - 60, size.width, size.height - 40);
-    path.lineTo(size.width, 0);
+        size.width * 0.25, size.height - 80, 0, size.height - 40);
+
     path.close();
     return path;
   }

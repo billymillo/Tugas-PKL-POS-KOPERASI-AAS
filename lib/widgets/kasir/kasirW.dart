@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:bluetooth_thermal_printer_example/controllers/authC.dart';
 import 'package:bluetooth_thermal_printer_example/controllers/kasir/kasirC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
@@ -26,7 +28,6 @@ class KasirW {
       onTap: () {
         showDialog(
           context: context,
-          barrierDismissible: false,
           builder: (BuildContext context) {
             return Dialog(
               elevation: 0,
@@ -154,7 +155,7 @@ class KasirW {
     );
   }
 
-  GestureDetector product(nama, mitra, harga, foto, varian, listDibeli,
+  GestureDetector product(nama, mitra, harga, stok, foto, varian, listDibeli,
       tambahKeKeranjangFunc, kurangKeKeranjangFunc, context) {
     return GestureDetector(
       onTap: () {
@@ -186,17 +187,32 @@ class KasirW {
                   fontWeight: FontWeight.bold,
                   fontSize: 11,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               SizedBox(
                 height: 2,
               ),
-              Text(
-                mitra ?? "Tidak Memiliki Mitra",
-                style: GoogleFonts.nunito(
-                  fontWeight: FontWeight.w300,
-                  fontSize: 8,
-                  color: PrimaryColor().black,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    mitra ?? "Tidak Memiliki Mitra",
+                    style: GoogleFonts.nunito(
+                      fontWeight: FontWeight.w300,
+                      fontSize: 8,
+                      color: PrimaryColor().black,
+                    ),
+                  ),
+                  Text(
+                    stok ?? "Stok Telah Habis",
+                    style: GoogleFonts.nunito(
+                      fontWeight: FontWeight.w300,
+                      fontSize: 9,
+                      color: PrimaryColor().black,
+                    ),
+                  ),
+                ],
               ),
               SizedBox(
                 height: 7,
@@ -239,7 +255,7 @@ class KasirW {
                           GestureDetector(
                             onTap: kurangKeKeranjangFunc,
                             child: Container(
-                              padding: EdgeInsets.all(3),
+                              padding: EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                   color: PrimaryColor().blue,
                                   borderRadius: BorderRadius.circular(20)),
@@ -253,14 +269,14 @@ class KasirW {
                           Text(
                             listDibeli.length.toString(),
                             style: GoogleFonts.nunito(
-                                fontSize: 11, color: PrimaryColor().blue),
+                                fontSize: 14, color: PrimaryColor().blue),
                           ),
                           GestureDetector(
                             onTap: varian == null
                                 ? tambahKeKeranjangFunc
                                 : tambahKeKeranjangFunc,
                             child: Container(
-                              padding: EdgeInsets.all(3),
+                              padding: EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                   color: PrimaryColor().blue,
                                   borderRadius: BorderRadius.circular(20)),
@@ -273,26 +289,44 @@ class KasirW {
                           ),
                         ],
                       ))
-                  : GestureDetector(
-                      onTap: varian == null
-                          ? tambahKeKeranjangFunc
-                          : tambahKeKeranjangFunc,
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(vertical: 6),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(6),
-                            color: PrimaryColor().grey,
-                            border: Border.all(
-                                width: 1, color: PrimaryColor().blue)),
-                        child: Text(
-                          'Tambahkan',
-                          style: GoogleFonts.nunito(
-                              fontSize: 11, color: PrimaryColor().blue),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    )
+                  : stok != 'Stok : 0'
+                      ? GestureDetector(
+                          onTap: varian == null
+                              ? tambahKeKeranjangFunc
+                              : tambahKeKeranjangFunc,
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(vertical: 6),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6),
+                                color: PrimaryColor().grey,
+                                border: Border.all(
+                                    width: 1, color: PrimaryColor().blue)),
+                            child: Text(
+                              'Tambahkan',
+                              style: GoogleFonts.nunito(
+                                  fontSize: 11, color: PrimaryColor().blue),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                      : GestureDetector(
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(vertical: 6),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6),
+                                color: Colors.white,
+                                border:
+                                    Border.all(width: 1, color: Colors.red)),
+                            child: Text(
+                              'Stok Telah Habis',
+                              style: GoogleFonts.nunito(
+                                  fontSize: 11, color: DarkColor().red),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
             ],
           )),
     );
@@ -431,28 +465,29 @@ class KasirW {
     );
   }
 
-  GestureDetector pembayaranTransaksi(context) {
+  GestureDetector tombolQris(
+      context, harga, VoidCallback onTap, VoidCallback onTap2) {
     return GestureDetector(
       child: Container(
         decoration: BoxDecoration(
             border: Border.all(width: 1, color: PrimaryColor().blue),
-            color: PrimaryColor().blue,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(5)),
         padding: EdgeInsets.symmetric(vertical: 11, horizontal: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Selesaikan Pembayaran',
+              'Bayar QRIS',
               style: GoogleFonts.nunito(
                   fontWeight: FontWeight.bold,
                   fontSize: 11,
-                  color: Colors.white),
+                  color: PrimaryColor().blue),
             ),
             Icon(
-              FontAwesomeIcons.moneyBill,
+              FontAwesomeIcons.qrcode,
               size: 14,
-              color: Colors.white,
+              color: PrimaryColor().blue,
             )
           ],
         ),
@@ -460,13 +495,12 @@ class KasirW {
       onTap: () {
         showDialog(
           context: context,
-          barrierDismissible: false,
           builder: (BuildContext context) {
             return Dialog(
               elevation: 0,
               backgroundColor: Colors.transparent,
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.5,
+                width: MediaQuery.of(context).size.width * 0.3,
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -474,71 +508,89 @@ class KasirW {
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [],
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text('Pembayaran Qris',
+                        style: GoogleFonts.nunito(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black)),
+                    SizedBox(height: 5),
+                    Text('Koperasi Karyawan Anugrah Artha Abadi',
+                        style: GoogleFonts.nunito(
+                            fontSize: 13, color: Colors.grey.shade600)),
+                    SizedBox(height: 10),
+                    Icon(
+                      FontAwesomeIcons.qrcode,
+                      size: 200,
+                      color: PrimaryColor().blue,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Scan QRIS',
+                      style: GoogleFonts.nunito(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: Colors.black),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Total Pembayaran : ' + harga,
+                      style: GoogleFonts.nunito(
+                          fontSize: 13, color: Colors.grey.shade600),
+                    ),
+                    SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: onTap,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: PrimaryColor().blue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Selesaikan Pembayaran',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: onTap2,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Pembayaran Non Lunas',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
           },
         );
       },
-    );
-  }
-
-  Widget buildDropdown({
-    required Rxn<String> selectedValue,
-    required String label,
-    required List<Map<String, dynamic>> items,
-    required ValueChanged<String?> onChanged,
-    required String key,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 13),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: label,
-                labelStyle: GoogleFonts.nunito(
-                    fontSize: 11, fontWeight: FontWeight.bold),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 2),
-              ),
-              value: selectedValue.value,
-              icon: SizedBox.shrink(),
-              style: TextStyle(fontSize: 14, color: Colors.black87),
-              onChanged: (newValue) {
-                selectedValue.value = newValue;
-                onChanged(newValue);
-              },
-              items: items.map<DropdownMenuItem<String>>((item) {
-                return DropdownMenuItem<String>(
-                  value: item['id'].toString(),
-                  child: SizedBox(
-                    width: double.infinity, // Menghindari overflow
-                    child: Text(
-                      item[key] ?? 'No Name',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Icon(Icons.keyboard_arrow_down,
-                color: Colors.grey.shade600, size: 20),
-          ),
-        ],
-      ),
     );
   }
 }

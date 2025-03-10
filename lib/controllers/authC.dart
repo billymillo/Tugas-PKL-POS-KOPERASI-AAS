@@ -21,7 +21,7 @@ class AuthController extends GetxController {
     try {
       final response = await apiService.login(name, password);
       if (response['status'] == true) {
-        validationC.setLoginStatus(true, response['role']);
+        validationC.setLoginStatus(true, response['role'], response['name']);
         if (response['role'] == 'admin') {
           Get.offNamed(Routes.DASHBOARDADMINP);
         } else {

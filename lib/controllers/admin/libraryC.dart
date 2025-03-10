@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
+import 'package:bluetooth_thermal_printer_example/services/apiServiceTr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -13,10 +14,13 @@ import 'package:image_picker/image_picker.dart';
 class LibraryController extends GetxController {
   final ApiService apiService = ApiService();
   var url = ApiService.baseUrl + '/product';
+  final ApiServiceTr apiServiceTr = ApiServiceTr();
+  var urlTr = ApiServiceTr.baseUrlTr;
 
   var isLoading = false.obs;
   var tipe = <Map<String, dynamic>>[].obs;
   var kategori = <Map<String, dynamic>>[].obs;
+  var mitra = <Map<String, dynamic>>[].obs;
 
   Rx<File?> imagePathK = Rx<File?>(null);
   var hasNewImage = false.obs;
@@ -26,7 +30,8 @@ class LibraryController extends GetxController {
   var imagePathNewK = Rxn<File>();
   var isPickingImageNewK = false.obs;
 
-  var mitra = <Map<String, dynamic>>[].obs;
+  var member = <Map<String, dynamic>>[].obs;
+  var metode = <Map<String, dynamic>>[].obs;
 
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
@@ -41,6 +46,8 @@ class LibraryController extends GetxController {
     fetchMitra();
     fetchKategori();
     fetchTipe();
+    fetchMember();
+    fetchMetode();
   }
 
   Future<void> fetchMitra() async {
@@ -66,8 +73,8 @@ class LibraryController extends GetxController {
     }
   }
 
-    Future<void> addNewMitra(String nama, String no_tlp, String email,
-    {bool fromButton = false}) async {
+  Future<void> addNewMitra(String nama, String no_tlp, String email,
+      {bool fromButton = false}) async {
     if (!fromButton) {
       return;
     }
@@ -100,7 +107,6 @@ class LibraryController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   Future<void> deleteMitra(String id, {bool fromButton = false}) async {
     if (!fromButton) {
@@ -139,11 +145,7 @@ class LibraryController extends GetxController {
     }
   }
 
-    Future<void> editMitra(
-      String id,
-      String nama,
-      String no_tlp,
-      String email,
+  Future<void> editMitra(String id, String nama, String no_tlp, String email,
       {bool fromButton = false}) async {
     if (!fromButton) {
       return;
@@ -184,7 +186,6 @@ class LibraryController extends GetxController {
     }
   }
 
-
   Future<void> fetchTipe() async {
     try {
       isLoading(true);
@@ -206,7 +207,7 @@ class LibraryController extends GetxController {
     }
   }
 
-    Future<void> deleteTipe(String id, {bool fromButton = false}) async {
+  Future<void> deleteTipe(String id, {bool fromButton = false}) async {
     if (!fromButton) {
       return;
     }
@@ -267,10 +268,7 @@ class LibraryController extends GetxController {
     }
   }
 
-
-  Future<void> editTipe(
-      String id,
-      String tipe,
+  Future<void> editTipe(String id, String tipe,
       {bool fromButton = false}) async {
     if (!fromButton) {
       return;
@@ -308,7 +306,6 @@ class LibraryController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   Future<void> fetchKategori() async {
     try {
@@ -472,7 +469,7 @@ class LibraryController extends GetxController {
       } else if (response['status'] == false) {
         Get.snackbar(
           'Error',
-          'Tolong lengkapi data kategori',  
+          'Tolong lengkapi data kategori',
           backgroundColor: DarkColor().red.withOpacity(0.5),
           icon: Icon(Icons.crisis_alert, color: Colors.black),
         );
@@ -484,9 +481,273 @@ class LibraryController extends GetxController {
     }
   }
 
+  Future<void> fetchMember() async {
+    try {
+      isLoading.value = true;
+      var response = await http.get(Uri.parse(urlTr + "/member"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          member.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> addNewMember(
+      String nama, String no_tlp, String saldo, String poin, String idPeg,
+      {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    try {
+      final response =
+          await apiServiceTr.member(nama, idPeg, no_tlp, saldo, poin);
+      print("Response API: $response");
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      } else if (response['status'] == false) {
+        print(response['message']);
+        Get.snackbar(
+          'Error',
+          'Tolong lengkapi data Member',
+          backgroundColor: DarkColor().red.withOpacity(0.5),
+          icon: Icon(Icons.crisis_alert, color: Colors.black),
+        );
+      }
+    } catch (e) {
+      print("Error saat request API: $e");
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: DarkColor().red.withOpacity(0.5),
+        icon: Icon(Icons.crisis_alert, color: Colors.black),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteMember(String id, {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    try {
+      final response = await apiServiceTr.deleteMember(
+        id,
+      );
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          '${response['message']}',
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat Menghapus Member.',
+        backgroundColor: Colors.red.withOpacity(0.5),
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> editMember(
+      String id, String nama, String no_tlp, String saldo, String poin,
+      {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    try {
+      final response = await apiServiceTr.editMember(
+        id,
+        nama,
+        no_tlp,
+        saldo,
+        poin,
+      );
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          '${response['message']}',
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat Menghapus Member.',
+        backgroundColor: Colors.red.withOpacity(0.5),
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchMetode() async {
+    try {
+      isLoading(true);
+      var response =
+          await http.get(Uri.parse(urlTr + "/transaksi_in/pembayaran"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          metode.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deleteMetode(String id, {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    try {
+      final response = await apiServiceTr.deleteMetode(
+        id,
+      );
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          '${response['message']}',
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat Menghapus Mitra.',
+        backgroundColor: Colors.red.withOpacity(0.5),
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> addMetode(String metode) async {
+    isLoading.value = true;
+    try {
+      final response = await apiServiceTr.metode(metode);
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: DarkColor().red.withOpacity(0.5),
+        icon: Icon(Icons.crisis_alert, color: Colors.black),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> editMetode(String id, String metode,
+      {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    try {
+      final response = await apiServiceTr.editMetode(
+        id,
+        metode,
+      );
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          '${response['message']}',
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat Menghapus Metode Pembayaran.',
+        backgroundColor: Colors.red.withOpacity(0.5),
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> refresh() async {
     await fetchTipe();
     await fetchKategori();
     await fetchMitra();
+    await fetchMetode();
   }
 }

@@ -15,7 +15,7 @@ class ApiService {
     final data = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
-      return data['data'];
+      return data['data'];       
     } else {
       throw Exception('Failed to fetch users');
     }

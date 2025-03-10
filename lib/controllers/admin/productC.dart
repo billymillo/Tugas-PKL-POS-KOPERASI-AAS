@@ -112,6 +112,7 @@ class ProductController extends GetxController {
     }
     isLoading(false);
   }
+  
 
   Future<void> delete(String id, {bool fromButton = false}) async {
     if (!fromButton) {
