@@ -340,11 +340,11 @@ class _MetodePState extends State<MetodeP> {
                         }),
                       ),
                       SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 16.0, top: 32),
-                          child: Column(
-                            children: [
-                              Row(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16, top: 32),
+                              child: Row(
                                 children: [
                                   Icon(CupertinoIcons.star_circle_fill,
                                       size: 25, color: PrimaryColor().blue),
@@ -358,8 +358,51 @@ class _MetodePState extends State<MetodeP> {
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.only(left: 32, top: 20),
+                                  width: 300,
+                                  child: buildTextField(
+                                      controller: poinController,
+                                      hintText: '1 Poin = "..." Rupiah',
+                                      prefixIcon: Icons.star,
+                                      type: TextInputType.number,
+                                      inputFormat:
+                                          LengthLimitingTextInputFormatter(20)),
+                                ),
+                                SizedBox(width: 10),
+                                GestureDetector(
+                                  onTap: () {
+                                    int newValue =
+                                        int.tryParse(poinController.text) ??
+                                            100;
+                                    metodeController.simpanPoin(newValue);
+                                    poinController.clear();
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: 20),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: PrimaryColor().blue,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 10),
+                                      child: Text(
+                                        'Simpan',
+                                        style: GoogleFonts.nunito(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                       SliverToBoxAdapter(

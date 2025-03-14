@@ -19,6 +19,7 @@ abstract class Routes {
   static const TIPEP = _Paths.TIPEP;
   static const MEMBERP = _Paths.MEMBERP;
   static const METODEP = _Paths.METODEP;
+  static const TRANSAKSIP = _Paths.TRANSAKSIP;
 }
 
 abstract class _Paths {
@@ -39,4 +40,5 @@ abstract class _Paths {
   static const TIPEP = '/TipeP';
   static const MEMBERP = '/MemberP';
   static const METODEP = '/MetodeP';
+  static const TRANSAKSIP = '/TransaksiP';
 }

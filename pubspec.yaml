@@ -29,6 +29,8 @@ dependencies:
   intl: ^0.20.2
   shared_preferences: ^2.2.3
   dropdown_search: ^5.0.6
+  qr_flutter: ^4.1.0
+  blue_thermal_printer: ^1.2.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

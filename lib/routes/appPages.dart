@@ -10,6 +10,7 @@ import 'package:bluetooth_thermal_printer_example/pages/admin/mitraP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/productP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/kasir/kasirP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/kasir/lockDeviceP.dart';
+import 'package:bluetooth_thermal_printer_example/pages/kasir/transaksiP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/loginP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/validationP.dart';
 import 'package:get/get.dart';
@@ -76,6 +77,10 @@ class AppPages {
     GetPage(
       name: _Paths.METODEP,
       page: () => MetodeP(),
+    ),
+    GetPage(
+      name: _Paths.TRANSAKSIP,
+      page: () => TransaksiP(),
     ),
   ];
 }

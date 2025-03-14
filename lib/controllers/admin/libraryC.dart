@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:bluetooth_thermal_printer_example/services/apiService.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LibraryController extends GetxController {
   final ApiService apiService = ApiService();
@@ -32,7 +33,7 @@ class LibraryController extends GetxController {
 
   var member = <Map<String, dynamic>>[].obs;
   var metode = <Map<String, dynamic>>[].obs;
-
+  static var poinToRupiah = 100.obs;
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
   Future<void> ProductP() async {
@@ -48,6 +49,7 @@ class LibraryController extends GetxController {
     fetchTipe();
     fetchMember();
     fetchMetode();
+    konfersiPoin();
   }
 
   Future<void> fetchMitra() async {
@@ -742,6 +744,24 @@ class LibraryController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> konfersiPoin() async {
+    final prefs = await SharedPreferences.getInstance();
+    poinToRupiah.value = prefs.getInt('poinConversion') ?? 100;
+  }
+
+  Future<void> simpanPoin(int newValue) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('poinConversion', newValue);
+    poinToRupiah.value = newValue;
+
+    Get.snackbar(
+      'Berhasil',
+      "Konversi poin diperbarui menjadi 1 Poin = Rp $newValue",
+      backgroundColor: Colors.green.withOpacity(0.5),
+      icon: Icon(Icons.check_circle, color: Colors.white),
+    );
   }
 
   Future<void> refresh() async {

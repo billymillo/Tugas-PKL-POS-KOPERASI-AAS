@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:bluetooth_thermal_printer_example/controllers/authC.dart';
 import 'package:bluetooth_thermal_printer_example/controllers/kasir/kasirC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/dividerW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/kasir/kasirW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/notFoundW.dart';
@@ -24,6 +25,7 @@ class KasirP extends StatefulWidget {
 class _KasirPState extends State<KasirP> {
   final AuthController logoutController = Get.put(AuthController());
   TextEditingController searchController = TextEditingController();
+  TextEditingController saldoController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -259,7 +261,7 @@ class _KasirPState extends State<KasirP> {
                               () => Expanded(
                                   child: Container(
                                 height:
-                                    MediaQuery.of(context).size.height * 0.9,
+                                    MediaQuery.of(context).size.height * 1.1,
                                 margin: EdgeInsets.only(left: 15, bottom: 15),
                                 padding: EdgeInsets.all(20),
                                 color: Colors.white,
@@ -277,7 +279,7 @@ class _KasirPState extends State<KasirP> {
                                       Container(
                                         height:
                                             MediaQuery.of(context).size.height *
-                                                0.3,
+                                                0.25,
                                         width: double.infinity,
                                         margin:
                                             EdgeInsets.symmetric(vertical: 50),
@@ -316,53 +318,51 @@ class _KasirPState extends State<KasirP> {
                                         height:
                                             MediaQuery.of(context).size.height *
                                                 0.4,
-                                        child: Expanded(
-                                          child: Obx(() {
-                                            Set<String> displayedProducts = {};
-                                            List<Widget> billItems = [];
-                                            for (var i = 0;
-                                                i < c.listProduk.length;
-                                                i++) {
-                                              if (c.listProduk[i]['listDibeli']
-                                                  .isNotEmpty) {
-                                                int jumlahDibeli = c
-                                                    .listProduk[i]['listDibeli']
-                                                    .length;
-                                                for (var x = 0;
-                                                    x <
-                                                        c
-                                                            .listProduk[i]
-                                                                ['listDibeli']
-                                                            .length;
-                                                    x++) {
-                                                  String productKey =
-                                                      '${c.listProduk[i]['nama']}-${c.listProduk[i]['listDibeli'][x]['tipe']}';
-                                                  if (!displayedProducts
-                                                      .contains(productKey)) {
-                                                    displayedProducts
-                                                        .add(productKey);
-                                                    billItems.add(
-                                                      KasirW().bill(
-                                                        c.listProduk[i]['nama'],
-                                                        "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.listProduk[i]['listDibeli'][x]['harga'].toString()))}/pcs",
-                                                        '$jumlahDibeli',
-                                                        c.listProduk[i]
-                                                                ['listDibeli']
-                                                            [x]['tipe'],
-                                                      ),
-                                                    );
-                                                  }
+                                        child: Obx(() {
+                                          Set<String> displayedProducts = {};
+                                          List<Widget> billItems = [];
+                                          for (var i = 0;
+                                              i < c.listProduk.length;
+                                              i++) {
+                                            if (c.listProduk[i]['listDibeli']
+                                                .isNotEmpty) {
+                                              int jumlahDibeli = c
+                                                  .listProduk[i]['listDibeli']
+                                                  .length;
+                                              for (var x = 0;
+                                                  x <
+                                                      c
+                                                          .listProduk[i]
+                                                              ['listDibeli']
+                                                          .length;
+                                                  x++) {
+                                                String productKey =
+                                                    '${c.listProduk[i]['nama']} - ${c.listProduk[i]['listDibeli'][x]['tipe']}';
+                                                if (!displayedProducts
+                                                    .contains(productKey)) {
+                                                  displayedProducts
+                                                      .add(productKey);
+                                                  billItems.add(
+                                                    KasirW().bill(
+                                                      c.listProduk[i]['nama'],
+                                                      "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.listProduk[i]['listDibeli'][x]['harga'].toString()))}/pcs",
+                                                      '$jumlahDibeli',
+                                                      c.listProduk[i]
+                                                              ['listDibeli'][x]
+                                                          ['tipe'],
+                                                    ),
+                                                  );
                                                 }
                                               }
                                             }
-                                            return ListView.builder(
-                                              itemCount: billItems.length,
-                                              itemBuilder: (context, index) {
-                                                return billItems[index];
-                                              },
-                                            );
-                                          }),
-                                        ),
+                                          }
+                                          return ListView.builder(
+                                            itemCount: billItems.length,
+                                            itemBuilder: (context, index) {
+                                              return billItems[index];
+                                            },
+                                          );
+                                        }),
                                       ),
                                     SizedBox(height: 5),
                                     Column(
@@ -506,23 +506,33 @@ class _KasirPState extends State<KasirP> {
                                                                 )),
                                                             Transform.scale(
                                                               scale: 0.7,
-                                                              child: Checkbox(
-                                                                activeColor:
-                                                                    PrimaryColor()
-                                                                        .blue,
-                                                                value: c
-                                                                    .checkbox
-                                                                    .value,
-                                                                onChanged:
-                                                                    (bool?
-                                                                        value) {
-                                                                  setState(() {
-                                                                    c.checkbox
-                                                                            .value =
-                                                                        value ??
-                                                                            false; // Update checkbox status
-                                                                  });
-                                                                },
+                                                              child: SizedBox(
+                                                                height: 15,
+                                                                child: Checkbox(
+                                                                  activeColor:
+                                                                      PrimaryColor()
+                                                                          .blue,
+                                                                  visualDensity:
+                                                                      VisualDensity
+                                                                          .compact,
+                                                                  materialTapTargetSize:
+                                                                      MaterialTapTargetSize
+                                                                          .shrinkWrap,
+                                                                  value: c
+                                                                      .checkbox
+                                                                      .value,
+                                                                  onChanged:
+                                                                      (bool?
+                                                                          value) {
+                                                                    setState(
+                                                                        () {
+                                                                      c.checkbox
+                                                                              .value =
+                                                                          value ??
+                                                                              false; // Update checkbox status
+                                                                    });
+                                                                  },
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -539,8 +549,68 @@ class _KasirPState extends State<KasirP> {
                                                         ),
                                                       ],
                                                     ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text('Gunakan Saldo ?',
+                                                            style: GoogleFonts
+                                                                .nunito(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 10,
+                                                              color:
+                                                                  Colors.black,
+                                                            )),
+                                                        Transform.scale(
+                                                          scale: 0.7,
+                                                          child: Checkbox(
+                                                            activeColor:
+                                                                PrimaryColor()
+                                                                    .blue,
+                                                            visualDensity:
+                                                                VisualDensity
+                                                                    .compact,
+                                                            materialTapTargetSize:
+                                                                MaterialTapTargetSize
+                                                                    .shrinkWrap,
+                                                            value: c
+                                                                .checkboxSaldo
+                                                                .value,
+                                                            onChanged:
+                                                                (bool? value) {
+                                                              setState(() {
+                                                                c.checkboxSaldo
+                                                                        .value =
+                                                                    value ??
+                                                                        false; // Update checkboxSaldo status
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Text(
+                                                      c.checkboxSaldo.value
+                                                          ? "Saldo Member : Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.MemberSaldo.toString()))}"
+                                                          : "",
+                                                      style: GoogleFonts.nunito(
+                                                        fontSize: 12,
+                                                        color:
+                                                            PrimaryColor().blue,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
                                                   ],
                                                 )),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [],
                                         ),
                                         SizedBox(height: 5),
                                         GestureDetector(
@@ -806,271 +876,399 @@ class _KasirPState extends State<KasirP> {
                                           },
                                         ),
                                         SizedBox(height: 5),
-                                        GestureDetector(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    width: 1,
-                                                    color: PrimaryColor().blue),
-                                                color: PrimaryColor().blue,
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 11, horizontal: 16),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  'Tunai',
-                                                  style: GoogleFonts.nunito(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 11,
-                                                      color: Colors.white),
-                                                ),
-                                                Icon(
-                                                  FontAwesomeIcons.moneyBill,
-                                                  size: 14,
-                                                  color: Colors.white,
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            c.fetchStatus();
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return Dialog(
-                                                  elevation: 0,
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  child: Container(
-                                                    width:
-                                                        MediaQuery.of(context)
+                                        KasirW().tombolTunai(
+                                            context,
+                                            c.isLoading,
+                                            c.totalHarga.toInt().toString(),
+                                            c.MemberName,
+                                            saldoController, () async {
+                                          double totalHarga =
+                                              c.totalHarga.toDouble();
+                                          double inputHarga = double.tryParse(
+                                                  saldoController.text) ??
+                                              0.0;
+
+                                          if (inputHarga >= totalHarga) {
+                                            c.statusId.value = 1;
+                                          } else {
+                                            c.statusId.value = 2;
+                                          }
+
+                                          if (c.banyakDibeli == 0 ||
+                                              c.banyakDibeli == '') {
+                                            Get.snackbar(
+                                              'Error',
+                                              'Produk Tidak Boleh Kosong!',
+                                              backgroundColor:
+                                                  Colors.red.withOpacity(0.8),
+                                              colorText: Colors.white,
+                                              icon: Icon(Icons.error,
+                                                  color: Colors.white),
+                                            );
+                                            return;
+                                          }
+
+                                          if (c.statusId.value == 2 &&
+                                              c.banyakDibeli != 0) {
+                                            Get.snackbar(
+                                              'Error',
+                                              'Non Member tidak bisa melakukan Kasbon',
+                                              backgroundColor:
+                                                  Colors.red.withOpacity(0.8),
+                                              colorText: Colors.white,
+                                              icon: Icon(Icons.error,
+                                                  color: Colors.white),
+                                            );
+                                            return;
+                                          }
+
+                                          if ((double.tryParse(c.MemberSaldo) ??
+                                                      0) <
+                                                  inputHarga &&
+                                              c.checkboxSaldo.value == true) {
+                                            Get.snackbar(
+                                              'Error',
+                                              'Saldo Anda Kurang, Tidak bisa Menggunakan Saldo!',
+                                              backgroundColor:
+                                                  Colors.red.withOpacity(0.8),
+                                              colorText: Colors.white,
+                                              icon: Icon(Icons.error,
+                                                  color: Colors.white),
+                                            );
+                                            return;
+                                          }
+
+                                          c.metodePembayaran.value = 1;
+                                          try {
+                                            await c.addTransaksiOut(
+                                              c.selectedMember.string,
+                                              c.banyakDibeli.toString(),
+                                              c.metodePembayaran.string,
+                                              inputHarga.toString(),
+                                              c.calculateDiskon.toString(),
+                                              c.statusId.string,
+                                              c.calculateDiskon.toString(),
+                                              c.poinUpdate.toString(),
+                                              fromButton: true,
+                                            );
+                                            for (var produk
+                                                in c.filteredProduk) {
+                                              print(produk['listDibeli']);
+                                              await c.addAllDetailTransaksiOut(
+                                                  produk['listDibeli']);
+                                            }
+                                            if (c.checkboxSaldo.value == true) {
+                                              await c.kurangSaldo(
+                                                  c.selectedMember.string,
+                                                  c.saldoUpdate.toString());
+                                            }
+                                            await c.tambahPoin(
+                                                c.selectedMember.string,
+                                                c.poinUpdate.toString());
+
+                                            if (c.statusId.value == 2 &&
+                                                c.selectedMember.value !=
+                                                    null) {
+                                              double totalKasbon =
+                                                  c.totalHarga - inputHarga;
+                                              await c.kasbonMember(
+                                                c.selectedMember.string,
+                                                totalKasbon.toInt().toString(),
+                                                c.statusId.string,
+                                              );
+                                            }
+                                            c.fetchTransaksiStruk();
+                                          } catch (e) {
+                                            Get.snackbar(
+                                              'Error',
+                                              'Terjadi Kesalahan',
+                                              backgroundColor:
+                                                  Colors.red.withOpacity(0.8),
+                                              colorText: Colors.white,
+                                              icon: Icon(Icons.error,
+                                                  color: Colors.white),
+                                            );
+                                          }
+                                          Future.delayed(
+                                            Duration(milliseconds: 200),
+                                            () {
+                                              Navigator.pop(context);
+                                              showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Dialog(
+                                                    elevation: 0,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      // Tambahkan scroll
+                                                      child: Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
                                                                 .size
                                                                 .width *
                                                             0.3,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                      color: Colors.white,
-                                                    ),
-                                                    child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          Container(
-                                                            height: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .height *
-                                                                0.34,
-                                                            width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width *
-                                                                0.5,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius: BorderRadius.only(
-                                                                  topLeft: Radius
-                                                                      .circular(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          color: Colors.white,
+                                                        ),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Container(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(20),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius: BorderRadius.only(
+                                                                    topLeft: Radius
+                                                                        .circular(
+                                                                            20),
+                                                                    topRight: Radius
+                                                                        .circular(
+                                                                            20)),
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  SizedBox(
+                                                                      height:
                                                                           20),
-                                                                  topRight: Radius
-                                                                      .circular(
-                                                                          20)),
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                            child: Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                SizedBox(
-                                                                    height: 20),
-                                                                Container(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .all(
-                                                                              30),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Color
-                                                                        .fromARGB(
-                                                                            255,
-                                                                            174,
-                                                                            255,
-                                                                            163),
-                                                                    shape: BoxShape
-                                                                        .circle,
-                                                                  ),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
+                                                                  Container(
+                                                                    padding:
+                                                                        EdgeInsets.all(
+                                                                            30),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      color: Color.fromARGB(
+                                                                          255,
+                                                                          163,
+                                                                          218,
+                                                                          255),
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                    ),
                                                                     child: Icon(
                                                                       FontAwesomeIcons
-                                                                          .moneyBill1,
+                                                                          .receipt,
                                                                       color: Colors
-                                                                          .green,
+                                                                          .blue,
                                                                       size: 60,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                                SizedBox(
-                                                                    height: 15),
-                                                                Text(
-                                                                  'Status Transaksi',
-                                                                  style: GoogleFonts.nunito(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w800,
-                                                                      fontSize:
-                                                                          27,
-                                                                      color: Colors
-                                                                          .green
-                                                                          .shade700),
-                                                                ),
-                                                              ],
+                                                                  SizedBox(
+                                                                      height:
+                                                                          15),
+                                                                  Text(
+                                                                    'Cetak Struk',
+                                                                    style: GoogleFonts.nunito(
+                                                                        fontWeight: FontWeight.w800,
+                                                                        fontSize: 22, // Lebih responsif
+                                                                        color: Colors.blue),
+                                                                  ),
+                                                                ],
+                                                              ),
                                                             ),
-                                                          ),
-                                                          Container(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    20),
-                                                            child: Column(
-                                                              children: [
-                                                                Text(
-                                                                  'Pilih status pembayaran untuk menyelesaikan transaksi dengan total harga ' +
-                                                                      "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.totalHarga.toString()))}",
-                                                                  style: GoogleFonts.nunito(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade600),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                ),
-                                                                SizedBox(
-                                                                    height: 5),
-                                                                Text(
-                                                                  'Member : ' +
-                                                                      c.MemberName,
-                                                                  style: GoogleFonts.nunito(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade600),
-                                                                ),
-                                                                SizedBox(
-                                                                    height: 20),
-                                                                Obx(() {
-                                                                  return Column(
-                                                                    children: c
-                                                                        .status
-                                                                        .map(
-                                                                            (status) {
-                                                                      Color buttonColor = (status['status'] ==
-                                                                              "Lunas")
-                                                                          ? Colors
-                                                                              .green
-                                                                          : Colors
-                                                                              .red;
-                                                                      return ListTile(
-                                                                        title:
-                                                                            Button(
-                                                                          status[
-                                                                              'status'],
-                                                                          buttonColor,
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      left: 20,
+                                                                      right: 20,
+                                                                      bottom:
+                                                                          20),
+                                                              child: Column(
+                                                                children: [
+                                                                  Text(
+                                                                    'Transaksi Anda telah berhasil !. Apakah Anda ingin mencetak struk sebagai bukti transaksi Anda?',
+                                                                    style: GoogleFonts.nunito(
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontSize:
+                                                                            14,
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade600),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                  ),
+                                                                  SizedBox(
+                                                                      height:
+                                                                          20),
+                                                                  Container(
+                                                                    width: 300,
+                                                                    child:
+                                                                        ElevatedButton(
+                                                                      onPressed:
                                                                           () async {
-                                                                            if (c.banyakDibeli == 0 ||
-                                                                                c.banyakDibeli == '') {
-                                                                              Get.snackbar(
-                                                                                'Error',
-                                                                                'Produk Tidak Boleh Kosong!',
-                                                                                backgroundColor: Colors.red.withOpacity(0.8),
-                                                                                colorText: Colors.white,
-                                                                                icon: Icon(Icons.error, color: Colors.white),
-                                                                              );
-                                                                              return;
-                                                                            }
-                                                                            c.metodePembayaran.value =
-                                                                                1;
-                                                                            try {
-                                                                              await c.addTransaksiOut(
-                                                                                c.selectedMember.string,
-                                                                                c.banyakDibeli.toString(),
-                                                                                c.metodePembayaran.string,
-                                                                                c.totalHarga.toString(),
-                                                                                c.calculateDiskon.toString(),
-                                                                                status['id'],
-                                                                                c.calculateDiskon.toString(),
-                                                                                c.poinUpdate.toString(),
-                                                                                fromButton: true,
-                                                                              );
+                                                                        bool
+                                                                            connected =
+                                                                            await c.checkPrinterStatus();
 
-                                                                              if (status['status'] == "Tidak Lunas") {
-                                                                                await c.kasbonMember(c.selectedMember.string, c.totalHarga.toString(), status['id']);
-                                                                              }
-                                                                              await c.tambahPoin(c.selectedMember.string, c.poinUpdate.toString());
+                                                                        if (connected) {
+                                                                          await c
+                                                                              .printReceipt("Hello World");
+                                                                          await c
+                                                                              .disconnectPrinter();
+                                                                        } else {
+                                                                          print(
+                                                                              "Printer belum terhubung, mencari perangkat...");
+                                                                          await c
+                                                                              .scanForDevices();
 
-                                                                              c.selectedMember.value = null;
-                                                                              c.banyakDibeli.value = 0;
-                                                                            } catch (e) {
-                                                                              Get.snackbar(
-                                                                                'Error',
-                                                                                'Terjadi Kesalahan',
-                                                                                backgroundColor: Colors.red.withOpacity(0.8),
-                                                                                colorText: Colors.white,
-                                                                                icon: Icon(Icons.error, color: Colors.white),
-                                                                              );
-                                                                            }
-                                                                            await c.fetchProduk();
-                                                                            await c.fetchMember();
-
-                                                                            Navigator.pop(context);
-                                                                          },
+                                                                          connected =
+                                                                              await c.checkPrinterStatus();
+                                                                          if (connected) {
+                                                                            await c.printReceipt("Hello World");
+                                                                            await c.disconnectPrinter();
+                                                                          } else {
+                                                                            print("Printer tidak ditemukan atau gagal terhubung.");
+                                                                          }
+                                                                          await c
+                                                                              .fetchProduk();
+                                                                          await c
+                                                                              .fetchMember();
+                                                                          c.selectedMember.value =
+                                                                              null;
+                                                                          c.banyakDibeli.value =
+                                                                              0;
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        }
+                                                                      },
+                                                                      style: ElevatedButton
+                                                                          .styleFrom(
+                                                                        backgroundColor:
+                                                                            PrimaryColor().blue,
+                                                                        shape:
+                                                                            RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(12),
                                                                         ),
-                                                                      );
-                                                                    }).toList(),
-                                                                  );
-                                                                })
-                                                              ],
+                                                                      ),
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          SizedBox(
+                                                                              width: 8),
+                                                                          Text(
+                                                                            'Cetak Struk',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: Colors.white,
+                                                                              fontSize: 14,
+                                                                              fontWeight: FontWeight.w600,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                      height:
+                                                                          5),
+                                                                  Container(
+                                                                    width: 300,
+                                                                    child:
+                                                                        ElevatedButton(
+                                                                      onPressed:
+                                                                          () async {
+                                                                        await c
+                                                                            .fetchProduk();
+                                                                        await c
+                                                                            .fetchMember();
+                                                                        c.selectedMember.value =
+                                                                            null;
+                                                                        c.banyakDibeli
+                                                                            .value = 0;
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      style: ElevatedButton
+                                                                          .styleFrom(
+                                                                        backgroundColor:
+                                                                            PrimaryColor().grey,
+                                                                        shape:
+                                                                            RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(12),
+                                                                        ),
+                                                                      ),
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          SizedBox(
+                                                                              width: 8),
+                                                                          Text(
+                                                                            'Tidak',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: Colors.black,
+                                                                              fontSize: 14,
+                                                                              fontWeight: FontWeight.w600,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
                                                             ),
-                                                          )
-                                                        ]),
-                                                  ),
-                                                );
-                                              },
-                                            );
-                                          },
-                                        ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          );
+                                        }),
                                         SizedBox(height: 5),
                                         KasirW().tombolQris(
                                           context,
                                           "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.totalHarga.toString()))}",
+                                          "00020101021126660014ID.LINKAJA.WWW011893600911000000000802152103124400000080303UMI51440014ID.CO.QRIS.WWW0215ID20210652077750303UMI5204839853033605802ID5922YAY BAKTI KAMAJAYA IND6006SLEMAN61055528162070703A016304FA4D",
                                           () async {
                                             if (c.banyakDibeli == 0 ||
                                                 c.banyakDibeli == '') {
                                               Get.snackbar(
                                                 'Error',
                                                 'Produk Tidak Boleh Kosong!',
+                                                backgroundColor:
+                                                    Colors.red.withOpacity(0.8),
+                                                colorText: Colors.white,
+                                                icon: Icon(Icons.error,
+                                                    color: Colors.white),
+                                              );
+                                              return;
+                                            }
+                                            if ((double.tryParse(
+                                                            c.MemberSaldo) ??
+                                                        0) <
+                                                    c.totalHarga.toInt() &&
+                                                c.checkboxSaldo.value == true) {
+                                              Get.snackbar(
+                                                'Error',
+                                                'Saldo Anda Kurang, Tidak bisa Menggunakan Saldo!',
                                                 backgroundColor:
                                                     Colors.red.withOpacity(0.8),
                                                 colorText: Colors.white,
@@ -1093,53 +1291,19 @@ class _KasirPState extends State<KasirP> {
                                                 c.poinUpdate.toString(),
                                                 fromButton: true,
                                               );
-                                              await c.tambahPoin(
-                                                  c.selectedMember.string,
-                                                  c.poinUpdate.toString());
-                                              c.selectedMember.value = null;
-                                              c.banyakDibeli.value = 0;
-                                            } catch (e) {
-                                              Get.snackbar(
-                                                'Error',
-                                                'Terjadi Kesalahan',
-                                                backgroundColor:
-                                                    Colors.red.withOpacity(0.8),
-                                                colorText: Colors.white,
-                                                icon: Icon(Icons.error,
-                                                    color: Colors.white),
-                                              );
-                                            }
-                                            await c.fetchProduk();
-                                            Navigator.pop(context);
-                                          },
-                                          () async {
-                                            if (c.banyakDibeli == 0 ||
-                                                c.banyakDibeli == '') {
-                                              Get.snackbar(
-                                                'Error',
-                                                'Produk Tidak Boleh Kosong!',
-                                                backgroundColor:
-                                                    Colors.red.withOpacity(0.8),
-                                                colorText: Colors.white,
-                                                icon: Icon(Icons.error,
-                                                    color: Colors.white),
-                                              );
-                                              return;
-                                            }
-                                            c.metodePembayaran.value = 2;
-                                            c.statusTr.value = 2;
-                                            try {
-                                              await c.addTransaksiOut(
-                                                c.selectedMember.string,
-                                                c.banyakDibeli.toString(),
-                                                c.metodePembayaran.string,
-                                                c.totalHarga.toString(),
-                                                c.calculateDiskon.toString(),
-                                                c.statusTr.toString(),
-                                                c.calculateDiskon.toString(),
-                                                c.poinUpdate.toString(),
-                                                fromButton: true,
-                                              );
+                                              for (var produk
+                                                  in c.filteredProduk) {
+                                                print(produk['listDibeli']);
+                                                await c
+                                                    .addAllDetailTransaksiOut(
+                                                        produk['listDibeli']);
+                                              }
+                                              if (c.checkboxSaldo.value ==
+                                                  true) {
+                                                await c.kurangSaldo(
+                                                    c.selectedMember.string,
+                                                    c.saldoUpdate.toString());
+                                              }
                                               await c.tambahPoin(
                                                   c.selectedMember.string,
                                                   c.poinUpdate.toString());
@@ -1239,9 +1403,14 @@ class _KasirPState extends State<KasirP> {
                       children: [
                         KasirW().logout(context),
                         SizedBox(width: 30),
-                        Icon(
-                          FontAwesomeIcons.circleDollarToSlot,
-                          color: PrimaryColor().blue,
+                        GestureDetector(
+                          onTap: () {
+                            Get.toNamed(Routes.TRANSAKSIP);
+                          },
+                          child: Icon(
+                            FontAwesomeIcons.circleDollarToSlot,
+                            color: PrimaryColor().blue,
+                          ),
                         ),
                         SizedBox(
                           width: 30,
