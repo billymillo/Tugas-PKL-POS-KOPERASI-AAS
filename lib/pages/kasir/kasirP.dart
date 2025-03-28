@@ -422,19 +422,22 @@ class _KasirPState extends State<KasirP> {
                                                                 color: Colors
                                                                     .black,
                                                               ),
-                                                              maxLines: 1,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
                                                             ),
                                                           ],
                                                         ),
-                                                        Text(
-                                                          '${c.MemberName}',
-                                                          style: GoogleFonts
-                                                              .nunito(
-                                                            fontSize: 12,
-                                                            color: Colors.black,
+                                                        Expanded(
+                                                          child: Text(
+                                                            '${c.MemberName}',
+                                                            style: GoogleFonts
+                                                                .nunito(
+                                                              fontSize: 12,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                           ),
                                                         ),
                                                       ],
@@ -529,7 +532,7 @@ class _KasirPState extends State<KasirP> {
                                                                       c.checkbox
                                                                               .value =
                                                                           value ??
-                                                                              false; // Update checkbox status
+                                                                              false;
                                                                     });
                                                                   },
                                                                 ),
@@ -585,7 +588,7 @@ class _KasirPState extends State<KasirP> {
                                                                 c.checkboxSaldo
                                                                         .value =
                                                                     value ??
-                                                                        false; // Update checkboxSaldo status
+                                                                        false;
                                                               });
                                                             },
                                                           ),
@@ -894,22 +897,9 @@ class _KasirPState extends State<KasirP> {
                                             c.statusId.value = 2;
                                           }
 
-                                          if (c.banyakDibeli == 0 ||
-                                              c.banyakDibeli == '') {
-                                            Get.snackbar(
-                                              'Error',
-                                              'Produk Tidak Boleh Kosong!',
-                                              backgroundColor:
-                                                  Colors.red.withOpacity(0.8),
-                                              colorText: Colors.white,
-                                              icon: Icon(Icons.error,
-                                                  color: Colors.white),
-                                            );
-                                            return;
-                                          }
-
                                           if (c.statusId.value == 2 &&
-                                              c.banyakDibeli != 0) {
+                                              c.banyakDibeli != 0 &&
+                                              c.selectedMember.value == null) {
                                             Get.snackbar(
                                               'Error',
                                               'Non Member tidak bisa melakukan Kasbon',
@@ -1119,8 +1109,9 @@ class _KasirPState extends State<KasirP> {
                                                                             await c.checkPrinterStatus();
 
                                                                         if (connected) {
-                                                                          await c
-                                                                              .printReceipt("Hello World");
+                                                                          await c.printReceipt(
+                                                                              "Hello World",
+                                                                              "Tunai");
                                                                           await c
                                                                               .disconnectPrinter();
                                                                         } else {
@@ -1132,10 +1123,15 @@ class _KasirPState extends State<KasirP> {
                                                                           connected =
                                                                               await c.checkPrinterStatus();
                                                                           if (connected) {
-                                                                            await c.printReceipt("Hello World");
+                                                                            await c.printReceipt("Hello World",
+                                                                                "Tunai");
                                                                             await c.disconnectPrinter();
                                                                           } else {
                                                                             print("Printer tidak ditemukan atau gagal terhubung.");
+                                                                          }
+                                                                          if (c.statusId.value == 2 &&
+                                                                              c.selectedMember.value != null) {
+                                                                            await c.detKasbon(c.idTransaksiOut.toString());
                                                                           }
                                                                           await c
                                                                               .fetchProduk();
@@ -1145,6 +1141,16 @@ class _KasirPState extends State<KasirP> {
                                                                               null;
                                                                           c.banyakDibeli.value =
                                                                               0;
+                                                                          setState(
+                                                                              () {
+                                                                            c.checkboxSaldo.value =
+                                                                                false;
+                                                                          });
+                                                                          setState(
+                                                                              () {
+                                                                            c.checkbox.value =
+                                                                                false;
+                                                                          });
                                                                           Navigator.pop(
                                                                               context);
                                                                         }
@@ -1188,6 +1194,14 @@ class _KasirPState extends State<KasirP> {
                                                                         ElevatedButton(
                                                                       onPressed:
                                                                           () async {
+                                                                        if (c.statusId.value ==
+                                                                                2 &&
+                                                                            c.selectedMember.value !=
+                                                                                null) {
+                                                                          await c.detKasbon(c
+                                                                              .idTransaksiOut
+                                                                              .toString());
+                                                                        }
                                                                         await c
                                                                             .fetchProduk();
                                                                         await c
@@ -1196,6 +1210,16 @@ class _KasirPState extends State<KasirP> {
                                                                             null;
                                                                         c.banyakDibeli
                                                                             .value = 0;
+                                                                        setState(
+                                                                            () {
+                                                                          c.checkboxSaldo.value =
+                                                                              false;
+                                                                        });
+                                                                        setState(
+                                                                            () {
+                                                                          c.checkbox.value =
+                                                                              false;
+                                                                        });
                                                                         Navigator.pop(
                                                                             context);
                                                                       },
@@ -1245,22 +1269,10 @@ class _KasirPState extends State<KasirP> {
                                         SizedBox(height: 5),
                                         KasirW().tombolQris(
                                           context,
+                                          c.isLoading,
                                           "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.totalHarga.toString()))}",
                                           "00020101021126660014ID.LINKAJA.WWW011893600911000000000802152103124400000080303UMI51440014ID.CO.QRIS.WWW0215ID20210652077750303UMI5204839853033605802ID5922YAY BAKTI KAMAJAYA IND6006SLEMAN61055528162070703A016304FA4D",
                                           () async {
-                                            if (c.banyakDibeli == 0 ||
-                                                c.banyakDibeli == '') {
-                                              Get.snackbar(
-                                                'Error',
-                                                'Produk Tidak Boleh Kosong!',
-                                                backgroundColor:
-                                                    Colors.red.withOpacity(0.8),
-                                                colorText: Colors.white,
-                                                icon: Icon(Icons.error,
-                                                    color: Colors.white),
-                                              );
-                                              return;
-                                            }
                                             if ((double.tryParse(
                                                             c.MemberSaldo) ??
                                                         0) <
@@ -1293,7 +1305,6 @@ class _KasirPState extends State<KasirP> {
                                               );
                                               for (var produk
                                                   in c.filteredProduk) {
-                                                print(produk['listDibeli']);
                                                 await c
                                                     .addAllDetailTransaksiOut(
                                                         produk['listDibeli']);
@@ -1307,8 +1318,7 @@ class _KasirPState extends State<KasirP> {
                                               await c.tambahPoin(
                                                   c.selectedMember.string,
                                                   c.poinUpdate.toString());
-                                              c.selectedMember.value = null;
-                                              c.banyakDibeli.value = 0;
+                                              c.fetchTransaksiStruk();
                                             } catch (e) {
                                               Get.snackbar(
                                                 'Error',
@@ -1320,8 +1330,272 @@ class _KasirPState extends State<KasirP> {
                                                     color: Colors.white),
                                               );
                                             }
-                                            await c.fetchProduk();
-                                            Navigator.pop(context);
+                                            Future.delayed(
+                                              Duration(milliseconds: 200),
+                                              () {
+                                                Navigator.pop(context);
+                                                showDialog(
+                                                  context: context,
+                                                  barrierDismissible: false,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return Dialog(
+                                                      elevation: 0,
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      child:
+                                                          SingleChildScrollView(
+                                                        // Tambahkan scroll
+                                                        child: Container(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.3,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            color: Colors.white,
+                                                          ),
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              Container(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(
+                                                                            20),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius: BorderRadius.only(
+                                                                      topLeft: Radius
+                                                                          .circular(
+                                                                              20),
+                                                                      topRight:
+                                                                          Radius.circular(
+                                                                              20)),
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                                child: Column(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    SizedBox(
+                                                                        height:
+                                                                            20),
+                                                                    Container(
+                                                                      padding:
+                                                                          EdgeInsets.all(
+                                                                              30),
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: Color.fromARGB(
+                                                                            255,
+                                                                            163,
+                                                                            218,
+                                                                            255),
+                                                                        shape: BoxShape
+                                                                            .circle,
+                                                                      ),
+                                                                      child:
+                                                                          Icon(
+                                                                        FontAwesomeIcons
+                                                                            .receipt,
+                                                                        color: Colors
+                                                                            .blue,
+                                                                        size:
+                                                                            60,
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            15),
+                                                                    Text(
+                                                                      'Cetak Struk',
+                                                                      style: GoogleFonts.nunito(
+                                                                          fontWeight: FontWeight.w800,
+                                                                          fontSize: 22, // Lebih responsif
+                                                                          color: Colors.blue),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Container(
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        left:
+                                                                            20,
+                                                                        right:
+                                                                            20,
+                                                                        bottom:
+                                                                            20),
+                                                                child: Column(
+                                                                  children: [
+                                                                    Text(
+                                                                      'Transaksi Anda telah berhasil !. Apakah Anda ingin mencetak struk sebagai bukti transaksi Anda?',
+                                                                      style: GoogleFonts.nunito(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              14,
+                                                                          color: Colors
+                                                                              .grey
+                                                                              .shade600),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                    ),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            20),
+                                                                    Container(
+                                                                      width:
+                                                                          300,
+                                                                      child:
+                                                                          ElevatedButton(
+                                                                        onPressed:
+                                                                            () async {
+                                                                          bool
+                                                                              connected =
+                                                                              await c.checkPrinterStatus();
+
+                                                                          if (connected) {
+                                                                            await c.printReceipt("Hello World",
+                                                                                "Qris");
+                                                                            await c.disconnectPrinter();
+                                                                          } else {
+                                                                            print("Printer belum terhubung, mencari perangkat...");
+                                                                            await c.scanForDevices();
+
+                                                                            connected =
+                                                                                await c.checkPrinterStatus();
+                                                                            if (connected) {
+                                                                              await c.printReceipt("Hello World", "Qris");
+                                                                              await c.disconnectPrinter();
+                                                                            } else {
+                                                                              print("Printer tidak ditemukan atau gagal terhubung.");
+                                                                            }
+                                                                            await c.fetchProduk();
+                                                                            await c.fetchMember();
+                                                                            c.selectedMember.value =
+                                                                                null;
+                                                                            c.banyakDibeli.value =
+                                                                                0;
+                                                                            setState(() {
+                                                                              c.checkboxSaldo.value = false;
+                                                                            });
+                                                                            setState(() {
+                                                                              c.checkbox.value = false;
+                                                                            });
+                                                                            Navigator.pop(context);
+                                                                          }
+                                                                        },
+                                                                        style: ElevatedButton
+                                                                            .styleFrom(
+                                                                          backgroundColor:
+                                                                              PrimaryColor().blue,
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(12),
+                                                                          ),
+                                                                        ),
+                                                                        child:
+                                                                            Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            SizedBox(width: 8),
+                                                                            Text(
+                                                                              'Cetak Struk',
+                                                                              style: TextStyle(
+                                                                                color: Colors.white,
+                                                                                fontSize: 14,
+                                                                                fontWeight: FontWeight.w600,
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        height:
+                                                                            5),
+                                                                    Container(
+                                                                      width:
+                                                                          300,
+                                                                      child:
+                                                                          ElevatedButton(
+                                                                        onPressed:
+                                                                            () async {
+                                                                          await c
+                                                                              .fetchProduk();
+                                                                          await c
+                                                                              .fetchMember();
+                                                                          c.selectedMember.value =
+                                                                              null;
+                                                                          c.banyakDibeli.value =
+                                                                              0;
+                                                                          setState(
+                                                                              () {
+                                                                            c.checkboxSaldo.value =
+                                                                                false;
+                                                                          });
+                                                                          setState(
+                                                                              () {
+                                                                            c.checkbox.value =
+                                                                                false;
+                                                                          });
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                        },
+                                                                        style: ElevatedButton
+                                                                            .styleFrom(
+                                                                          backgroundColor:
+                                                                              PrimaryColor().grey,
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(12),
+                                                                          ),
+                                                                        ),
+                                                                        child:
+                                                                            Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            SizedBox(width: 8),
+                                                                            Text(
+                                                                              'Tidak',
+                                                                              style: TextStyle(
+                                                                                color: Colors.black,
+                                                                                fontSize: 14,
+                                                                                fontWeight: FontWeight.w600,
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            );
                                           },
                                         )
                                       ],

@@ -102,7 +102,6 @@ class ApiService {
     }
   }
 
-
   Future<Map<String, dynamic>> kategori(
       String kategori, File? gambar_kategori) async {
     final url = Uri.parse('$baseUrl/product/kategori');
@@ -332,6 +331,43 @@ class ApiService {
       Uri.parse(url),
       body: {
         'id': id,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteOpname(
+    String id,
+  ) async {
+    final url = '$baseUrl/opname/$id';
+    final response = await http.delete(
+      Uri.parse(url),
+      body: {
+        'id': id,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> editOpname(
+    String id, String stok, String stokAsli, String catatan, String userUpdate) async {
+    final url = '$baseUrl/opname/ubah/$id';
+    final response = await http.put(
+      Uri.parse(url),
+      body: {
+        'id': id,
+        'stok': stok,
+        'stok_asli': stokAsli,
+        'catatan':catatan,
+        'user_update': userUpdate,
       },
     );
     if (response.statusCode == 200) {

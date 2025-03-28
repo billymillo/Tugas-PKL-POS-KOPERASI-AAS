@@ -24,6 +24,8 @@ class AddPageController extends GetxController {
   var isPickingImageK = false.obs;
 
   RxBool showMitra = true.obs;
+  RxBool jumlahPcsPack = true.obs;
+  RxBool hargaPack = true.obs;
   var isLoading = false.obs;
   var produk = <Map<String, dynamic>>[].obs;
   var tipe = <Map<String, dynamic>>[].obs;

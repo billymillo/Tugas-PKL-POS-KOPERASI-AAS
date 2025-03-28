@@ -399,9 +399,15 @@ class _AddProductPState extends State<AddProductP> {
                                     addController.selectedTipe.value = newValue;
                                     if (newValue == '1') {
                                       addController.showMitra.value = false;
+                                      addController.jumlahPcsPack.value = false;
+                                      addController.hargaPack.value = false;
                                       addController.selectedMitra.value = null;
+                                      hargaPackProdukController.text = '';
+                                      jumlahIsiProdukController.text = '';
                                     } else {
                                       addController.showMitra.value = true;
+                                      addController.jumlahPcsPack.value = true;
+                                      addController.hargaPack.value = true;
                                     }
                                   },
                                   key: 'tipe',
@@ -539,8 +545,7 @@ class _AddProductPState extends State<AddProductP> {
                     SizedBox(height: 10),
                     Obx(() {
                       return Visibility(
-                        visible: addController.showMitra
-                            .value, // Menyembunyikan dropdown mitra berdasarkan selectedTipe
+                        visible: addController.showMitra.value,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -770,34 +775,44 @@ class _AddProductPState extends State<AddProductP> {
                     Row(
                       children: [
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              buildInputLabel('Harga Pack', " *"),
-                              buildTextField(
-                                inputFormat: RupiahFormaters(),
-                                controller: hargaPackProdukController,
-                                hintText: 'Rp 0',
-                                prefixIcon: FontAwesomeIcons.moneyBill1Wave,
-                                type: TextInputType.number,
+                          child: Obx(
+                            () => Visibility(
+                              visible: addController.hargaPack.value,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  buildInputLabel('Harga Pack', " *"),
+                                  buildTextField(
+                                    inputFormat: RupiahFormaters(),
+                                    controller: hargaPackProdukController,
+                                    hintText: 'Rp 0',
+                                    prefixIcon: FontAwesomeIcons.moneyBill1Wave,
+                                    type: TextInputType.number,
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                         SizedBox(width: 16),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              buildInputLabel('Jumlah Isi Per-pack', " *"),
-                              buildTextField(
-                                inputFormat: RupiahFormaters(),
-                                controller: jumlahIsiProdukController,
-                                hintText: '0 pcs',
-                                prefixIcon: Icons.inventory_2_outlined,
-                                type: TextInputType.number,
+                          child: Obx(
+                            () => Visibility(
+                              visible: addController.jumlahPcsPack.value,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  buildInputLabel('Jumlah Isi Per-pack', " *"),
+                                  buildTextField(
+                                    inputFormat: RupiahFormaters(),
+                                    controller: jumlahIsiProdukController,
+                                    hintText: '0 pcs',
+                                    prefixIcon: Icons.inventory_2_outlined,
+                                    type: TextInputType.number,
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ],

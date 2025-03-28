@@ -467,8 +467,8 @@ class KasirW {
     );
   }
 
-  GestureDetector tombolQris(
-      BuildContext context, String harga, String qrisData, VoidCallback onTap) {
+  GestureDetector tombolQris(BuildContext context, RxBool isLoading,
+      String harga, String qrisData, VoidCallback onTap) {
     return GestureDetector(
       child: Container(
         decoration: BoxDecoration(
@@ -495,6 +495,17 @@ class KasirW {
         ),
       ),
       onTap: () {
+        KasirC c = Get.put(KasirC());
+        if (c.banyakDibeli == 0 || c.banyakDibeli == '') {
+          Get.snackbar(
+            'Error',
+            'Produk Tidak Boleh Kosong!',
+            backgroundColor: Colors.red.withOpacity(0.8),
+            colorText: Colors.white,
+            icon: Icon(Icons.error, color: Colors.white),
+          );
+          return;
+        }
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -542,33 +553,47 @@ class KasirW {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      'Total Pembayaran : Rp. $harga',
+                      'Total Pembayaran : $harga',
                       style: GoogleFonts.nunito(
                           fontSize: 13, color: Colors.grey.shade600),
                     ),
                     SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: onTap,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: PrimaryColor().blue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Selesaikan Pembayaran',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                    Obx(() => Container(
+                          width: 300,
+                          child: ElevatedButton(
+                            onPressed: isLoading.value ? null : onTap,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: PrimaryColor().blue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
+                            child: isLoading.value
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5),
+                                        child: SizedBox(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Text(
+                                    'Selesaikan Pembayaran',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                           ),
-                        ],
-                      ),
-                    ),
+                        )),
                   ],
                 ),
               ),
@@ -615,6 +640,7 @@ class KasirW {
         ),
       ),
       onTap: () {
+        KasirC c = Get.put(KasirC());
         saldoController.text = harga;
         RxDouble nominalBayar =
             RxDouble(double.tryParse(saldoController.text) ?? 0);
@@ -625,6 +651,17 @@ class KasirW {
           nominalBayar.value = double.tryParse(saldoController.text) ?? 0;
           kembalian.value = nominalBayar.value - double.parse(harga.toString());
         });
+
+        if (c.banyakDibeli == 0 || c.banyakDibeli == '') {
+          Get.snackbar(
+            'Error',
+            'Produk Tidak Boleh Kosong!',
+            backgroundColor: Colors.red.withOpacity(0.8),
+            colorText: Colors.white,
+            icon: Icon(Icons.error, color: Colors.white),
+          );
+          return;
+        }
 
         showDialog(
           context: context,

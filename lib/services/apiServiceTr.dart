@@ -88,6 +88,24 @@ class ApiServiceTr {
     }
   }
 
+  Future<Map<String, dynamic>> tambahStok(
+      String id, String stok, String userUpdate) async {
+    final url = '$baseUrlTr/product/tambah';
+    final response = await http.put(
+      Uri.parse(url),
+      body: {
+        'id': id,
+        'stok': stok,
+        'user_update': userUpdate,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
   Future<Map<String, dynamic>> gunakanSaldo(String id, String saldo) async {
     final url = '$baseUrlTr/member/$id';
     final response = await http.put(
@@ -202,7 +220,7 @@ class ApiServiceTr {
         'id': id,
       },
     );
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
       return jsonDecode(response.body);
@@ -213,6 +231,7 @@ class ApiServiceTr {
     String idMember,
     String totalKasbon,
     String statusKasbon,
+    String userInput,
   ) async {
     final url = '$baseUrlTr/kasbon';
 
@@ -223,6 +242,7 @@ class ApiServiceTr {
           'id_member': idMember,
           'total_kasbon': totalKasbon,
           'id_status': statusKasbon,
+          'user_input': userInput,
         },
       );
 
@@ -236,6 +256,102 @@ class ApiServiceTr {
       }
     } catch (e) {
       return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> detKasbon(
+    String idTransaksi,
+    String userInput,
+  ) async {
+    final url = '$baseUrlTr/kasbon/detail';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id_transaksi_out': idTransaksi,
+          'user_input': userInput,
+        },
+      );
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> pemKasbon(
+    String idKasbon,
+    String totalBayar,
+    String userUpdate,
+  ) async {
+    final url = '$baseUrlTr/kasbon/pembayaran';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id_kasbon': idKasbon,
+          'total_bayar': totalBayar,
+          'user_update': userUpdate,
+        },
+      );
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> lunasKasbon(
+    String id,
+    String totalKasbon,
+    String statusTr,
+    String userUpdate,
+  ) async {
+    final url = '$baseUrlTr/transaksi_out/';
+      final response = await http.put(
+        Uri.parse(url),
+        body: {
+          'id' : id,
+          'total_transaksi': totalKasbon,
+          'status_transaksi': statusTr,
+          'user_update': userUpdate,
+        },
+      );
+      if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteKasbon(
+    String id,
+    String userUpdate
+  ) async {
+    final url = '$baseUrlTr/kasbon';
+    final response = await http.delete(
+      Uri.parse(url), 
+      body: {
+        'id': id,
+        'user_update': userUpdate,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
     }
   }
 
@@ -260,6 +376,172 @@ class ApiServiceTr {
         },
       );
 
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> addDetTransaksiIn(
+    String idProduk,
+    String jumlah,
+    String hargaSatuan,
+    String hargaJual,
+    String userInput,
+  ) async {
+    final url = '$baseUrlTr/transaksi_in/detail';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id_produk': idProduk,
+          'jumlah': jumlah,
+          'harga_satuan': hargaSatuan,
+          'harga_jual': hargaJual,
+          'user_input': userInput,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> addDetTransaksiMitra(
+    String idProduk,
+    String jumlah,
+    String hargaSatuan,
+    String hargaJual,
+    String userInput,
+  ) async {
+    final url = '$baseUrlTr/transaksi_mitra/detail';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id_produk': idProduk,
+          'jumlah': jumlah,
+          'harga_satuan': hargaSatuan,
+          'harga_jual': hargaJual,
+          'user_input': userInput,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+
+  static Future<Map<String, dynamic>> addTransaksiIn(
+    String jumlah,
+    String total,
+    String userInput,
+  ) async {
+    final url = '$baseUrlTr/transaksi_in/';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'jumlah_produk': jumlah,
+          'total_transaksi': total,
+          'user_input': userInput,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> addTransaksiInMitra(
+    String mitra,
+    String jumlah,
+    String total,
+    String status,
+    String userInput,
+  ) async {
+    final url = '$baseUrlTr/transaksi_mitra/';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id_mitra' : mitra,
+          'jumlah_produk': jumlah,
+          'total_transaksi': total,
+          'status_transaksi' : status,
+          'user_input': userInput,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+
+  Future<Map<String, dynamic>> duplikatProduk(
+    String idProduk,
+    String stok,
+    String hargaSatuan,
+    String hargaJual,
+    String userUpdate,
+  ) async {
+    final url = '$baseUrlTr/product/duplicate';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id': idProduk,
+          'stok': stok,
+          'harga_satuan': hargaSatuan,
+          'harga_jual': hargaJual,
+          'user_update': userUpdate,
+        },
+      );
+
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
@@ -272,4 +554,26 @@ class ApiServiceTr {
       return {'status': false, 'message': 'Request failed: $e'};
     }
   }
+
+  Future<Map<String, dynamic>> editProduk(
+    String id, String stok, String hargaSatuan, String hargaJual, String userUpdate) async {
+    final url = '$baseUrlTr/product/ubah/$id';
+    final response = await http.put(
+      Uri.parse(url),
+      body: {
+        'id': id,
+        'stok': stok,
+        'harga_satuan': hargaSatuan,
+        'harga_jual':hargaJual,
+        'user_update': userUpdate,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+
 }

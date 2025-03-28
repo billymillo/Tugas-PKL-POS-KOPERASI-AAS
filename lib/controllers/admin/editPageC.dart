@@ -132,13 +132,12 @@ class EditPageController extends GetxController {
 
     isLoading.value = true;
 
-    // Tampilkan loading overlay
     Get.dialog(
       Center(
           child: CircularProgressIndicator(
         color: PrimaryColor().blue,
       )),
-      barrierDismissible: false, // Agar user tidak bisa menutup loading manual
+      barrierDismissible: false,
     );
 
     try {

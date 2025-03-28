@@ -114,23 +114,6 @@ Widget buildDrawer(BuildContext context) {
                   Get.toNamed(Routes.TIPEP);
                 },
               ),
-              ListTile(
-                leading: Icon(
-                  FontAwesomeIcons.creditCard,
-                  color: DarkColor().grey,
-                  size: 20,
-                ),
-                title: Text(
-                  "Metode Pembayaran",
-                  style: TextStyle(
-                    color: DarkColor().grey,
-                    fontSize: 17,
-                  ),
-                ),
-                onTap: () {
-                  Get.toNamed(Routes.METODEP);
-                },
-              ),
             ],
             collapsedShape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -154,7 +137,7 @@ Widget buildDrawer(BuildContext context) {
             ),
           ),
           onTap: () {
-            Navigator.pop(context);
+            Get.toNamed(Routes.OPNAMEP);
           },
         ),
         Container(
@@ -173,14 +156,14 @@ Widget buildDrawer(BuildContext context) {
                   size: 20,
                 ),
                 title: Text(
-                  "Transaksi Masuk",
+                  "Transaksi In",
                   style: TextStyle(
                     color: DarkColor().grey,
                     fontSize: 17,
                   ),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
+                  Get.toNamed(Routes.TRANSAKSIINP);
                 },
               ),
               ListTile(
@@ -190,14 +173,14 @@ Widget buildDrawer(BuildContext context) {
                   size: 20,
                 ),
                 title: Text(
-                  "Transaksi Keluar",
+                  "Transaksi In Mitra",
                   style: TextStyle(
                     color: DarkColor().grey,
                     fontSize: 17,
                   ),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
+                  Get.toNamed(Routes.TRANSAKSIINMITRAP);
                 },
               ),
             ],
@@ -239,6 +222,23 @@ Widget buildDrawer(BuildContext context) {
           ),
           onTap: () {
             Get.toNamed(Routes.MEMBERP);
+          },
+        ),
+        ListTile(
+          leading: Icon(
+            FontAwesomeIcons.gear,
+            color: DarkColor().grey,
+            size: 20,
+          ),
+          title: Text(
+            "Settings",
+            style: TextStyle(
+              color: DarkColor().grey,
+              fontSize: 17,
+            ),
+          ),
+          onTap: () {
+            Get.toNamed(Routes.METODEP);
           },
         ),
       ],

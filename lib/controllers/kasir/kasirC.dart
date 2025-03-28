@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:bluetooth_thermal_printer_example/controllers/admin/libraryC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/pages/admin/memberP.dart';
 import 'package:bluetooth_thermal_printer_example/services/apiService.dart';
 import 'package:bluetooth_thermal_printer_example/services/apiServiceTr.dart';
 
@@ -25,6 +26,7 @@ class KasirC extends GetxController {
   RxList<dynamic> selectedVarian = [].obs;
   RxInt banyakDibeli = 0.obs;
   RxString searchQuery = ''.obs;
+  String? idTransaksiOut;
   String? noTransaksi;
   String? diskonStruk;
   String? bayarTransaksi;
@@ -45,15 +47,6 @@ class KasirC extends GetxController {
   var struk = <Map<String, dynamic>>[].obs;
   var selectedMember = Rxn<String>();
   var filteredMembers = <Map<String, dynamic>>[].obs;
-
-  var transaksiLunas = <Map<String, dynamic>>[].obs;
-  var transaksiKasbon = <Map<String, dynamic>>[].obs;
-  var isLoadingLunas = false.obs;
-  var isLoadingKasbon = false.obs;
-  var isLastPageLunas = false.obs;
-  var pageLunas = 1.obs;
-  final int limitLunas = 10;
-  final int limitKasbon = 100;
 
   var status = <Map<String, dynamic>>[].obs;
   RxBool checkbox = false.obs;
@@ -146,7 +139,7 @@ class KasirC extends GetxController {
   String get MemberName {
     var selected = member.firstWhere(
       (m) => m['id'] == selectedMember.value,
-      orElse: () => {'nama': 'Tidak Ada'},
+      orElse: () => {'nama': 'Non Member'},
     );
     return selected['nama'] ?? 0;
   }
@@ -187,11 +180,7 @@ class KasirC extends GetxController {
     fetchProduk();
     fetchKategori();
     fetchMember();
-    fetchTransaksiLunas();
-    fetchDetailTransaksiOut(transaksiId.toString());
     fetchTransaksiStruk();
-    fetchTransaksiKasbon();
-    loadMoreTransaksiLunas();
 
     if (listProduk.isEmpty || filteredProduk.isEmpty) {
       setData2();
@@ -215,7 +204,10 @@ class KasirC extends GetxController {
   void searchProduk(String query) {
     searchQuery.value = query;
     filteredProduk.assignAll(listProduk.where((produk) {
-      return produk['nama'].toLowerCase().contains(query.toLowerCase());
+      return produk['nama'].toLowerCase().contains(query.toLowerCase()) ||
+          produk['kategori_name'].toString().toLowerCase().contains(query.toLowerCase()) ||
+          produk['tipe_name'].toString().toLowerCase().contains(query.toLowerCase()) ||
+          produk['mitra_name'].toString().toLowerCase().contains(query.toLowerCase());
     }).toList());
   }
 
@@ -378,15 +370,9 @@ class KasirC extends GetxController {
       filteredMembers.assignAll(originalMemberList.where((member) {
         final nama = member['nama'].toString().toLowerCase();
         final id = member['id'].toString().toLowerCase();
-        final kategori = member['kategori_name'].toString().toLowerCase();
-        final tipe = member['tipe_name'].toString().toLowerCase();
-        final mitra = member['mitra_name'].toString().toLowerCase();
 
         return nama.contains(query.toLowerCase()) ||
-            id.contains(query.toLowerCase()) ||
-            kategori.contains(query.toLowerCase()) ||
-            tipe.contains(query.toLowerCase()) ||
-            mitra.contains(query.toLowerCase());
+            id.contains(query.toLowerCase());
       }).toList());
     }
   }
@@ -472,6 +458,7 @@ class KasirC extends GetxController {
       );
     } finally {
       isLoading.value = false;
+      checkboxSaldo.value = false;
     }
   }
 
@@ -583,61 +570,6 @@ class KasirC extends GetxController {
     }
   }
 
-  Future<void> fetchTransaksiLunas() async {
-    try {
-      isLoadingLunas(true);
-      var response = await http.get(
-          Uri.parse('$urlTr/transaksi_out?page=$pageLunas&limit=$limitLunas'));
-      if (response.statusCode == 200) {
-        var jsonData = json.decode(response.body);
-        if (jsonData['status'] == true) {
-          var filteredData = jsonData['data']
-              .where((item) => item['status_transaksi'].toString() == '1')
-              .toList();
-          transaksiLunas.value = List<Map<String, dynamic>>.from(filteredData);
-        }
-      }
-    } catch (e) {
-      print('Error: $e');
-    } finally {
-      isLoadingLunas(false);
-    }
-  }
-
-  Future<void> fetchTransaksiKasbon() async {
-    try {
-      isLoadingKasbon(true);
-      var response = await http
-          .get(Uri.parse('$urlTr/transaksi_out?page=1&limit=$limitKasbon'));
-      if (response.statusCode == 200) {
-        var jsonData = json.decode(response.body);
-        if (jsonData['status'] == true) {
-          var filteredData = jsonData['data']
-              .where((item) => item['status_transaksi'].toString() == '2')
-              .toList();
-
-          transaksiKasbon.value = List<Map<String, dynamic>>.from(filteredData);
-        }
-      }
-    } catch (e) {
-      print('Error: $e');
-    } finally {
-      isLoadingKasbon(false);
-    }
-  }
-
-  Future<void> loadMoreTransaksiLunas() async {
-    if (isLoadingLunas.value || isLastPageLunas.value) return;
-    pageLunas.value++;
-    await fetchTransaksiLunas();
-  }
-
-  void resetPageLunas() {
-    pageLunas.value = 1;
-    isLastPageLunas.value = false;
-    fetchTransaksiLunas();
-  }
-
   Future<void> fetchTransaksiStruk() async {
     try {
       isLoading.value = true;
@@ -647,11 +579,11 @@ class KasirC extends GetxController {
         if (jsonData['status'] == true) {
           var transaksiData = jsonData['data'];
           // Ambil nilai yang diinginkan
+          idTransaksiOut = transaksiData['id'] ?? 'Tidak ada';
+          print('ID TRANSAKSI!' + ' $idTransaksiOut');
           noTransaksi = transaksiData['no_transaksi_out'] ?? 'Tidak ada';
           diskonStruk = transaksiData['diskon'] ?? '0';
           bayarTransaksi = transaksiData['total_transaksi'] ?? '0';
-          print('No Transaksi: $noTransaksi');
-          print('Total Transaksi: $bayarTransaksi');
         } else {
           throw Exception('Failed to load data');
         }
@@ -665,39 +597,21 @@ class KasirC extends GetxController {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchDetailTransaksiOut(String id) async {
-    try {
-      var response =
-          await http.get(Uri.parse('$urlTr/transaksi_out/detail?id=$id'));
-
-      if (response.statusCode == 200) {
-        var jsonData = json.decode(response.body);
-        if (jsonData['status'] == true) {
-          return List<Map<String, dynamic>>.from(jsonData['data']);
-        } else {
-          throw Exception('Gagal mengambil detail transaksi');
-        }
-      } else {
-        throw Exception('Gagal load data detail');
-      }
-    } catch (e) {
-      print('Error: $e');
-      return [];
-    }
-  }
-
   Future<void> kasbonMember(
     String idMember,
     String totalKasbon,
     String statusKasbon,
   ) async {
     isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    String? userInput = prefs.getString('name') ?? 'system';
+    final response = await ApiServiceTr.kasbonMember(
+      idMember,
+      totalKasbon,
+      statusKasbon,
+      userInput,
+    );
     try {
-      final response = await ApiServiceTr.kasbonMember(
-        idMember,
-        totalKasbon,
-        statusKasbon,
-      );
       if (response['status'] == true) {
         Get.snackbar(
           'Berhasil',
@@ -714,6 +628,36 @@ class KasirC extends GetxController {
           colorText: Colors.white,
           icon: Icon(Icons.error, color: Colors.white),
         );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Gagal',
+        e.toString(),
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> detKasbon(
+    String idTransaksi,
+  ) async {
+    isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    String? userInput = prefs.getString('name') ?? 'system';
+    try {
+      final response = await ApiServiceTr.detKasbon(
+        idTransaksi,
+        userInput,
+      );
+      if (response['status'] == true) {
+        print('HASIL' + ' $response');
+      } else if (response['status'] == false) {
+        print('HASIL' + ' $response');
       }
     } catch (e) {
       print(e);
@@ -831,14 +775,15 @@ class KasirC extends GetxController {
   }
 
   // Untuk mencetak teks
-  Future<void> printReceipt(String text) async {
+  Future<void> printReceipt(String text, String metode) async {
     if ((await printer.isConnected)!) {
       printer.printNewLine();
       String formattedDate =
           DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
       final prefs = await SharedPreferences.getInstance();
       String? userInput = prefs.getString('name') ?? 'system';
-      // Harus kayak manggil di Page
+      String? member = MemberName;
+      String poinMember = MemberPoin.toString();
       String totalHargaSt = NumberFormat('#,##0', 'id_ID')
           .format(double.parse(totalHarga.toString()));
 
@@ -852,6 +797,7 @@ class KasirC extends GetxController {
 
       String diskonRupiah = NumberFormat('#,##0', 'id_ID')
           .format(double.parse(diskonStruk.toString()));
+
       // Header - Nama Toko
       printer.printCustom("Koperasi", 2, 1);
       printer.printCustom("Artha Abadi", 2, 1);
@@ -867,7 +813,7 @@ class KasirC extends GetxController {
       printer.printLeftRight("Kasir", userInput.toString(), 0);
       printer.printLeftRight("No. Transaksi", noTransaksi ?? "Tidak ada", 0);
       printer.printCustom("--------------------------------", 0, 1);
-      printer.printLeftRight("Nama Produk", "Keterangan", 0);
+      printer.printLeftRight("Nama Produk", "Harga", 0);
       printer.printCustom("--------------------------------", 0, 1);
       // Loop here
       Set<String> displayedProducts = {};
@@ -910,13 +856,19 @@ class KasirC extends GetxController {
       printer.printLeftRight("Diskon", diskonRupiah ?? "null", 0);
       printer.printLeftRight("Total", totalHargaSt.toString(), 0);
       // Nanti diambil setelah Transaksi selesai dikirim
-      printer.printLeftRight("Bayar (Tunai)", totalBayar ?? "0", 0);
+      printer.printLeftRight("Bayar ($metode)", totalBayar ?? "0", 0);
       // Nanti diambil setelah Transaksi selesai dikirim
       printer.printLeftRight("Kembalian", kembalianSt, 0);
       printer.printCustom("--------------------------------", 0, 1);
 
+      printer.printLeftRight(
+          "Nama Member", member.toString() ?? "Non Member", 0);
+      printer.printLeftRight(
+          "Poin Member", poinMember.toString() ?? "Non Member", 0);
+      printer.printCustom("--------------------------------", 0, 1);
+
       // Pesan Penutup
-      printer.printCustom("Terima Kasih!", 1, 1);
+      printer.printCustom("Terima Kasih!", 0, 1);
       printer.printCustom("Selamat Berbelanja Kembali", 0, 1);
 
       // Potong Kertas

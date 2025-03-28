@@ -1,6 +1,4 @@
 import 'package:bluetooth_thermal_printer_example/controllers/admin/productC.dart';
-import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
-import 'package:bluetooth_thermal_printer_example/pages/admin/productP.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,9 +14,9 @@ class DetailProdukP extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.grey[800]),
-            onPressed: () => Get.back(),
-          ),
+          icon: Icon(Icons.arrow_back, color: Colors.grey[800]),
+          onPressed: () => Get.back(),
+        ),
         title: Center(
           child: Padding(
             padding: const EdgeInsets.only(right: 70),
@@ -335,116 +333,6 @@ class DetailProdukP extends StatelessWidget {
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               textAlign: TextAlign.right,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData prefixIcon,
-    required TextInputType type,
-    required TextInputFormatter inputFormat,
-    required String label,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade500,
-          ),
-          textAlign: TextAlign.start,
-        ),
-        SizedBox(height: 5),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.grey.shade50,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: TextField(
-            inputFormatters: [inputFormat],
-            keyboardType: type,
-            controller: controller,
-            cursorColor: PrimaryColor().blue,
-            style: TextStyle(fontSize: 14),
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                prefixIcon,
-                color: Colors.grey.shade600,
-                size: 20,
-              ),
-              hintText: hintText,
-              hintStyle: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade400,
-              ),
-              border: InputBorder.none,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildDropdown({
-    required Rxn<String> selectedValue,
-    required String label,
-    required List<Map<String, dynamic>> items,
-    required ValueChanged<String?> onChanged,
-    required String key,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: label,
-                border: InputBorder.none,
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              ),
-              value: selectedValue.value,
-              icon: SizedBox.shrink(),
-              style: TextStyle(fontSize: 14, color: Colors.black87),
-              onChanged: (newValue) {
-                selectedValue.value = newValue;
-                onChanged(newValue);
-              },
-              items: items.map<DropdownMenuItem<String>>((item) {
-                return DropdownMenuItem<String>(
-                  value: item['id'].toString(),
-                  child: SizedBox(
-                    width: double.infinity, // Menghindari overflow
-                    child: Text(
-                      item[key] ?? 'No Name',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Icon(Icons.keyboard_arrow_down,
-                color: Colors.grey.shade600, size: 20),
           ),
         ],
       ),
