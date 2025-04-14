@@ -98,7 +98,10 @@ class _EditProductPState extends State<EditProductP> {
             padding: const EdgeInsets.only(right: 70),
             child: Text(
               'Edit Produk',
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black),
             ),
           ),
         ),

@@ -226,7 +226,7 @@ class DashboardAdminP extends StatelessWidget {
                                           spots: [
                                             FlSpot(0, 1),
                                             FlSpot(1, 3),
-                                            FlSpot(2, 2),
+                                            FlSpot(2, 1.5),
                                             FlSpot(3, 1.5),
                                             FlSpot(4, 4),
                                           ],
@@ -367,9 +367,9 @@ class DashboardAdminP extends StatelessWidget {
                                     PieChartData(
                                       sections: [
                                         PieChartSectionData(
-                                          value: 33,
+                                          value: 50,
                                           color: PrimaryColor().blue,
-                                          title: '33%',
+                                          title: '50%',
                                           radius: 30,
                                           titleStyle: TextStyle(
                                               fontSize: 16,
@@ -377,7 +377,7 @@ class DashboardAdminP extends StatelessWidget {
                                               color: Colors.white),
                                         ),
                                         PieChartSectionData(
-                                          value: 67,
+                                          value: 50,
                                           color: PrimaryColor().black,
                                           radius: 30,
                                         ),

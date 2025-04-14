@@ -646,7 +646,6 @@ class KasirW {
             RxDouble(double.tryParse(saldoController.text) ?? 0);
         RxDouble kembalian =
             RxDouble(nominalBayar.value - double.parse(harga.toString()));
-
         saldoController.addListener(() {
           nominalBayar.value = double.tryParse(saldoController.text) ?? 0;
           kembalian.value = nominalBayar.value - double.parse(harga.toString());

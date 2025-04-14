@@ -140,6 +140,11 @@ class TransaksiInMitraP extends StatelessWidget {
                                                                               14,
                                                                           color:
                                                                               PrimaryColor().blue),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
                                                                     )),
                                                           Icon(
                                                             Icons.handshake,
@@ -303,12 +308,16 @@ class TransaksiInMitraP extends StatelessWidget {
                                                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                     children: [
                                                                                       Text(
-                                                                                        produk['nama_barang'] + ' (${produk['mitra_name']})',
+                                                                                        produk['nama_barang'].toString(),
                                                                                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+                                                                                        overflow: TextOverflow.ellipsis,
+                                                                                        maxLines: 1,
                                                                                       ),
                                                                                       Text(
                                                                                         "${produk['stok']} pcs",
                                                                                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                                                                        overflow: TextOverflow.ellipsis,
+                                                                                        maxLines: 1,
                                                                                       ),
                                                                                     ],
                                                                                   ),
@@ -724,11 +733,13 @@ Widget buildCardTransaksi(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        name + ' ($mitra pcs)',
+                        name + ' ($mitra)',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                       Text(
                         noTransaksi,

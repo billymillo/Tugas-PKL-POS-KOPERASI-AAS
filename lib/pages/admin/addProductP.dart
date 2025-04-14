@@ -777,7 +777,7 @@ class _AddProductPState extends State<AddProductP> {
                         Expanded(
                           child: Obx(
                             () => Visibility(
-                              visible: addController.hargaPack.value,
+                              visible: addController.hargaPack.value == false,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -798,7 +798,7 @@ class _AddProductPState extends State<AddProductP> {
                         Expanded(
                           child: Obx(
                             () => Visibility(
-                              visible: addController.jumlahPcsPack.value,
+                              visible: addController.jumlahPcsPack.value == false,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [

@@ -124,20 +124,10 @@ class ProductController extends GetxController {
         id,
       );
       if (response['status'] == true) {
-        Get.snackbar(
-          'Success',
-          response['message'],
-          backgroundColor: Colors.green.withOpacity(0.5),
-          icon: Icon(Icons.check_circle, color: Colors.white),
-        );
+        print("Delete Berhasil" + response['message']);
         Get.toNamed(Routes.PRODUCTP);
       } else {
-        Get.snackbar(
-          'Error',
-          '${response['message']}',
-          backgroundColor: Colors.red.withOpacity(0.5),
-          icon: Icon(Icons.error, color: Colors.white),
-        );
+        print("Gagal" + response['message']);
       }
     } catch (e) {
       print(e);

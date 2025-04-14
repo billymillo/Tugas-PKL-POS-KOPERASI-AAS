@@ -1,3 +1,4 @@
+import 'package:bluetooth_thermal_printer_example/pages/admin/OpNameDet.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/TipeP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/addProductP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/dashboardAdminP.dart';
@@ -96,6 +97,10 @@ class AppPages {
     GetPage(
       name: _Paths.OPNAMEP,
       page: () => OpNamePage(),
+    ),
+    GetPage(
+      name: _Paths.OPNAMEDET,
+      page: () => OpNameDet(),
     ),
   ];
 }

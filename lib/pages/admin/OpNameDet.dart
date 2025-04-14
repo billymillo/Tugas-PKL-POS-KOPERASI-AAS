@@ -1,0 +1,1097 @@
+import 'package:bluetooth_thermal_printer_example/controllers/admin/OpNameC.dart';
+import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+
+class OpNameDet extends StatelessWidget {
+  final OpNameController controller = Get.put(OpNameController());
+  final currencyFormat =
+      NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.grey[800]),
+          onPressed: () => Get.back(),
+        ),
+        title: Text(
+          'Opname Detail',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 1,
+      ),
+      body: Container(
+        padding: EdgeInsets.all(16),
+        color: Color(0xFFF3F4F6),
+        alignment: Alignment.topCenter,
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 1000),
+            child: Card(
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      final idOpname = Get.arguments != null
+                          ? Get.arguments['id_opname']?.toString() ?? ''
+                          : '';
+                      return Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        color: Colors.white,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SingleChildScrollView(
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 1.25,
+                              child: DataTable(
+                                headingRowColor: MaterialStateProperty.all(
+                                    Color(0xFFF9FAFB)),
+                                headingTextStyle: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF4B5563),
+                                  fontSize: 14,
+                                ),
+                                dataTextStyle: TextStyle(
+                                  color: Color(0xFF111827),
+                                  fontSize: 14,
+                                ),
+                                columnSpacing: 20,
+                                horizontalMargin: 9,
+                                dividerThickness: 1,
+                                headingRowHeight: 48,
+                                columns: [
+                                  DataColumn(label: Text('No')),
+                                  DataColumn(
+                                      label: Text('Produk',
+                                          overflow: TextOverflow.ellipsis)),
+                                  DataColumn(
+                                      label: Text('Stok',
+                                          overflow: TextOverflow.ellipsis)),
+                                  DataColumn(
+                                      label: Text('Stok Asli',
+                                          overflow: TextOverflow.ellipsis)),
+                                  DataColumn(
+                                      label: Text('Harga Satuan',
+                                          overflow: TextOverflow.ellipsis)),
+                                  DataColumn(
+                                      label: Text('Harga Jual',
+                                          overflow: TextOverflow.ellipsis)),
+                                  DataColumn(
+                                      label: Text('Aksi',
+                                          overflow: TextOverflow.ellipsis)),
+                                  DataColumn(label: Text('')),
+                                ],
+                                rows: controller.paginatedProduk
+                                    .asMap()
+                                    .entries
+                                    .map((entry) {
+                                  final index = entry.key;
+                                  final realIndex = entry.key +
+                                      controller.currentPage.value *
+                                          controller.itemsPerPage;
+                                  final produkItem = entry.value;
+                                  final opnameItem =
+                                      controller.opnameDet.firstWhere(
+                                    (item) =>
+                                        item['id_produk'].toString() ==
+                                            produkItem['id'].toString() &&
+                                        item['id_opname'].toString() ==
+                                            idOpname,
+                                    orElse: () => {},
+                                  );
+
+                                  final product = {
+                                    'stok': opnameItem['stok'] ??
+                                        produkItem['stok'],
+                                    'stok_asli': opnameItem['stok_asli'] ??
+                                        produkItem['stok_asli'],
+                                    'harga_satuan':
+                                        opnameItem['harga_satuan'] ??
+                                            produkItem['harga_satuan'],
+                                    'harga_jual': opnameItem['harga_jual'] ??
+                                        produkItem['harga_jual'],
+                                    'isEdit': produkItem['isEdit'],
+                                    'checked': produkItem['checked'],
+                                    'hasBeenSaved': opnameItem.isNotEmpty,
+                                  };
+
+                                  final isEdit = product['isEdit'] ?? false;
+                                  final isChecked = product['checked'] ?? false;
+
+                                  return DataRow(
+                                    color: index % 2 == 0
+                                        ? null
+                                        : MaterialStateProperty.all(
+                                            Color(0xFFF6F9FC)),
+                                    cells: [
+                                      DataCell(SizedBox(
+                                        width: 20,
+                                        child: Text(
+                                          '${realIndex + 1}', // Ini akan menampilkan nomor urut
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      )),
+                                      DataCell(SizedBox(
+                                        width: 150,
+                                        child: Text(
+                                          produkItem['nama_barang'] ?? '',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      )),
+                                      DataCell(product['hasBeenSaved'] == true
+                                          ? SizedBox(
+                                              width: 70,
+                                              child: Text(
+                                                  product['stok'].toString() +
+                                                      ' pcs'),
+                                            )
+                                          : buildTextField(
+                                              product['stok']?.toString() ?? '',
+                                              (val) =>
+                                                  produkItem['stok_input'] =
+                                                      int.tryParse(val) ?? 0,
+                                            )),
+                                      DataCell(product['hasBeenSaved'] == true
+                                          ? Text(
+                                              product['stok_asli'].toString() +
+                                                  ' pcs')
+                                          : buildTextField(
+                                              product['stok_asli']
+                                                      ?.toString() ??
+                                                  '',
+                                              (val) => produkItem[
+                                                      'stok_asli_input'] =
+                                                  int.tryParse(val) ?? 0,
+                                            )),
+                                      DataCell(product['hasBeenSaved'] == true
+                                          ? Text(currencyFormat.format(
+                                              int.tryParse(
+                                                      product['harga_satuan']
+                                                          .toString()) ??
+                                                  0))
+                                          : buildTextField(
+                                              product['harga_satuan']
+                                                  .toString(),
+                                              (val) => produkItem[
+                                                      'harga_satuan_input'] =
+                                                  int.tryParse(val) ?? 0,
+                                            )),
+                                      DataCell(product['hasBeenSaved'] == true
+                                          ? Text(currencyFormat.format(
+                                              int.tryParse(product['harga_jual']
+                                                      .toString()) ??
+                                                  0))
+                                          : buildTextField(
+                                              product['harga_jual'].toString(),
+                                              (val) => produkItem[
+                                                      'harga_jual_input'] =
+                                                  int.tryParse(val) ?? 0,
+                                            )),
+                                      DataCell(product['hasBeenSaved'] == false
+                                          ? ElevatedButton(
+                                              onPressed: () async {
+                                                if (product['hasBeenSaved'] ==
+                                                    true) {
+                                                  // Jangan kirim ke API kalau sudah disimpan
+                                                  controller.toggleEdit(index);
+                                                  return;
+                                                }
+
+                                                if (!isEdit) {
+                                                  // Kirim ke API hanya saat pertama kali disimpan
+                                                  final stok = int.tryParse(
+                                                          produkItem['stok_input']
+                                                                  ?.toString() ??
+                                                              '') ??
+                                                      produkItem['stok'];
+                                                  final stokAsli = int.tryParse(
+                                                          produkItem['stok_asli_input']
+                                                                  ?.toString() ??
+                                                              '') ??
+                                                      produkItem['stok_asli'];
+                                                  final hargaSatuan =
+                                                      int.tryParse(produkItem[
+                                                                      'harga_satuan_input']
+                                                                  ?.toString() ??
+                                                              '') ??
+                                                          produkItem[
+                                                              'harga_satuan'];
+                                                  final hargaJual = int.tryParse(
+                                                          produkItem['harga_jual_input']
+                                                                  ?.toString() ??
+                                                              '') ??
+                                                      produkItem['harga_jual'];
+
+                                                  final catatan = '';
+
+                                                  await controller.addDetOpname(
+                                                    produkItem['id'].toString(),
+                                                    idOpname,
+                                                    stok.toString(),
+                                                    stokAsli.toString(),
+                                                    hargaSatuan.toString(),
+                                                    hargaJual.toString(),
+                                                    catatan,
+                                                  );
+
+                                                  await controller
+                                                      .fetchDetOpName();
+                                                  await controller
+                                                      .fetchProduk();
+                                                }
+
+                                                controller.toggleEdit(index);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    PrimaryColor().blue,
+                                                foregroundColor: Colors.white,
+                                                textStyle: TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                                minimumSize: Size(0, 32),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 12),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                elevation: 0,
+                                              ),
+                                              child: Text('Simpan'),
+                                            )
+                                          : Row(
+                                              children: [
+                                                Text('Selesai',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 13,
+                                                        color: Colors.green)),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    showEditOpnameDialog(
+                                                        context, opnameItem);
+                                                  },
+                                                  icon:
+                                                      Icon(Icons.edit_calendar),
+                                                  color: PrimaryColor().blue,
+                                                  iconSize: 20,
+                                                )
+                                              ],
+                                            )),
+                                      DataCell(
+                                        Checkbox(
+                                          value: isChecked,
+                                          onChanged: (val) =>
+                                              controller.toggleCheck(
+                                                  realIndex, val ?? false),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          activeColor: Color(0xFF4F46E5),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                    SizedBox(height: 16),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      color: Colors.white,
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (controller.selectedProduk.isEmpty) {
+                                      Get.snackbar(
+                                        'Peringatan',
+                                        'Tidak ada produk yang dipilih!',
+                                        backgroundColor:
+                                            Colors.red.withOpacity(0.5),
+                                        icon: Icon(Icons.error,
+                                            color: Colors.white),
+                                      );
+                                      return;
+                                    }
+                                    final idOpname = Get.arguments != null
+                                        ? Get.arguments['id_opname']
+                                                ?.toString() ??
+                                            ''
+                                        : '';
+                                    prepareAndShowDialog(context, idOpname);
+                                  },
+                                  child: Text('Pembelian Opname'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: PrimaryColor().blue,
+                                    foregroundColor: Colors.white,
+                                    textStyle: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500),
+                                    minimumSize: Size(0, 32),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    final idOpname = Get.arguments != null
+                                        ? Get.arguments['id_opname']
+                                                ?.toString() ??
+                                            ''
+                                        : '';
+                                    if (!controller.isAllItemSaved(idOpname)) {
+                                      Get.snackbar(
+                                        'Gagal',
+                                        'Seluruh data harus disimpan terlebih dahulu.',
+                                        backgroundColor:
+                                            DarkColor().red.withOpacity(0.5),
+                                        icon: Icon(Icons.crisis_alert,
+                                            color: Colors.white),
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+                                    await controller.editOpname(idOpname, '3');
+                                    await controller.fetchOpName();
+                                  },
+                                  child: Text('Simpan Opname'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: PrimaryColor().green,
+                                    foregroundColor: Colors.white,
+                                    textStyle: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500),
+                                    minimumSize: Size(0, 32),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Obx(() {
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: controller.previousPage,
+                                    child: buildPaginationNumber('<<', false),
+                                  ),
+                                  ...List.generate(controller.totalPages,
+                                      (index) {
+                                    return GestureDetector(
+                                      onTap: () => controller.goToPage(index),
+                                      child: buildPaginationNumber(
+                                        (index + 1).toString(),
+                                        controller.currentPage.value == index,
+                                      ),
+                                    );
+                                  }),
+                                  GestureDetector(
+                                    onTap: controller.nextPage,
+                                    child: buildPaginationNumber('>>', false),
+                                  ),
+                                ],
+                              );
+                            })
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildPaginationNumber(String label, bool isActive) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 2),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: isActive ? PrimaryColor().blue : Colors.transparent,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: PrimaryColor().blue),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isActive ? Colors.white : PrimaryColor().blue,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextField(String value, Function(String) onChanged) {
+    final controller = TextEditingController(text: value);
+    return SizedBox(
+      width: 100,
+      height: 36,
+      child: TextField(
+        keyboardType: TextInputType.number,
+        controller: controller,
+        onChanged: (val) {
+          onChanged(val);
+          controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: controller.text.length));
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        ),
+      ),
+    );
+  }
+
+  void prepareAndShowDialog(BuildContext context, String idOpname) {
+    final selected = controller.selectedProduk;
+
+    controller.stokControllers.value = List.generate(
+      selected.length,
+      (index) => TextEditingController(text: '0'),
+    );
+
+    controller.totalHargaList.value = List.generate(
+      selected.length,
+      (index) => 0,
+    );
+
+    showSelectedProductsDialog(context, idOpname);
+  }
+
+  void showSelectedProductsDialog(BuildContext context, String idOpname) {
+    final selected = controller.selectedProduk;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          insetPadding: EdgeInsets.all(16),
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: getResponsiveWidth(context),
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 20,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: PrimaryColor().blue,
+                      size: 24,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Pembelian Stok Opname',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    color: Color(0xFFF9FAFB),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columnSpacing: 24,
+                        horizontalMargin: 16,
+                        dividerThickness: 1,
+                        headingRowColor: MaterialStateProperty.all(
+                          Color(0xFFEEF2F7),
+                        ),
+                        headingTextStyle: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: Color(0xFF374151),
+                        ),
+                        dataTextStyle: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF111827),
+                        ),
+                        columns: const [
+                          DataColumn(label: Text('Produk')),
+                          DataColumn(label: Text('Tambah Stok')),
+                          DataColumn(label: Text('Harga Satuan')),
+                          DataColumn(label: Text('Harga Jual')),
+                          DataColumn(label: Text('Total Harga')),
+                        ],
+                        rows: List.generate(selected.length, (index) {
+                          final productRx = selected[index];
+                          final product = productRx;
+                          final isEven = index % 2 == 0;
+                          final stokController =
+                              controller.stokControllers[index];
+                          final hargaSatuan = int.tryParse(
+                                  product['harga_satuan'].toString()) ??
+                              0;
+
+                          return DataRow(
+                            color: MaterialStateProperty.all(
+                              isEven ? Colors.white : Color(0xFFF1F5F9),
+                            ),
+                            cells: [
+                              DataCell(Text(product['nama_barang'] ?? '')),
+                              DataCell(
+                                SizedBox(
+                                  width: 60,
+                                  child: TextField(
+                                    controller: stokController,
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      final qty = int.tryParse(value) ?? 0;
+                                      controller.totalHargaList[index] =
+                                          qty * hargaSatuan;
+                                    },
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 2),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(Text(currencyFormat.format(int.tryParse(
+                                      product['harga_satuan'].toString()) ??
+                                  0))),
+                              DataCell(Text(currencyFormat.format(int.tryParse(
+                                      product['harga_jual'].toString()) ??
+                                  0))),
+                              DataCell(
+                                Obx(() => Text(currencyFormat
+                                    .format(controller.totalHargaList[index]))),
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        final selected = controller.selectedProduk;
+                        List<Map<String, dynamic>> dataUntukDisimpan = [];
+
+                        bool adaJumlahKosong = false;
+
+                        for (int i = 0; i < selected.length; i++) {
+                          final stokText = controller.stokControllers[i].text;
+                          final qty = int.tryParse(stokText) ?? 0;
+
+                          if (qty <= 0) {
+                            adaJumlahKosong = true;
+                            break;
+                          }
+
+                          final produk = selected[i];
+                          final hargaSatuan =
+                              int.tryParse(produk['harga_satuan'].toString()) ??
+                                  0;
+
+                          dataUntukDisimpan.add({
+                            'id_barang': produk['id'].toString(),
+                            'jumlah': qty.toString(),
+                            'total_beli': (qty * hargaSatuan).toString(),
+                          });
+                        }
+
+                        if (adaJumlahKosong) {
+                          Get.snackbar(
+                            'Gagal',
+                            'Stok pembelian tidak boleh kosong!',
+                            backgroundColor: Colors.red.withOpacity(0.8),
+                            colorText: Colors.white,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+                          return;
+                        }
+
+                        for (var item in dataUntukDisimpan) {
+                          await controller.addPemOpname(
+                            idOpname,
+                            item['id_barang']!,
+                            item['jumlah']!,
+                            item['total_beli']!,
+                          );
+                        }
+
+                        await Get.snackbar(
+                          'Success',
+                          'Pembelian Opname berhasil ditambahkan',
+                          backgroundColor: Colors.green.withOpacity(0.5),
+                          icon: Icon(Icons.check_circle, color: Colors.white),
+                        );
+
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('Simpan'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF4F46E5),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text('Cancel'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade200,
+                        foregroundColor: Colors.black54,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void showEditOpnameDialog(BuildContext context, Map<String, dynamic> item) {
+    final TextEditingController stokController =
+        TextEditingController(text: item['stok']);
+    final TextEditingController stokAsliController =
+        TextEditingController(text: item['stok_asli'].toString());
+    final TextEditingController hargaSatuanController =
+        TextEditingController(text: item['harga_satuan'].toString());
+    final TextEditingController hargaJualController =
+        TextEditingController(text: item['harga_jual'].toString());
+    final TextEditingController catatanController =
+        TextEditingController(text: item['catatan'] ?? '');
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.add_circled,
+                          color: PrimaryColor().blue,
+                          size: 24,
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          "Edit Opname",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    buildInputLabel('Stok'),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade50,
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: stokController,
+                        cursorColor: PrimaryColor().blue,
+                        style: TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.all_inbox_outlined,
+                            color: Colors.grey.shade600,
+                            size: 20,
+                          ),
+                          hintText: 'Stok',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade400,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    buildInputLabel('Stok Asli'),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade50,
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: stokAsliController,
+                        cursorColor: PrimaryColor().blue,
+                        style: TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.all_inbox_outlined,
+                            color: Colors.grey.shade600,
+                            size: 20,
+                          ),
+                          hintText: '15 pcs',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade400,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    buildInputLabel('Harga Satuan'),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade50,
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: hargaSatuanController,
+                        cursorColor: PrimaryColor().blue,
+                        style: TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            FontAwesomeIcons.moneyBillWave,
+                            color: Colors.grey.shade600,
+                            size: 20,
+                          ),
+                          hintText: 'Rp 1.000',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade400,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    buildInputLabel('Harga Jual'),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade50,
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        controller: hargaJualController,
+                        cursorColor: PrimaryColor().blue,
+                        style: TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            FontAwesomeIcons.moneyBillWave,
+                            color: Colors.grey.shade600,
+                            size: 20,
+                          ),
+                          hintText: 'Rp 1.500',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade400,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    buildInputLabel('Catatan'),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade50,
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: TextField(
+                        keyboardType: TextInputType.multiline,
+                        controller: catatanController,
+                        cursorColor: PrimaryColor().blue,
+                        minLines: 4, // Tinggi minimal 4 baris
+                        maxLines: null, // Bisa terus bertambah sesuai isi
+                        style: TextStyle(fontSize: 14),
+                        decoration: InputDecoration(
+                          hintText: '3 Barang Rusak...',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade400,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            // Lanjut ke proses update
+                            await controller.editDetOpname(
+                              item['id'].toString(),
+                              stokController.text,
+                              stokAsliController.text,
+                              hargaSatuanController.text,
+                              hargaJualController.text,
+                              catatanController.text,
+                            );
+                            Navigator.of(context).pop();
+                            await controller.fetchDetOpName();
+                            await controller.fetchProduk();
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                'Simpan',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: PrimaryColor().blue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            Get.back();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey.shade200,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Batal',
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+Widget buildInputLabel(String label) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade700,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget buildTextField({
+  required TextEditingController controller,
+  required String hintText,
+  required IconData prefixIcon,
+  required TextInputType type,
+}) {
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(12),
+      color: Colors.grey.shade50,
+      border: Border.all(color: Colors.grey.shade200),
+    ),
+    child: TextField(
+      keyboardType: type,
+      controller: controller,
+      cursorColor: PrimaryColor().blue,
+      style: TextStyle(fontSize: 14),
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+          prefixIcon,
+          color: Colors.grey.shade600,
+          size: 20,
+        ),
+        hintText: hintText,
+        hintStyle: TextStyle(
+          fontSize: 14,
+          color: Colors.grey.shade400,
+        ),
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+    ),
+  );
+}
+
+double getResponsiveWidth(BuildContext context) {
+  var orientation = MediaQuery.of(context).orientation;
+
+  if (orientation == Orientation.portrait) {
+    return MediaQuery.of(context).size.width * 0.8;
+  } else {
+    return MediaQuery.of(context).size.width * 0.55;
+  }
+}

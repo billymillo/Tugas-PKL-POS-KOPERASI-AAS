@@ -142,6 +142,7 @@ class TransaksiInController extends GetxController {
     }
   }
 
+
   Future<void> fetchTransaksiIn() async {
     var url = ApiService.baseUrl + '/transaksi_in';
     try {

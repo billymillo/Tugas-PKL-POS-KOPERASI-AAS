@@ -22,7 +22,8 @@ abstract class Routes {
   static const TRANSAKSIP = _Paths.TRANSAKSIP;
   static const TRANSAKSIINP = _Paths.TRANSAKSIINP;
   static const TRANSAKSIINMITRAP = _Paths.TRANSAKSIINMITRAP;
-   static const OPNAMEP = _Paths.OPNAMEP;
+  static const OPNAMEP = _Paths.OPNAMEP;
+  static const OPNAMEDET = _Paths.OPNAMEDET;
   
 }
 
@@ -48,4 +49,5 @@ abstract class _Paths {
   static const TRANSAKSIINP = '/TransaksiInP';
   static const TRANSAKSIINMITRAP = '/TransaksiInMitraP';
   static const OPNAMEP = '/OpNameP';
+  static const OPNAMEDET = '/OpNameDetail';
 }

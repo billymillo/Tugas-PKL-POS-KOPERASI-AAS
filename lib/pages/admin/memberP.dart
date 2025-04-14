@@ -495,6 +495,7 @@ class _MemberPState extends State<MemberP> {
                             prefixIcon: CupertinoIcons.person_2_alt,
                             type: TextInputType.name,
                           ),
+                          SizedBox(height: 10),
                           buildInputLabel('Id Pegawai', " *"),
                           buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
@@ -512,6 +513,7 @@ class _MemberPState extends State<MemberP> {
                             prefixIcon: CupertinoIcons.phone_circle,
                             type: TextInputType.phone,
                           ),
+                          SizedBox(height: 10),
                           buildInputLabel('Saldo', ' *'),
                           buildTextField(
                             controller: newSaldoController,
@@ -521,7 +523,7 @@ class _MemberPState extends State<MemberP> {
                             inputFormat:
                                 FilteringTextInputFormatter.singleLineFormatter,
                           ),
-                          SizedBox(height: 15),
+                          SizedBox(height: 10),
                           buildInputLabel('Poin User', ' *'),
                           buildTextField(
                             controller: newPoinController,

@@ -15,7 +15,7 @@ class ApiService {
     final data = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
-      return data['data'];       
+      return data['data'];
     } else {
       throw Exception('Failed to fetch users');
     }
@@ -68,8 +68,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> editTipe(
-    String id, String tipe) async {
+  Future<Map<String, dynamic>> editTipe(String id, String tipe) async {
     final url = '$baseUrl/product/tipe/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -84,13 +83,13 @@ class ApiService {
       return jsonDecode(response.body);
     }
   }
-  
+
   Future<Map<String, dynamic>> deleteTipe(
     String id,
   ) async {
     final url = '$baseUrl/product/tipe/$id';
     final response = await http.delete(
-      Uri.parse(url), 
+      Uri.parse(url),
       body: {
         'id': id,
       },
@@ -198,7 +197,7 @@ class ApiService {
   ) async {
     final url = '$baseUrl/product/mitra/$id';
     final response = await http.delete(
-      Uri.parse(url), 
+      Uri.parse(url),
       body: {
         'id': id,
       },
@@ -211,7 +210,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> editMitra(
-    String id, String nama, String no_tlp, String email) async {
+      String id, String nama, String no_tlp, String email) async {
     final url = '$baseUrl/product/mitra/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -340,14 +339,14 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteOpname(
-    String id,
-  ) async {
-    final url = '$baseUrl/opname/$id';
-    final response = await http.delete(
+  static Future<Map<String, dynamic>> addOpname(
+      String status, String userInput) async {
+    final url = '$baseUrl/opname';
+    final response = await http.post(
       Uri.parse(url),
       body: {
-        'id': id,
+        'status_opname': status,
+        'user_input': userInput,
       },
     );
     if (response.statusCode == 200) {
@@ -357,17 +356,97 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> editOpname(
-    String id, String stok, String stokAsli, String catatan, String userUpdate) async {
-    final url = '$baseUrl/opname/ubah/$id';
+  static Future<Map<String, dynamic>> editOpname(
+      String id, String status, String user_update) async {
+    final url = '$baseUrl/opname';
+    final response = await http.put(
+      Uri.parse(url),
+      body: {
+        'id': id,
+        'status_opname': status,
+        'user_update': user_update,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  static Future<Map<String, dynamic>> addDetOpname(
+      String idProduk,
+      String idOpname,
+      String stok,
+      String stokAsli,
+      String hargaSatuan,
+      String hargaJual,
+      String catatan,
+      String userInput) async {
+    final url = '$baseUrl/opname/detail';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'id_produk': idProduk,
+        'id_opname': idOpname,
+        'stok': stok,
+        'stok_asli': stokAsli,
+        'harga_satuan': hargaSatuan,
+        'harga_jual': hargaJual,
+        'catatan': catatan,
+        'user_input': userInput,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  static Future<Map<String, dynamic>> editDetOpname(
+      String id,
+      String stok,
+      String stokAsli,
+      String hargaSatuan,
+      String hargaJual,
+      String catatan,
+      String user_update) async {
+    final url = '$baseUrl/opname/detail';
     final response = await http.put(
       Uri.parse(url),
       body: {
         'id': id,
         'stok': stok,
         'stok_asli': stokAsli,
-        'catatan':catatan,
-        'user_update': userUpdate,
+        'harga_satuan': hargaSatuan,
+        'harga_jual': hargaJual,
+        'catatan': catatan,
+        'user_update': user_update,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  static Future<Map<String, dynamic>> addPemOpname(
+      String idOpname,
+      String idProduk,
+      String jumlah,
+      String totalBeli,
+      String userInput) async {
+    final url = '$baseUrl/opname/pembelian';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'id_opname': idOpname,
+        'id_produk': idProduk,
+        'jumlah': jumlah,
+        'total_beli': totalBeli,
+        'user_input': userInput,
       },
     );
     if (response.statusCode == 200) {
