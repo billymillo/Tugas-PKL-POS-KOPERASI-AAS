@@ -49,6 +49,7 @@ class _EditProductPState extends State<EditProductP> {
     editController.hasNewImage.value = false;
 
     fetchData();
+    editController.fetchAddon();
     editController.fetchMitra();
     editController.fetchTipe();
     editController.fetchKategori();
@@ -60,6 +61,7 @@ class _EditProductPState extends State<EditProductP> {
       editController.selectedKategori.string,
       editController.selectedTipe.string,
       editController.selectedMitra.string,
+      editController.selectedAddOn.string,
       hargaPackProdukController.text,
       jumlahIsiProdukController.text,
       hargaSatuanProdukController.text,
@@ -223,6 +225,22 @@ class _EditProductPState extends State<EditProductP> {
                         ),
                       );
                     }),
+                    SizedBox(height: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildInputLabel('Add On', " *"),
+                        buildDropdown(
+                          selectedValue: editController.selectedAddOn,
+                          label: 'Pilih Add On',
+                          items: editController.addOn,
+                          onChanged: (newValue) {
+                            editController.selectedAddOn.value = newValue;
+                          },
+                          key: 'add_on',
+                        ),
+                      ],
+                    ),
                     SizedBox(height: 10),
                     Row(
                       children: [
@@ -529,6 +547,7 @@ class _EditProductPState extends State<EditProductP> {
                                       editController.selectedKategori.string,
                                       editController.selectedTipe.string,
                                       editController.selectedMitra.string,
+                                      editController.selectedAddOn.string,
                                       hargaPackProdukController.text
                                           .replaceAll('.', ''),
                                       jumlahIsiProdukController.text

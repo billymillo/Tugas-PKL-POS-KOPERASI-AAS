@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:bluetooth_thermal_printer_example/services/apiService.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditPageController extends GetxController {
   final ApiService apiService = ApiService();
@@ -18,6 +19,7 @@ class EditPageController extends GetxController {
   var selectedTipe = Rxn<String>();
   var selectedKategori = Rxn<String>();
   var selectedMitra = Rxn<String>();
+  var selectedAddOn = Rxn<String>();
 
   var imagePath = Rxn<File>();
   var imagePathK = Rxn<File>();
@@ -31,6 +33,7 @@ class EditPageController extends GetxController {
   var tipe = <Map<String, dynamic>>[].obs;
   var kategori = <Map<String, dynamic>>[].obs;
   var mitra = <Map<String, dynamic>>[].obs;
+  var addOn = <Map<String, dynamic>>[].obs;
 
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
@@ -115,6 +118,27 @@ class EditPageController extends GetxController {
     }
   }
 
+  Future<void> fetchAddon() async {
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(url + "/add_on"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOn.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<void> editProduct(
       String id,
       String nama_barang,
@@ -122,6 +146,7 @@ class EditPageController extends GetxController {
       String id_kategori_barang,
       String id_tipe_barang,
       String id_mitra_barang,
+      String id_add_on,
       String harga_pack,
       String jml_pcs_pack,
       String harga_satuan,
@@ -141,6 +166,8 @@ class EditPageController extends GetxController {
     );
 
     try {
+      final prefs = await SharedPreferences.getInstance();
+    String? userUpdate = prefs.getString('name') ?? 'system';
       final response = await apiService.editProduk(
         id,
         nama_barang,
@@ -148,11 +175,13 @@ class EditPageController extends GetxController {
         id_kategori_barang,
         id_tipe_barang,
         id_mitra_barang,
+        id_add_on,
         harga_pack,
         jml_pcs_pack,
         harga_satuan,
         harga_jual,
         stok,
+        userUpdate
       );
 
       if (response['status'] == true) {

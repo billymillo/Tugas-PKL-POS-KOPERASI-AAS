@@ -102,12 +102,10 @@ class TransaksiC extends GetxController {
       } else {
         isLoading(true);
       }
-
       var response = await http.get(
         Uri.parse(
-            '$urlTr/transaksi_out?page=${pageLunas.value}&limit=$limitLunas'),
+            '$urlTr/transaksi_out?page=${pageLunas.value}&limit=$limitLunas&sort=desc'),
       );
-
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
 
@@ -130,7 +128,7 @@ class TransaksiC extends GetxController {
               .where((id) => id.isNotEmpty)
               .toSet()
               .toList();
-
+          
           if (isLoadMore) {
             transaksiLunas.addAll(transaksiList);
             allTransaksiLunas.addAll(transaksiList);
@@ -143,7 +141,6 @@ class TransaksiC extends GetxController {
             detailTr.value = detailList;
             memberTransaksi.value = memberList;
           }
-
           if (transaksiList.isEmpty) {
             isLastPageLunas(true);
           }

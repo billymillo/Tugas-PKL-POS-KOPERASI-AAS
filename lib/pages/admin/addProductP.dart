@@ -25,6 +25,9 @@ class AddProductP extends StatefulWidget {
 class _AddProductPState extends State<AddProductP> {
   final AddPageController addController = Get.put(AddPageController());
 
+  final TextEditingController namaAddOnNewController = TextEditingController();
+  final TextEditingController hargaAddOnNewController = TextEditingController();
+
   final TextEditingController namaMitraNewController = TextEditingController();
   final TextEditingController noMitraNewController = TextEditingController();
   final TextEditingController emailMitraNewController = TextEditingController();
@@ -47,9 +50,12 @@ class _AddProductPState extends State<AddProductP> {
 
   void initState() {
     super.initState();
+    addController.fetchAddon();
     addController.fetchMitra();
     addController.fetchTipe();
     addController.fetchKategori();
+    addController.addNewAddOn(namaAddOnNewController.text,
+        hargaAddOnNewController.text);
     addController.addNewTipe(newTipeController.text);
     addController.addNewKategori(
         newKategoriController.text, gambarKategoriController.file);
@@ -66,6 +72,7 @@ class _AddProductPState extends State<AddProductP> {
       addController.selectedKategori.string,
       addController.selectedTipe.string,
       addController.selectedMitra.string,
+      addController.selectedAddOn.string,
       hargaPackProdukController.text,
       jumlahIsiProdukController.text,
       hargaSatuanProdukController.text,
@@ -727,6 +734,162 @@ class _AddProductPState extends State<AddProductP> {
                       );
                     }),
                     SizedBox(height: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildInputLabel('Add On', " *"),
+                        buildDropdown(
+                          selectedValue: addController.selectedAddOn,
+                          label: 'Pilih Add On',
+                          items: addController.addOn,
+                          onChanged: (newValue) {
+                            addController.selectedAddOn.value = newValue;
+                          },
+                          key: 'add_on',
+                        ),
+                        buildDialogButton(
+                          label: "Tambah Add On Baru",
+                          showDialog: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Dialog(
+                                  elevation: 0,
+                                  backgroundColor: Colors.transparent,
+                                  child: Container(
+                                    padding: EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                CupertinoIcons.add_circled,
+                                                color: PrimaryColor().blue,
+                                                size: 24,
+                                              ),
+                                              SizedBox(width: 12),
+                                              Text(
+                                                "Tambah Add On Baru",
+                                                style: TextStyle(
+                                                  color: Colors.black87,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 15),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              buildInputLabel(
+                                                  'Nama Add On', " *"),
+                                              buildTextField(
+                                                inputFormat:
+                                                    LengthLimitingTextInputFormatter(
+                                                        200),
+                                                controller:
+                                                    namaAddOnNewController,
+                                                hintText: 'Rebus',
+                                                prefixIcon:
+                                                    CupertinoIcons.person_2_alt,
+                                                type: TextInputType.name,
+                                              ),
+                                              SizedBox(height: 10),
+                                              buildInputLabel(
+                                                  'Harga Add On', " *"),
+                                              buildTextField(
+                                                inputFormat:
+                                                    LengthLimitingTextInputFormatter(
+                                                        200),
+                                                controller:
+                                                    hargaAddOnNewController,
+                                                hintText: 'Rp. ',
+                                                prefixIcon:
+                                                    CupertinoIcons.phone_circle,
+                                                type: TextInputType.number,
+                                              ),
+                                              SizedBox(height: 10),
+                                            ],
+                                          ),
+                                          SizedBox(height: 24),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                child: Text(
+                                                  'Batal',
+                                                  style: TextStyle(
+                                                    color: Colors.black45,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 12),
+                                              ElevatedButton(
+                                                onPressed: () async {
+                                                  await addController
+                                                      .addNewAddOn(
+                                                    namaAddOnNewController.text,
+                                                    hargaAddOnNewController
+                                                        .text,
+                                                    fromButton: true,
+                                                  );
+                                                  await addController.refresh();
+                                                  Navigator.pop(context);
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      PrimaryColor().blue,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      CupertinoIcons.add,
+                                                      size: 18,
+                                                      color: Colors.white,
+                                                    ),
+                                                    SizedBox(width: 8),
+                                                    Text(
+                                                      'Tambah',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -798,7 +961,8 @@ class _AddProductPState extends State<AddProductP> {
                         Expanded(
                           child: Obx(
                             () => Visibility(
-                              visible: addController.jumlahPcsPack.value == false,
+                              visible:
+                                  addController.jumlahPcsPack.value == false,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -1031,6 +1195,7 @@ class _AddProductPState extends State<AddProductP> {
                                         addController.selectedKategori.string,
                                         addController.selectedTipe.string,
                                         addController.selectedMitra.string,
+                                        addController.selectedAddOn.string,
                                         hargaPackProdukController.text
                                             .replaceAll('.', ''),
                                         jumlahIsiProdukController.text
@@ -1053,6 +1218,7 @@ class _AddProductPState extends State<AddProductP> {
                                           null;
                                       addController.selectedTipe.value = null;
                                       addController.selectedMitra.value = null;
+                                      addController.selectedAddOn.value = null;
                                     } catch (e) {
                                       Get.snackbar(
                                         'Error',

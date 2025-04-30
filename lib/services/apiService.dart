@@ -5,9 +5,10 @@ import 'package:http/http.dart' as http;
 
 // Fetch Api
 class ApiService {
-  static const String baseUrl = 'http://10.10.20.240/POS_CI/api/';
+  static const String baseUrl = 'http://10.10.20.172/POS_CI/api/';
+  // static const String baseUrl = 'http://10.10.20.240/POS_CI/api/';
   // static const String baseUrl = 'http://192.168.1.7/POS_CI/api/';
-  // static const String baseUrl = 'http://192.168.198.73/POS_CI/api/';
+  // static const String baseUrl = 'http://192.168.1.8/POS_CI/api/';
 
   Future<List<dynamic>> fetchUsers({String? id}) async {
     final url = id == null ? '$baseUrl/users' : '$baseUrl/users?id=$id';
@@ -53,12 +54,13 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> tipe(String tipe) async {
+  Future<Map<String, dynamic>> tipe(String tipe, userInput) async {
     final url = '$baseUrl/product/tipe';
     final response = await http.post(
       Uri.parse(url),
       body: {
         'tipe': tipe,
+        'userInput': userInput,
       },
     );
     if (response.statusCode == 200) {
@@ -68,14 +70,12 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> editTipe(String id, String tipe) async {
+  Future<Map<String, dynamic>> editTipe(
+      String id, String tipe, String update) async {
     final url = '$baseUrl/product/tipe/$id';
     final response = await http.put(
       Uri.parse(url),
-      body: {
-        'id': id,
-        'tipe': tipe,
-      },
+      body: {'id': id, 'tipe': tipe, 'user_update': update},
     );
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -102,7 +102,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> kategori(
-      String kategori, File? gambar_kategori) async {
+      String kategori, File? gambar_kategori, String userInput) async {
     final url = Uri.parse('$baseUrl/product/kategori');
     final request = http.MultipartRequest('POST', url);
 
@@ -110,6 +110,7 @@ class ApiService {
     var imageFile = await http.MultipartFile.fromPath(
         'gambar_kategori', gambar_kategori!.path);
     request.files.add(imageFile);
+    request.fields['user_input'] = userInput;
 
     try {
       var response = await request.send();
@@ -129,12 +130,14 @@ class ApiService {
     String id,
     String kategori,
     File? gambar_kategori,
+    String update,
   ) async {
     final url = Uri.parse('$baseUrl/product/kategori_edit?_method=PUT');
     final request = http.MultipartRequest('POST', url);
 
     request.fields['id'] = id;
     request.fields['kategori'] = kategori;
+    request.fields['user_update'] = update;
 
     if (gambar_kategori != null) {
       var imageFile = await http.MultipartFile.fromPath(
@@ -175,7 +178,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> mitra(
-      String nama, String no_tlp, String email) async {
+      String nama, String no_tlp, String email, String userInput) async {
     final url = '$baseUrl/product/mitra';
     final response = await http.post(
       Uri.parse(url),
@@ -183,6 +186,7 @@ class ApiService {
         'nama': nama,
         'no_tlp': no_tlp,
         'email': email,
+        'user_input': userInput,
       },
     );
     if (response.statusCode == 200) {
@@ -209,8 +213,8 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> editMitra(
-      String id, String nama, String no_tlp, String email) async {
+  Future<Map<String, dynamic>> editMitra(String id, String nama, String no_tlp,
+      String email, String update) async {
     final url = '$baseUrl/product/mitra/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -219,6 +223,7 @@ class ApiService {
         'nama': nama,
         'no_tlp': no_tlp,
         'email': email,
+        'user_update': update
       },
     );
     if (response.statusCode == 200) {
@@ -234,6 +239,7 @@ class ApiService {
     String id_kategori_barang,
     String id_tipe_barang,
     String id_mitra_barang,
+    String id_add_on,
     String harga_pack,
     String jml_pcs_pack,
     String harga_satuan,
@@ -247,6 +253,7 @@ class ApiService {
     request.fields['id_kategori_barang'] = id_kategori_barang;
     request.fields['id_tipe_barang'] = id_tipe_barang;
     request.fields['id_mitra_barang'] = id_mitra_barang;
+    request.fields['id_add_on'] = id_add_on;
     request.fields['harga_pack'] = harga_pack;
     request.fields['jml_pcs_pack'] = jml_pcs_pack;
     request.fields['harga_satuan'] = harga_satuan;
@@ -278,11 +285,13 @@ class ApiService {
     String id_kategori_barang,
     String id_tipe_barang,
     String id_mitra_barang,
+    String id_add_on,
     String harga_pack,
     String jml_pcs_pack,
     String harga_satuan,
     String harga_jual,
     String stok,
+    String update,
   ) async {
     final url = Uri.parse('$baseUrl/product/$id');
     final request = http.MultipartRequest('POST', url); // Gunakan POST
@@ -294,11 +303,13 @@ class ApiService {
     request.fields['id_kategori_barang'] = id_kategori_barang;
     request.fields['id_tipe_barang'] = id_tipe_barang;
     request.fields['id_mitra_barang'] = id_mitra_barang;
+    request.fields['id_add_on'] = id_add_on;
     request.fields['harga_pack'] = harga_pack;
     request.fields['jml_pcs_pack'] = jml_pcs_pack;
     request.fields['harga_satuan'] = harga_satuan;
     request.fields['harga_jual'] = harga_jual;
     request.fields['stok'] = stok;
+    request.fields['user_update'] = update;
 
     // Jika ada gambar yang dipilih, tambahkan ke request
     if (gambar_barang != null) {
@@ -447,6 +458,69 @@ class ApiService {
         'jumlah': jumlah,
         'total_beli': totalBeli,
         'user_input': userInput,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteOpname(
+      String id, String userUpdate) async {
+    final url = '$baseUrl/opname/';
+    final response = await http.delete(
+      Uri.parse(url),
+      body: {'id': id, 'user_update': userUpdate},
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> addAddOn(
+      String addOn, String harga, String userInput) async {
+    final url = '$baseUrl/product/add_on';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'add_on': addOn,
+        'harga': harga,
+        'user_input': userInput,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> editAddOn(
+      String id, String add_on, String harga, String update) async {
+    final url = '$baseUrl/product/add_on/$id';
+    final response = await http.put(
+      Uri.parse(url),
+      body: {'id': id, 'add_on': add_on, 'harga': harga, 'user_update': update},
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteAddOn(
+    String id,
+  ) async {
+    final url = '$baseUrl/product/add_on/$id';
+    final response = await http.delete(
+      Uri.parse(url),
+      body: {
+        'id': id,
       },
     );
     if (response.statusCode == 200) {

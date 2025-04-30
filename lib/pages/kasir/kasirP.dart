@@ -150,7 +150,7 @@ class _KasirPState extends State<KasirP> {
                                                   return Container(
                                                     child: KasirW().kategori(
                                                       item['kategori'],
-                                                      "http://10.10.20.240/POS_CI/kategori/${item['gambar_kategori']}",
+                                                      "http://10.10.20.172/POS_CI/kategori/${item['gambar_kategori']}",
                                                       Icons.fastfood,
                                                       (kategori) {
                                                         print(
@@ -212,6 +212,7 @@ class _KasirPState extends State<KasirP> {
                                                       .toString(),
                                                   c.filteredProduk[i]
                                                       ['kategori'],
+                                                  c.filteredProduk[i]['addOn'],
                                                   c.filteredProduk[i]
                                                       ['listDibeli'],
                                                   () {
@@ -223,6 +224,7 @@ class _KasirPState extends State<KasirP> {
                                                         i, null);
                                                   },
                                                   context,
+                                                  i,
                                                 ),
                                             for (var i = 0;
                                                 i < c.filteredProduk.length;
@@ -239,6 +241,7 @@ class _KasirPState extends State<KasirP> {
                                                 c.filteredProduk[i]['foto']
                                                     .toString(),
                                                 c.filteredProduk[i]['kategori'],
+                                                c.filteredProduk[i]['addOn'],
                                                 c.filteredProduk[i]
                                                     ['listDibeli'],
                                                 () {
@@ -248,6 +251,7 @@ class _KasirPState extends State<KasirP> {
                                                   c.kurangKeKeranjang(i, null);
                                                 },
                                                 context,
+                                                i,
                                               ),
                                           ],
                                         ),
@@ -346,6 +350,9 @@ class _KasirPState extends State<KasirP> {
                                                     KasirW().bill(
                                                       c.listProduk[i]['nama'],
                                                       "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.listProduk[i]['listDibeli'][x]['harga'].toString()))}/pcs",
+                                                      c.listProduk[i]
+                                                              ['listDibeli'][x]
+                                                          ['addOn'],
                                                       '$jumlahDibeli',
                                                       c.listProduk[i]
                                                               ['listDibeli'][x]

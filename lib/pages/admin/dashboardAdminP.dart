@@ -3,18 +3,18 @@ import 'package:bluetooth_thermal_printer_example/controllers/admin/AddPageC.dar
 import 'package:bluetooth_thermal_printer_example/controllers/admin/dashboardAdminC.dart';
 import 'package:bluetooth_thermal_printer_example/controllers/authC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
-import 'package:bluetooth_thermal_printer_example/pages/admin/productP.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/navAdminW.dart';
-import 'package:bluetooth_thermal_printer_example/widgets/notFoundW.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class DashboardAdminP extends StatelessWidget {
   DashboardAdminP({super.key});
@@ -24,59 +24,117 @@ class DashboardAdminP extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DashbaordAdminC c = Get.put(DashbaordAdminC());
+    DashboardController c = Get.put(DashboardController());
     return Scaffold(
       key: scaffoldKey,
       extendBody: true,
       backgroundColor: DarkColor().blue,
       body: Stack(
         children: [
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: DarkColor().blue,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 1,
+              margin: EdgeInsets.only(top: 80),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Total Penjualan',
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 19,
+                            letterSpacing: 1,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Obx(() {
+                          return Text(
+                            '${c.totalProduk.value} Item',
+                            style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30,
+                              color: Colors.white,
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Laba Kotor',
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 19,
+                            letterSpacing: 1,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Obx(() {
+                          return Text(
+                            'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(c.totalHarga.value.toString()) ?? 0)}',
+                            style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30,
+                              color: Colors.white,
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Laba Bersih',
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 19,
+                            letterSpacing: 1,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Obx(() {
+                          final int totalTransaksiIn = c.totalTransaksiIn.value;
+                          final int totalKasbon = c.totalKasbon.value;
+                          final int totalHarga = c.totalHarga.value;
+
+                          final int pengeluaran =
+                              totalTransaksiIn - totalKasbon;
+                          final int labaBersih = totalHarga - pengeluaran;
+
+                          return Text(
+                            'Rp ${NumberFormat('#,##0', 'id_ID').format(labaBersih)}',
+                            style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 30,
+                              color: Colors.white,
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '19 JAN 2024',
-                  style: GoogleFonts.roboto(
-                    fontWeight: FontWeight.w300,
-                    fontSize: 21,
-                    letterSpacing: 1,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  '100 Barang',
-                  style: GoogleFonts.roboto(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 50,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  'Terjual',
-                  style: GoogleFonts.roboto(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 50,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(
-                  height: 50,
-                ),
-              ],
-            ),
-            padding: EdgeInsets.only(left: 35, right: 35, top: 80, bottom: 30),
           ),
           ListView(
             shrinkWrap: true,
             children: [
               Container(
                 width: double.infinity,
-                height: 280,
+                height: 200,
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 35, vertical: 25),
@@ -91,110 +149,100 @@ class DashboardAdminP extends StatelessWidget {
                       children: [
                         Stack(
                           children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 20, left: 10, right: 10),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Jan',
-                                        style: GoogleFonts.roboto(
+                            Obx(() => Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [2025, 2026, 2027].map((year) {
+                                    final isSelected =
+                                        c.selectedYear.value == year;
+                                    return GestureDetector(
+                                      onTap: () => c.selectYear(year),
+                                      child: Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 20),
+                                        decoration: isSelected
+                                            ? BoxDecoration(
+                                                color: ShadowColor().aqua,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20)),
+                                              )
+                                            : null,
+                                        child: Text(
+                                          '$year',
+                                          style: GoogleFonts.roboto(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 22,
                                             letterSpacing: 1,
-                                            color: PrimaryColor().aqua),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 20, left: 10, right: 10),
-                                  decoration: BoxDecoration(
-                                      color: ShadowColor().aqua,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(100),
-                                          topRight: Radius.circular(100))),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Feb',
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22,
-                                            letterSpacing: 1,
-                                            color: PrimaryColor().aqua),
-                                      ),
-                                      SizedBox(
-                                        height: 2,
-                                      ),
-                                      Text(
-                                        '•',
-                                        style: TextStyle(
                                             color: PrimaryColor().aqua,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 30),
+                                          ),
+                                        ),
                                       ),
-                                      SizedBox(
-                                        height: 3,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 20, left: 10, right: 10),
-                                  child: Column(
+                                    );
+                                  }).toList(),
+                                )),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Stack(
+                          children: [
+                            Obx(() => SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Mar',
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22,
-                                            letterSpacing: 1,
-                                            color: PrimaryColor().aqua),
-                                      ),
-                                    ],
+                                      'Jan',
+                                      'Feb',
+                                      'Mar',
+                                      'Apr',
+                                      'May',
+                                      'Jun',
+                                      'Jul',
+                                      'Agu',
+                                      'Sep',
+                                      'Okt',
+                                      'Nov',
+                                      'Des'
+                                    ].map((month) {
+                                      final isSelected =
+                                          c.selectedMonth.value == month;
+                                      return GestureDetector(
+                                        onTap: () => c.selectMonth(month),
+                                        child: Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal:
+                                                  4), // biar agak renggang
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 20),
+                                          decoration: isSelected
+                                              ? BoxDecoration(
+                                                  color: ShadowColor().aqua,
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topRight:
+                                                        Radius.circular(100),
+                                                    topLeft:
+                                                        Radius.circular(100),
+                                                  ),
+                                                )
+                                              : null,
+                                          child: Text(
+                                            '$month',
+                                            style: GoogleFonts.roboto(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 22,
+                                              letterSpacing: 1,
+                                              color: PrimaryColor().aqua,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
                                   ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 20, left: 10, right: 10),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'Apr',
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22,
-                                            letterSpacing: 1,
-                                            color: PrimaryColor().aqua),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(
-                                      top: 20, left: 10, right: 10),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        'May',
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22,
-                                            letterSpacing: 1,
-                                            color: PrimaryColor().aqua),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                                )),
                             Column(
                               children: [
                                 Container(
@@ -205,51 +253,248 @@ class DashboardAdminP extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   padding: const EdgeInsets.all(25.0),
-                                  height: 300,
-                                  child: LineChart(
-                                    LineChartData(
-                                      // Pastikan ini adalah parameter dari LineChart
-                                      gridData: FlGridData(show: true),
-                                      titlesData: FlTitlesData(
-                                        leftTitles: AxisTitles(
-                                          sideTitles:
-                                              SideTitles(showTitles: true),
-                                        ),
-                                        bottomTitles: AxisTitles(
-                                          sideTitles:
-                                              SideTitles(showTitles: true),
-                                        ),
+                                  height: 390,
+                                  child: Obx(() {
+                                    final spots = c.produkChartSpots;
+                                    if (spots.isEmpty) {
+                                      return Center(
+                                          child: Text(
+                                              "Tidak ada data penjualan."));
+                                    }
+                                    return SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              'Penjualan Produk',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 17,
+                                                color: PrimaryColor().blue,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  1,
+                                              height: 300,
+                                              padding: EdgeInsets.only(top: 10),
+                                              child: Obx(() {
+                                                final spots =
+                                                    c.produkChartSpots;
+                                                final labels =
+                                                    c.produkChartLabels;
+                                                if (spots.isEmpty) {
+                                                  return const Center(
+                                                      child: Text(
+                                                          "Tidak ada data penjualan."));
+                                                }
+                                                return SingleChildScrollView(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  child: Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            1,
+                                                    child: LineChart(
+                                                      LineChartData(
+                                                        lineTouchData:
+                                                            LineTouchData(
+                                                          handleBuiltInTouches:
+                                                              true,
+                                                          touchTooltipData:
+                                                              LineTouchTooltipData(
+                                                            tooltipRoundedRadius:
+                                                                8,
+                                                            getTooltipItems:
+                                                                (touchedSpots) {
+                                                              return touchedSpots
+                                                                  .map(
+                                                                      (touchedSpot) {
+                                                                final value =
+                                                                    touchedSpot
+                                                                        .y;
+                                                                final formatted = NumberFormat
+                                                                        .decimalPattern(
+                                                                            'id_ID')
+                                                                    .format(value
+                                                                        .toInt());
+                                                                return LineTooltipItem(
+                                                                  formatted,
+                                                                  const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        12,
+                                                                  ),
+                                                                );
+                                                              }).toList();
+                                                            },
+                                                          ),
+                                                        ),
+                                                        gridData: FlGridData(
+                                                            show: true),
+                                                        titlesData:
+                                                            FlTitlesData(
+                                                          leftTitles:
+                                                              AxisTitles(
+                                                            sideTitles:
+                                                                SideTitles(
+                                                              showTitles: true,
+                                                              reservedSize: 50,
+                                                              interval: 10,
+                                                              getTitlesWidget:
+                                                                  (value,
+                                                                      meta) {
+                                                                return Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                  child: Text(
+                                                                    NumberFormat.decimalPattern(
+                                                                            'id_ID')
+                                                                        .format(
+                                                                            value.toInt()),
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            12),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .right,
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                          rightTitles:
+                                                              AxisTitles(
+                                                            sideTitles:
+                                                                SideTitles(
+                                                              showTitles: true,
+                                                              reservedSize: 50,
+                                                              interval: 10,
+                                                              getTitlesWidget:
+                                                                  (value,
+                                                                      meta) {
+                                                                return Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8.0),
+                                                                  child: Text(
+                                                                    NumberFormat.decimalPattern(
+                                                                            'id_ID')
+                                                                        .format(
+                                                                            value.toInt()),
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            12),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .right,
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                          bottomTitles:
+                                                              AxisTitles(
+                                                            sideTitles:
+                                                                SideTitles(
+                                                              showTitles: true,
+                                                              interval: 1,
+                                                              reservedSize: 30,
+                                                              getTitlesWidget:
+                                                                  (value,
+                                                                      meta) {
+                                                                int index = value
+                                                                    .toInt();
+
+                                                                if (index < 0 ||
+                                                                    index >=
+                                                                        labels
+                                                                            .length) {
+                                                                  return const SizedBox
+                                                                      .shrink();
+                                                                }
+                                                                final label =
+                                                                    labels[
+                                                                        index];
+                                                                return Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          top:
+                                                                              8.0),
+                                                                  child: Text(
+                                                                    '$label ${c.selectedMonth.value}',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            10),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        borderData:
+                                                            FlBorderData(
+                                                                show: true),
+                                                        lineBarsData: [
+                                                          LineChartBarData(
+                                                            spots: spots,
+                                                            isCurved: true,
+                                                            color:
+                                                                PrimaryColor()
+                                                                    .blue,
+                                                            barWidth: 3,
+                                                            dotData: FlDotData(
+                                                                show: false),
+                                                            belowBarData:
+                                                                BarAreaData(
+                                                              show: true,
+                                                              color: PrimaryColor()
+                                                                  .blue
+                                                                  .withOpacity(
+                                                                      0.2),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              })),
+                                        ],
                                       ),
-                                      borderData: FlBorderData(show: true),
-                                      lineBarsData: [
-                                        LineChartBarData(
-                                          spots: [
-                                            FlSpot(0, 1),
-                                            FlSpot(1, 3),
-                                            FlSpot(2, 1.5),
-                                            FlSpot(3, 1.5),
-                                            FlSpot(4, 4),
-                                          ],
-                                          isCurved: true,
-                                          // colors: [Colors.blue],
-                                          barWidth: 3,
-                                          belowBarData:
-                                              BarAreaData(show: false),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                    );
+                                  }),
                                 ),
                                 SizedBox(
                                   height: 5,
                                 ),
-                                Text(
-                                  'PENJUALAN BULANAN 2024',
-                                  style: GoogleFonts.nunito(
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 10,
-                                    letterSpacing: 0.5,
-                                    color: Colors.black,
+                                Obx(
+                                  () => Text(
+                                    'PENJUALAN BULANAN ${c.selectedYear.value}',
+                                    style: GoogleFonts.nunito(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 10,
+                                      letterSpacing: 0.5,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 )
                               ],
@@ -277,16 +522,23 @@ class DashboardAdminP extends StatelessWidget {
                     ),
                     Container(
                       color: Colors.white,
-                      child: Column(
-                        children: [
-                          AdminW().aktivitasTerbaru('Golda Coffee', '5000', '2',
-                              'QRIS', '8 November 2023'),
-                          AdminW().aktivitasTerbaru('Golda Coffee', '5000', '2',
-                              'Cash', '8 November 2023'),
-                          AdminW().aktivitasTerbaru('Golda Coffee', '5000', '2',
-                              'E-Wallet', '8 November 2023'),
-                        ],
-                      ),
+                      child: Obx(() {
+                        final sortedList = c.transaksiOutDet.toList()
+                          ..sort((a, b) => DateTime.parse(b['input_date'])
+                              .compareTo(DateTime.parse(a['input_date'])));
+                        final latestThree = sortedList.take(3).toList();
+                        return Column(
+                          children: latestThree.map((item) {
+                            return AdminW().aktivitasTerbaru(
+                              c.ProdukName(item['id_produk']),
+                              'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}',
+                              item['jumlah']?.toString() ?? '0',
+                              c.NoTransaksi(item['id_transaksi_out']),
+                              formatTanggal(item['input_date']),
+                            );
+                          }).toList(),
+                        );
+                      }),
                     ),
                     SizedBox(
                       height: 30,
@@ -302,36 +554,27 @@ class DashboardAdminP extends StatelessWidget {
                             color: Colors.black,
                           ),
                         ),
-                        Icon(
-                          FontAwesomeIcons.angleRight,
-                          color: PrimaryColor().blue,
-                          size: 20,
+                        GestureDetector(
+                          onTap: () => Get.toNamed(Routes.PRODUCTP),
+                          child: Icon(
+                            FontAwesomeIcons.angleRight,
+                            color: Colors.black,
+                            size: 20,
+                          ),
                         )
                       ],
                     ),
                     SizedBox(
                       height: 10,
                     ),
-                    AdminW().laporanStock([
-                      {
-                        "nama": 'Golda Coffee',
-                        "stock": 2,
-                        "image":
-                            'https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//101/MTA-2644895/golda_golda-coffee-dolce-latte--200-ml--pet-_full03.jpg'
-                      },
-                      {
-                        "nama": 'Yakult',
-                        "stock": 2,
-                        "image":
-                            'https://res.cloudinary.com/dk0z4ums3/image/upload/v1709014802/attached_image/yakult.jpg'
-                      },
-                      {
-                        "nama": 'Indomie Goreng',
-                        "stock": 2,
-                        'image':
-                            'https://images.tokopedia.net/img/cache/700/VqbcmM/2024/4/13/a55ae577-91f2-444c-851e-9d5c8a0c3673.jpg'
-                      },
-                    ]),
+                    Obx(() {
+                      final produkList = c.produk;
+
+                      if (produkList.isEmpty) {
+                        return Center(child: Text('Belum ada data produk'));
+                      }
+                      return AdminW().laporanStock(produkList);
+                    }),
                     SizedBox(
                       height: 30,
                     ),
@@ -353,131 +596,145 @@ class DashboardAdminP extends StatelessWidget {
                       ],
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 20,
                     ),
                     Container(
-                      height: 140,
+                      height: 200,
                       child: Row(
                         children: [
                           Expanded(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: [
-                                        PieChartSectionData(
-                                          value: 50,
-                                          color: PrimaryColor().blue,
-                                          title: '50%',
-                                          radius: 30,
-                                          titleStyle: TextStyle(
+                            child: Obx(() {
+                              double total = c.totalQRIS.value.toDouble() +
+                                  c.totalCash.value.toDouble();
+                              double qrisPercent = total == 0
+                                  ? 0
+                                  : (c.totalQRIS.value / total) * 100;
+                              double cashPercent = total == 0
+                                  ? 0
+                                  : (c.totalCash.value / total) * 100;
+
+                              return Column(
+                                children: [
+                                  Expanded(
+                                    child: PieChart(
+                                      PieChartData(
+                                        sections: [
+                                          PieChartSectionData(
+                                            value: c.totalQRIS.value.toDouble(),
+                                            color: PrimaryColor().blue,
+                                            title:
+                                                '${qrisPercent.toStringAsFixed(1)}%',
+                                            radius: 45,
+                                            titleStyle: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.white),
-                                        ),
-                                        PieChartSectionData(
-                                          value: 50,
-                                          color: PrimaryColor().black,
-                                          radius: 30,
-                                        ),
-                                      ],
-                                      centerSpaceRadius:
-                                          20, // Space di tengah pie chart
-                                      sectionsSpace: 1, // Space antar slice
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          PieChartSectionData(
+                                            value: c.totalCash.value.toDouble(),
+                                            color: PrimaryColor().black,
+                                            title:
+                                                '${cashPercent.toStringAsFixed(1)}%',
+                                            radius: 45,
+                                            titleStyle: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                        centerSpaceRadius: 20,
+                                        sectionsSpace: 1,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  'QRIS',
-                                  style: GoogleFonts.roboto(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 19,
-                                    color: Colors.black,
+                                  Text(
+                                    'Tunai = ${c.totalCash.value} Transaksi',
+                                    style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 19,
+                                      color: PrimaryColor().black,
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
+                                  Text(
+                                    'QRIS = ${c.totalQRIS.value} Transaksi',
+                                    style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 19,
+                                      color: PrimaryColor().blue,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
                           ),
                           Expanded(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: [
-                                        PieChartSectionData(
-                                          value: 33,
-                                          color: PrimaryColor().blue,
-                                          title: '33%',
-                                          radius: 30,
-                                          titleStyle: TextStyle(
+                            child: Obx(() {
+                              double total = c.member.value.toDouble() +
+                                  c.nonMember.value.toDouble();
+                              double nonMemberPercent = total == 0
+                                  ? 0
+                                  : (c.member.value / total) * 100;
+                              double memberPercent = total == 0
+                                  ? 0
+                                  : (c.nonMember.value / total) * 100;
+
+                              return Column(
+                                children: [
+                                  Expanded(
+                                    child: PieChart(
+                                      PieChartData(
+                                        sections: [
+                                          PieChartSectionData(
+                                            value: c.member.value.toDouble(),
+                                            color: PrimaryColor().blue,
+                                            title:
+                                                '${nonMemberPercent.toStringAsFixed(1)}%',
+                                            radius: 45,
+                                            titleStyle: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.white),
-                                        ),
-                                        PieChartSectionData(
-                                          value: 67,
-                                          color: PrimaryColor().black,
-                                          radius: 30,
-                                        ),
-                                      ],
-                                      centerSpaceRadius:
-                                          20, // Space di tengah pie chart
-                                      sectionsSpace: 1, // Space antar slice
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  'Cash',
-                                  style: GoogleFonts.roboto(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 19,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: [
-                                        PieChartSectionData(
-                                          value: 33,
-                                          color: PrimaryColor().blue,
-                                          title: '33%',
-                                          radius: 30,
-                                          titleStyle: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          PieChartSectionData(
+                                            value: c.nonMember.value.toDouble(),
+                                            color: PrimaryColor().black,
+                                            title:
+                                                '${memberPercent.toStringAsFixed(1)}%',
+                                            radius: 45,
+                                            titleStyle: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.white),
-                                        ),
-                                        PieChartSectionData(
-                                          value: 67,
-                                          color: PrimaryColor().black,
-                                          radius: 30,
-                                        ),
-                                      ],
-                                      centerSpaceRadius:
-                                          20, // Space di tengah pie chart
-                                      sectionsSpace: 1, // Space antar slice
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                        centerSpaceRadius: 20,
+                                        sectionsSpace: 1,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  'E-Wallet',
-                                  style: GoogleFonts.roboto(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 19,
-                                    color: Colors.black,
+                                  Text(
+                                    'Member = ${c.member.value} Transaksi',
+                                    style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 19,
+                                      color: PrimaryColor().black,
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
+                                  Text(
+                                    'Non-Member = ${c.nonMember.value} Transaksi',
+                                    style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 19,
+                                      color: PrimaryColor().blue,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
                           ),
                         ],
                       ),
@@ -492,5 +749,15 @@ class DashboardAdminP extends StatelessWidget {
       ),
       drawer: buildDrawer(context),
     );
+  }
+}
+
+String formatTanggal(String tanggal) {
+  try {
+    final parsedDate = DateTime.parse(tanggal);
+    final formatter = DateFormat('d MMMM y, HH:mm', 'id_ID');
+    return formatter.format(parsedDate);
+  } catch (e) {
+    return tanggal; // fallback jika gagal parsing
   }
 }

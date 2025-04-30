@@ -54,9 +54,9 @@ class TransaksiInController extends GetxController {
     return selected['stok'] ?? "Pilih Produk";
   }
 
-  String NoTransaksi(String idProduk) {
+  String NoTransaksi(String idTransaksi) {
     var selected = transaksi.firstWhere(
-      (m) => m['id'].toString() == idProduk,
+      (m) => m['id'].toString() == idTransaksi,
       orElse: () => {'no_transaksi_in': ''},
     );
     return selected['no_transaksi_in'] ?? "";

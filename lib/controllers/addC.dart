@@ -4,6 +4,7 @@ import 'package:bluetooth_thermal_printer_example/services/apiService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddProductController extends GetxController {
   var tipe = <Map<String, dynamic>>[].obs; // Store dropdown items
@@ -48,7 +49,9 @@ class AddProductController extends GetxController {
   Future<void> addTipe() async {
     isLoading.value = true;
     try {
-      final response = await apiService.tipe(selectedTipe.value!);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiService.tipe(selectedTipe.value!, userInput);
       if (selectedTipe.value == null) {
         Get.snackbar(
           'Error',
@@ -56,7 +59,7 @@ class AddProductController extends GetxController {
           backgroundColor: Colors.red.withOpacity(0.5),
           icon: Icon(Icons.error, color: Colors.white),
         );
-      return;
+        return;
       }
       print("Response from API: $response");
       if (response['status'] != true) {
@@ -80,18 +83,20 @@ class AddProductController extends GetxController {
     }
   }
 
-    Future<void> addTipeText(String tipe) async {
+  Future<void> addTipeText(String tipe) async {
     isLoading.value = true;
     try {
-      final response = await apiService.tipe(tipe);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiService.tipe(tipe, userInput);
       print("Response dari API: $response");
       if (response['status'] == 'true') {
-          Get.snackbar(
-            'Success',
-            'Tipe berhasil ditambahkan ke database!',
-            backgroundColor: Colors.green.withOpacity(0.5),
-            icon: Icon(Icons.check_circle, color: Colors.white),
-          );
+        Get.snackbar(
+          'Success',
+          'Tipe berhasil ditambahkan ke database!',
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
       } else {
         Get.snackbar(
           'Error',
@@ -112,5 +117,4 @@ class AddProductController extends GetxController {
       isLoading.value = false;
     }
   }
-
 }

@@ -376,7 +376,7 @@ class TransaksiP extends StatelessWidget {
                                                                               .w500,
                                                                     ),
                                                                   ),
-                                                                  const SizedBox(
+                                                                  SizedBox(
                                                                       height:
                                                                           4),
                                                                   Text(
@@ -390,6 +390,23 @@ class TransaksiP extends StatelessWidget {
                                                                           .shade600,
                                                                     ),
                                                                   ),
+                                                                  SizedBox(
+                                                                      height:
+                                                                          4),
+                                                                  item['harga_add_on'] !=
+                                                                          "0"
+                                                                      ? Text(
+                                                                          "Add On :",
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                13,
+                                                                            color:
+                                                                                Colors.grey.shade600,
+                                                                          ),
+                                                                        )
+                                                                      : SizedBox
+                                                                          .shrink(),
                                                                 ],
                                                               ),
                                                             ),
@@ -409,7 +426,7 @@ class TransaksiP extends StatelessWidget {
                                                                             .w600,
                                                                   ),
                                                                 ),
-                                                                const SizedBox(
+                                                                SizedBox(
                                                                     height: 4),
                                                                 Text(
                                                                   '${NumberFormat('#,##0', 'id_ID').format(int.parse(item['jumlah']))} pcs',
@@ -422,6 +439,23 @@ class TransaksiP extends StatelessWidget {
                                                                         .shade600,
                                                                   ),
                                                                 ),
+                                                                SizedBox(
+                                                                    height: 4),
+                                                                item['harga_add_on'] !=
+                                                                        "0"
+                                                                    ? Text(
+                                                                        'Rp ${NumberFormat('#,##0', 'id_ID').format(int.parse(item['harga_add_on']))}',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              13,
+                                                                          color: Colors
+                                                                              .grey
+                                                                              .shade600,
+                                                                        ),
+                                                                      )
+                                                                    : SizedBox
+                                                                        .shrink(),
                                                               ],
                                                             ),
                                                           ],

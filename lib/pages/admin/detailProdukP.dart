@@ -42,7 +42,7 @@ class DetailProdukP extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
                       image: NetworkImage(
-                        "http://10.10.20.240/POS_CI/uploads/${item['gambar_barang']}",
+                        "http://10.10.20.172/POS_CI/uploads/${item['gambar_barang']}",
                       ),
                       fit: BoxFit.cover,
                     ),
@@ -88,6 +88,8 @@ class DetailProdukP extends StatelessWidget {
                             buildInfoRow("Tipe", item['tipe_name']),
                             buildInfoRow("Mitra",
                                 item['mitra_name'] ?? "Tidak Memiliki Mitra"),
+                            buildInfoRow("Add On",
+                                item['add_on_name'] ?? "Tidak Memiliki Add On"),
                             buildInfoRow("Harga Satuan",
                                 "Rp${NumberFormat('#,##0', 'id_ID').format(double.parse(item['harga_satuan'].toString()))}"),
                             buildInfoRow("Harga Jual",

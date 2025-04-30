@@ -201,15 +201,15 @@ class _MemberPState extends State<MemberP> {
                             color: Color.fromARGB(255, 166, 31, 31), size: 45),
                       ),
                       SizedBox(height: 10),
-                      Text(
-                        'Member : ' + item['nama'],
-                        style: GoogleFonts.nunito(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      Text('Member : ' + item['nama'],
+                          style: GoogleFonts.nunito(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1),
                       Text(
                         "Saldo : " +
                             "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(item['saldo'].toString()))}",
@@ -498,7 +498,7 @@ class _MemberPState extends State<MemberP> {
                           SizedBox(height: 10),
                           buildInputLabel('Id Pegawai', " *"),
                           buildTextField(
-                            inputFormat: LengthLimitingTextInputFormatter(200),
+                            inputFormat: LengthLimitingTextInputFormatter(12),
                             controller: newIdPegController,
                             hintText: 'ID : 1',
                             prefixIcon: CupertinoIcons.person_2_alt,
@@ -520,8 +520,7 @@ class _MemberPState extends State<MemberP> {
                             hintText: 'Rp. 50.000',
                             prefixIcon: FontAwesomeIcons.moneyBill,
                             type: TextInputType.number,
-                            inputFormat:
-                                FilteringTextInputFormatter.singleLineFormatter,
+                            inputFormat: LengthLimitingTextInputFormatter(20),
                           ),
                           SizedBox(height: 10),
                           buildInputLabel('Poin User', ' *'),
@@ -530,8 +529,7 @@ class _MemberPState extends State<MemberP> {
                             hintText: '500 poin',
                             prefixIcon: Icons.star,
                             type: TextInputType.number,
-                            inputFormat:
-                                FilteringTextInputFormatter.singleLineFormatter,
+                            inputFormat: LengthLimitingTextInputFormatter(20),
                           ),
                         ],
                       ),
@@ -564,12 +562,6 @@ class _MemberPState extends State<MemberP> {
                                             newPoinController.text,
                                             fromButton: true,
                                           );
-                                          await memberController.refresh();
-                                          Navigator.pop(context);
-                                          newNameController.clear();
-                                          newNoController.clear();
-                                          newSaldoController.clear();
-                                          newPoinController.clear();
                                         } catch (e) {
                                           print(
                                               "Error saat menambahkan member: $e");
@@ -577,6 +569,13 @@ class _MemberPState extends State<MemberP> {
                                         } finally {
                                           memberController.isLoading.value =
                                               false;
+                                          Navigator.pop(context);
+                                          await memberController.refresh();
+                                          newNameController.clear();
+                                          newIdPegController.clear();
+                                          newNoController.clear();
+                                          newSaldoController.clear();
+                                          newPoinController.clear();
                                         }
                                       },
                                 style: ElevatedButton.styleFrom(
@@ -689,8 +688,7 @@ class _MemberPState extends State<MemberP> {
                     hintText: '0891-XXXX-XXXX',
                     prefixIcon: CupertinoIcons.phone_circle,
                     type: TextInputType.number,
-                    inputFormat:
-                        FilteringTextInputFormatter.singleLineFormatter,
+                    inputFormat: LengthLimitingTextInputFormatter(12),
                   ),
                   SizedBox(height: 15),
                   buildInputLabel('Saldo', ' *'),
@@ -699,8 +697,7 @@ class _MemberPState extends State<MemberP> {
                     hintText: 'Rp. 50.000',
                     prefixIcon: FontAwesomeIcons.moneyBill,
                     type: TextInputType.number,
-                    inputFormat:
-                        FilteringTextInputFormatter.singleLineFormatter,
+                    inputFormat: LengthLimitingTextInputFormatter(20),
                   ),
                   SizedBox(height: 15),
                   buildInputLabel('Poin User', ' *'),
@@ -709,8 +706,7 @@ class _MemberPState extends State<MemberP> {
                     hintText: '500 poin',
                     prefixIcon: Icons.star,
                     type: TextInputType.number,
-                    inputFormat:
-                        FilteringTextInputFormatter.singleLineFormatter,
+                    inputFormat: LengthLimitingTextInputFormatter(20),
                   ),
                   SizedBox(height: 24),
                   Row(

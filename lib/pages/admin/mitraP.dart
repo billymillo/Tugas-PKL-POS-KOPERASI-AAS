@@ -201,15 +201,15 @@ class _MitraPState extends State<MitraP> {
                             color: PrimaryColor().blue, size: 45),
                       ),
                       SizedBox(height: 10),
-                      Text(
-                        item['nama'],
-                        style: GoogleFonts.nunito(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      Text(item['nama'],
+                          style: GoogleFonts.nunito(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1),
                       Text(
                         item['no_tlp'],
                         style: GoogleFonts.nunito(

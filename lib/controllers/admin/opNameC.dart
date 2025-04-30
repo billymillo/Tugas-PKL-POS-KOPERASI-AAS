@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
+import 'package:bluetooth_thermal_printer_example/services/apiServiceTr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class OpNameController extends GetxController {
   final ApiService apiService = ApiService();
+  final ApiServiceTr apiServiceTr = ApiServiceTr();
   var url = ApiService.baseUrl;
   ScrollController scrollController = ScrollController();
 
@@ -88,7 +90,6 @@ class OpNameController extends GetxController {
     }
   }
 
-
   bool isAllItemSaved(String idOpname) {
     final currentOpnameDetails = opnameDet
         .where((op) => op['id_opname'].toString() == idOpname)
@@ -101,6 +102,46 @@ class OpNameController extends GetxController {
       );
       return matchingDetail.isNotEmpty;
     });
+  }
+
+  Future<void> saveAllUnsavedItems(String idOpname) async {
+    for (int i = 0; i < produk.length; i++) {
+      final produkItem = produk[i];
+
+      // Cek apakah item ini sudah ada di opnameDet
+      final alreadySaved = opnameDet.any((item) =>
+          item['id_produk'].toString() == produkItem['id'].toString() &&
+          item['id_opname'].toString() == idOpname);
+
+      // Jika belum ada, baru disimpan
+      if (!alreadySaved) {
+        final stok = int.tryParse(produkItem['stok_input']?.toString() ?? '') ??
+            produkItem['stok'];
+        final stokAsli =
+            int.tryParse(produkItem['stok_asli_input']?.toString() ?? '') ??
+                produkItem['stok_asli'];
+        final hargaSatuan =
+            int.tryParse(produkItem['harga_satuan_input']?.toString() ?? '') ??
+                produkItem['harga_satuan'];
+        final hargaJual =
+            int.tryParse(produkItem['harga_jual_input']?.toString() ?? '') ??
+                produkItem['harga_jual'];
+        final catatan = '';
+
+        await addDetOpname(
+          produkItem['id'].toString(),
+          idOpname,
+          stok.toString(),
+          stokAsli.toString(),
+          hargaSatuan.toString(),
+          hargaJual.toString(),
+          catatan,
+        );
+      }
+    }
+
+    await fetchDetOpName();
+    await fetchProduk();
   }
 
   String statusName(String idStatus) {
@@ -284,6 +325,45 @@ class OpNameController extends GetxController {
     }
   }
 
+  Future<void> deleteOpname(String id) async {
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userUpdate = prefs.getString('name') ?? 'system';
+      final response = await apiService.deleteOpname(
+        id,
+        userUpdate,
+      );
+      if (response['status'] == true) {
+          Get.snackbar(
+            'Success',
+            response['message'],
+            backgroundColor: Colors.green.withOpacity(0.5),
+            icon: Icon(Icons.check_circle, color: Colors.white),
+          );
+        print('Success: $response');
+      } else {
+        Get.snackbar(
+          'Error',
+          '${response['message']}',
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+        print('Gagal: $response');
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat Menghapus Mitra.',
+        backgroundColor: Colors.red.withOpacity(0.5),
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> addDetOpname(
     String idProduk,
     String idOpname,
@@ -308,20 +388,9 @@ class OpNameController extends GetxController {
     );
     try {
       if (response['status'] == true) {
-        Get.snackbar(
-          'Success',
-          response['message'],
-          backgroundColor: Colors.green.withOpacity(0.5),
-          icon: Icon(Icons.check_circle, color: Colors.white),
-        );
+        print("Opname Berhasil" + response['message']);
       } else if (response['status'] == false) {
-        Get.snackbar(
-          'Error',
-          'Error Saat Menambahkan Opname Detail',
-          backgroundColor: DarkColor().red.withOpacity(0.5),
-          icon: Icon(Icons.crisis_alert, color: Colors.black),
-        );
-        print('error message: $response');
+        print("Opname Gagal $response");
       }
     } catch (e) {
       Get.snackbar(
@@ -415,6 +484,34 @@ class OpNameController extends GetxController {
         print('error message: $response');
       }
     } catch (e) {
+      Get.snackbar(
+        'Gagal',
+        e.toString(),
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> tambahStok(
+    String id,
+    String stok,
+  ) async {
+    isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    String? userUpdate = prefs.getString('name') ?? 'system';
+    try {
+      final response = await apiServiceTr.tambahStok(id, stok, userUpdate);
+      if (response['status'] == true) {
+        print("TambahStok Berhasil" + response['message']);
+      } else {
+        print("TambahStok Gagal" + response['message']);
+      }
+    } catch (e) {
+      print(e);
       Get.snackbar(
         'Gagal',
         e.toString(),

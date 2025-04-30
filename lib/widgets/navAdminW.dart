@@ -43,6 +43,11 @@ Widget buildDrawer(BuildContext context) {
                 title: "List",
                 routeName: Routes.PRODUCTP,
               ),
+              drawerItem(
+                icon: Icons.add_to_photos_outlined,
+                title: "Add On",
+                routeName: Routes.ADDONP,
+              ),
             ],
             collapsedShape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -200,13 +205,13 @@ Widget buildDrawer(BuildContext context) {
             color: DarkColor().grey,
           ),
           title: Text(
-            "Laporan Barang",
+            "Reporting",
             style: TextStyle(
               color: DarkColor().grey,
             ),
           ),
           onTap: () {
-            Navigator.pop(context);
+            Get.toNamed(Routes.REPORTINGP);
           },
         ),
         ListTile(

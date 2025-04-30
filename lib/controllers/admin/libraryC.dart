@@ -22,6 +22,7 @@ class LibraryController extends GetxController {
   var tipe = <Map<String, dynamic>>[].obs;
   var kategori = <Map<String, dynamic>>[].obs;
   var mitra = <Map<String, dynamic>>[].obs;
+  var addOn = <Map<String, dynamic>>[].obs;
 
   Rx<File?> imagePathK = Rx<File?>(null);
   var hasNewImage = false.obs;
@@ -49,6 +50,7 @@ class LibraryController extends GetxController {
     fetchTipe();
     fetchMember();
     fetchMetode();
+    fetchAddOn();
     konfersiPoin();
   }
 
@@ -82,7 +84,9 @@ class LibraryController extends GetxController {
     }
     isLoading.value = true;
     try {
-      final response = await apiService.mitra(nama, no_tlp, email);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiService.mitra(nama, no_tlp, email, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',
@@ -154,11 +158,14 @@ class LibraryController extends GetxController {
     }
     isLoading.value = true;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userUpdate = prefs.getString('name') ?? 'system';
       final response = await apiService.editMitra(
         id,
         nama,
         no_tlp,
         email,
+        userUpdate,
       );
       if (response['status'] == true) {
         Get.snackbar(
@@ -249,7 +256,9 @@ class LibraryController extends GetxController {
   Future<void> addTipe(String tipe) async {
     isLoading.value = true;
     try {
-      final response = await apiService.tipe(tipe);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiService.tipe(tipe, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',
@@ -277,9 +286,12 @@ class LibraryController extends GetxController {
     }
     isLoading.value = true;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userUpdate = prefs.getString('name') ?? 'system';
       final response = await apiService.editTipe(
         id,
         tipe,
+        userUpdate,
       );
       if (response['status'] == true) {
         Get.snackbar(
@@ -360,10 +372,13 @@ class LibraryController extends GetxController {
 
     isLoading.value = true;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userUpdate = prefs.getString('name') ?? 'system';
       final response = await apiService.editKategori(
         id,
         kategori,
-        hasNewImage.value ? imagePathK.value : null, // Gunakan dari controller
+        hasNewImage.value ? imagePathK.value : null,
+        userUpdate,
       );
 
       if (response['status'] == true) {
@@ -373,7 +388,7 @@ class LibraryController extends GetxController {
           backgroundColor: Colors.green.withOpacity(0.5),
           icon: Icon(Icons.check_circle, color: Colors.white),
         );
-        hasNewImage.value = false; // Reset setelah berhasil
+        hasNewImage.value = false;
       } else {
         Get.snackbar(
           'Error',
@@ -460,7 +475,10 @@ class LibraryController extends GetxController {
   Future<void> addNewKategori(String kategori, File gambar_kategori) async {
     isLoading.value = true;
     try {
-      final response = await apiService.kategori(kategori, gambar_kategori);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response =
+          await apiService.kategori(kategori, gambar_kategori, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',
@@ -505,15 +523,17 @@ class LibraryController extends GetxController {
   }
 
   Future<void> addNewMember(
-      String nama, String no_tlp, String saldo, String poin, String idPeg,
+      String nama, String idPeg, String no_tlp, String saldo, String poin,
       {bool fromButton = false}) async {
     if (!fromButton) {
       return;
     }
     isLoading.value = true;
     try {
-      final response =
-          await apiServiceTr.member(nama, idPeg, no_tlp, saldo, poin);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiServiceTr.member(
+          nama, idPeg, no_tlp, saldo, poin, userInput);
       print("Response API: $response");
       if (response['status'] == true) {
         Get.snackbar(
@@ -589,12 +609,15 @@ class LibraryController extends GetxController {
     }
     isLoading.value = true;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userUpdate = prefs.getString('name') ?? 'system';
       final response = await apiServiceTr.editMember(
         id,
         nama,
         no_tlp,
         saldo,
         poin,
+        userUpdate,
       );
       if (response['status'] == true) {
         Get.snackbar(
@@ -686,7 +709,9 @@ class LibraryController extends GetxController {
   Future<void> addMetode(String metode) async {
     isLoading.value = true;
     try {
-      final response = await apiServiceTr.metode(metode);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiServiceTr.metode(metode, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',
@@ -714,10 +739,9 @@ class LibraryController extends GetxController {
     }
     isLoading.value = true;
     try {
-      final response = await apiServiceTr.editMetode(
-        id,
-        metode,
-      );
+      final prefs = await SharedPreferences.getInstance();
+      String? userUpdate = prefs.getString('name') ?? 'system';
+      final response = await apiServiceTr.editMetode(id, metode, userUpdate);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',
@@ -764,10 +788,139 @@ class LibraryController extends GetxController {
     );
   }
 
+  Future<void> fetchAddOn() async {
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(url + "/add_on"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOn.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deleteAddOn(String id, {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    try {
+      final response = await apiService.deleteAddOn(
+        id,
+      );
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          '${response['message']}',
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat Menghapus Mitra.',
+        backgroundColor: Colors.red.withOpacity(0.5),
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> addAddOn(String addOn, String harga) async {
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiService.addAddOn(addOn, harga, userInput);
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: DarkColor().red.withOpacity(0.5),
+        icon: Icon(Icons.crisis_alert, color: Colors.black),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> editAddOn(String id, String addOn, String harga,
+      {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userUpdate = prefs.getString('name') ?? 'system';
+      final response = await apiService.editAddOn(
+        id,
+        addOn,
+        harga,
+        userUpdate,
+      );
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          '${response['message']}',
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat Menghapus Mitra.',
+        backgroundColor: Colors.red.withOpacity(0.5),
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> refresh() async {
     await fetchTipe();
     await fetchKategori();
     await fetchMitra();
     await fetchMetode();
+    await fetchMember();
+    await fetchAddOn();
   }
 }

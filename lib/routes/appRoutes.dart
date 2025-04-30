@@ -11,6 +11,7 @@ abstract class Routes {
 
   static const DASHBOARDADMINP = _Paths.DASHBOARDADMINP;
   static const ADDPRODUCTP = _Paths.ADDPRODUCTP;
+  static const ADDONP = _Paths.ADDONP;
   static const PRODUCTP = _Paths.PRODUCTP;
   static const DETAILPRODUKP = _Paths.DETAILPRODUKP;
   static const EDITPRODUCTP = _Paths.EDITPRODUCTP;
@@ -24,7 +25,7 @@ abstract class Routes {
   static const TRANSAKSIINMITRAP = _Paths.TRANSAKSIINMITRAP;
   static const OPNAMEP = _Paths.OPNAMEP;
   static const OPNAMEDET = _Paths.OPNAMEDET;
-  
+  static const REPORTINGP = _Paths.REPORTINGP;
 }
 
 abstract class _Paths {
@@ -37,6 +38,7 @@ abstract class _Paths {
 
   static const DASHBOARDADMINP = '/dashboardadminp';
   static const ADDPRODUCTP = '/addproductp';
+  static const ADDONP = '/AddOnP';
   static const PRODUCTP = '/productp';
   static const DETAILPRODUKP = '/detailprodukp';
   static const EDITPRODUCTP = '/editproductp';
@@ -50,4 +52,5 @@ abstract class _Paths {
   static const TRANSAKSIINMITRAP = '/TransaksiInMitraP';
   static const OPNAMEP = '/OpNameP';
   static const OPNAMEDET = '/OpNameDetail';
+  static const REPORTINGP = '/ReportingP';
 }

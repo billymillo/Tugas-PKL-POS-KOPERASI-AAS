@@ -1,5 +1,6 @@
 import 'package:bluetooth_thermal_printer_example/pages/admin/OpNameDet.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/TipeP.dart';
+import 'package:bluetooth_thermal_printer_example/pages/admin/addOnP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/addProductP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/dashboardAdminP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/detailProdukP.dart';
@@ -10,6 +11,7 @@ import 'package:bluetooth_thermal_printer_example/pages/admin/metodePembP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/mitraP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/opNameP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/productP.dart';
+import 'package:bluetooth_thermal_printer_example/pages/admin/reportingP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/transaksiInMitra.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/transaksiInP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/kasir/kasirP.dart';
@@ -49,6 +51,10 @@ class AppPages {
     GetPage(
       name: _Paths.ADDPRODUCTP,
       page: () => AddProductP(),
+    ),
+    GetPage(
+      name: _Paths.ADDONP,
+      page: () => AddOnP(),
     ),
     GetPage(
       name: _Paths.PRODUCTP,
@@ -101,6 +107,10 @@ class AppPages {
     GetPage(
       name: _Paths.OPNAMEDET,
       page: () => OpNameDet(),
+    ),
+    GetPage(
+      name: _Paths.REPORTINGP,
+      page: () => ReportingP(),
     ),
   ];
 }

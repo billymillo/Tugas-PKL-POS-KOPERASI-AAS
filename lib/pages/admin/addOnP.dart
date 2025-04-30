@@ -12,15 +12,15 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-class MetodeP extends StatefulWidget {
+class AddOnP extends StatefulWidget {
   @override
-  _MetodePState createState() => _MetodePState();
+  _AddOnPState createState() => _AddOnPState();
 }
 
-class _MetodePState extends State<MetodeP> {
-  final LibraryController metodeController = Get.put(LibraryController());
-  final TextEditingController newMetodeController = TextEditingController();
-  final TextEditingController poinController = TextEditingController();
+class _AddOnPState extends State<AddOnP> {
+  final LibraryController addOnC = Get.put(LibraryController());
+  final TextEditingController namaAddOnNewController = TextEditingController();
+  final TextEditingController hargaAddOnNewController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -35,7 +35,7 @@ class _MetodePState extends State<MetodeP> {
               padding: const EdgeInsets.only(top: 70),
               child: RefreshIndicator(
                 onRefresh: () async {
-                  await metodeController.refresh();
+                  await addOnC.refresh();
                 },
                 child: NotificationListener<ScrollNotification>(
                   child: CustomScrollView(
@@ -55,12 +55,12 @@ class _MetodePState extends State<MetodeP> {
                                     children: [
                                       Row(
                                         children: [
-                                          Icon(Icons.people,
+                                          Icon(Icons.add_to_photos_outlined,
                                               size: 25,
                                               color: PrimaryColor().blue),
                                           SizedBox(width: 10),
                                           Text(
-                                            'Metode Pembayaran',
+                                            'Add On Barang',
                                             style: GoogleFonts.roboto(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20,
@@ -71,7 +71,7 @@ class _MetodePState extends State<MetodeP> {
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(right: 16),
-                                        child: buildNewMetodeDialog(),
+                                        child: buildNewAddOnDialog(),
                                       ),
                                     ],
                                   ),
@@ -83,17 +83,18 @@ class _MetodePState extends State<MetodeP> {
                                   padding: EdgeInsets.only(top: 10),
                                   child: ListView.builder(
                                     scrollDirection: Axis.horizontal,
-                                    itemCount: metodeController.metode.length,
+                                    itemCount: addOnC.addOn.length,
                                     itemBuilder: (context, index) {
-                                      var metode =
-                                          metodeController.metode[index];
+                                      var addOn = addOnC.addOn[index];
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 5),
                                         child: Stack(
                                           children: [
-                                            buildMetodeDialog(
-                                                metode['id'], metode['metode']),
+                                            buildAddOnDialog(
+                                                addOn['id'],
+                                                addOn['add_on'],
+                                                addOn['harga']),
                                             Positioned(
                                               right: 4,
                                               top: 0,
@@ -168,7 +169,7 @@ class _MetodePState extends State<MetodeP> {
                                                                       height:
                                                                           25),
                                                                   Text(
-                                                                    "Hapus Metode",
+                                                                    "Hapus Add On",
                                                                     style:
                                                                         TextStyle(
                                                                       color: Colors
@@ -184,7 +185,7 @@ class _MetodePState extends State<MetodeP> {
                                                                       height:
                                                                           10),
                                                                   Text(
-                                                                    "Apakah anda yakin untuk menghapus Metode ini?",
+                                                                    "Apakah anda yakin untuk menghapus Add On ini?",
                                                                     style:
                                                                         TextStyle(
                                                                       color: Colors
@@ -209,15 +210,15 @@ class _MetodePState extends State<MetodeP> {
                                                                   ElevatedButton(
                                                                     onPressed:
                                                                         () async {
-                                                                      await metodeController.deleteMetode(
-                                                                          metode[
+                                                                      await addOnC.deleteAddOn(
+                                                                          addOn[
                                                                               'id'],
                                                                           fromButton:
                                                                               true);
-                                                                      await metodeController
+                                                                      await addOnC
                                                                           .refresh();
                                                                       Get.to(
-                                                                          MetodeP());
+                                                                          AddOnP());
                                                                       Navigator.pop(
                                                                           context);
                                                                     },
@@ -340,74 +341,8 @@ class _MetodePState extends State<MetodeP> {
                         }),
                       ),
                       SliverToBoxAdapter(
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 16, top: 32),
-                              child: Row(
-                                children: [
-                                  Icon(CupertinoIcons.star_circle_fill,
-                                      size: 25, color: PrimaryColor().blue),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Konfigurasi Poin Member',
-                                    style: GoogleFonts.roboto(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                        color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(left: 32, top: 20),
-                                  width: 300,
-                                  child: buildTextField(
-                                      controller: poinController,
-                                      hintText: '1 Poin = "..." Rupiah',
-                                      prefixIcon: Icons.star,
-                                      type: TextInputType.number,
-                                      inputFormat:
-                                          LengthLimitingTextInputFormatter(20)),
-                                ),
-                                SizedBox(width: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    int newValue =
-                                        int.tryParse(poinController.text) ??
-                                            100;
-                                    metodeController.simpanPoin(newValue);
-                                    poinController.clear();
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(top: 20),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: PrimaryColor().blue,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 10),
-                                      child: Text(
-                                        'Simpan',
-                                        style: GoogleFonts.nunito(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SliverToBoxAdapter(
                         child: Obx(() {
-                          if (metodeController.isLoading.value) {
+                          if (addOnC.isLoading.value) {
                             return Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Center(child: CircularProgressIndicator()),
@@ -440,7 +375,7 @@ class _MetodePState extends State<MetodeP> {
     );
   }
 
-  Widget buildNewMetodeDialog() {
+  Widget buildNewAddOnDialog() {
     return ElevatedButton(
       onPressed: () {
         showDialog(
@@ -462,13 +397,13 @@ class _MetodePState extends State<MetodeP> {
                       Row(
                         children: [
                           Icon(
-                            CupertinoIcons.person_2,
+                            Icons.add_to_photos_outlined,
                             color: PrimaryColor().blue,
                             size: 24,
                           ),
                           SizedBox(width: 12),
                           Text(
-                            "Tambahkan Metode Pembayaran ",
+                            "Tambah Add On",
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 18,
@@ -480,14 +415,24 @@ class _MetodePState extends State<MetodeP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Metode Pembayaran', " *"),
+                          buildInputLabel('Nama Add On', " *"),
                           buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
-                            controller: newMetodeController,
-                            hintText: 'Metode Pembayaran',
-                            prefixIcon: FontAwesomeIcons.moneyCheck,
+                            controller: namaAddOnNewController,
+                            hintText: 'Rebus',
+                            prefixIcon: Icons.add_to_photos_outlined,
                             type: TextInputType.name,
                           ),
+                          SizedBox(height: 10),
+                          buildInputLabel('Harga Add On', " *"),
+                          buildTextField(
+                            inputFormat: LengthLimitingTextInputFormatter(200),
+                            controller: hargaAddOnNewController,
+                            hintText: 'Rp. ',
+                            prefixIcon: FontAwesomeIcons.moneyBillWave,
+                            type: TextInputType.number,
+                          ),
+                          SizedBox(height: 10),
                         ],
                       ),
                       SizedBox(height: 24),
@@ -506,23 +451,23 @@ class _MetodePState extends State<MetodeP> {
                           ),
                           SizedBox(width: 12),
                           Obx(() => ElevatedButton(
-                                onPressed: metodeController.isLoading.value
+                                onPressed: addOnC.isLoading.value
                                     ? null
                                     : () async {
-                                        metodeController.isLoading.value = true;
+                                        addOnC.isLoading.value = true;
                                         try {
-                                          await metodeController.addMetode(
-                                            newMetodeController.text,
+                                          await addOnC.addAddOn(
+                                            namaAddOnNewController.text,
+                                            hargaAddOnNewController.text,
                                           );
-                                          newMetodeController.clear();
-                                          await metodeController.refresh();
+                                          await addOnC.refresh();
                                           Navigator.pop(context);
-                                          newMetodeController.clear();
+                                          namaAddOnNewController.clear();
+                                          hargaAddOnNewController.clear();
                                         } catch (e) {
                                           Get.snackbar("Error", e.toString());
                                         } finally {
-                                          metodeController.isLoading.value =
-                                              false;
+                                          addOnC.isLoading.value = false;
                                         }
                                       },
                                 style: ElevatedButton.styleFrom(
@@ -531,7 +476,7 @@ class _MetodePState extends State<MetodeP> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: metodeController.isLoading.value
+                                child: addOnC.isLoading.value
                                     ? SizedBox(
                                         width: 15,
                                         height: 15,
@@ -582,7 +527,7 @@ class _MetodePState extends State<MetodeP> {
           Icon(Icons.add, color: Colors.white, size: 20),
           SizedBox(width: 8),
           Text(
-            'Tambah Metode',
+            'Tambah Add On',
             style: TextStyle(
               color: Colors.white,
               fontSize: 14,
@@ -594,9 +539,11 @@ class _MetodePState extends State<MetodeP> {
     );
   }
 
-  Widget buildMetodeDialog(String id, String metodeLama) {
-    final TextEditingController namaMetodeController =
-        TextEditingController(text: metodeLama);
+  Widget buildAddOnDialog(String id, String addOn, String harga) {
+    final TextEditingController newAddOnText =
+        TextEditingController(text: addOn);
+    final TextEditingController newAddOnHargaText =
+        TextEditingController(text: harga);
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -618,13 +565,13 @@ class _MetodePState extends State<MetodeP> {
                       Row(
                         children: [
                           Icon(
-                            FontAwesomeIcons.moneyCheck,
+                            Icons.add_to_photos_outlined,
                             color: PrimaryColor().blue,
                             size: 24,
                           ),
                           SizedBox(width: 12),
                           Text(
-                            "Edit Metode Pembayaran ",
+                            "Edit Add On ",
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 18,
@@ -636,14 +583,24 @@ class _MetodePState extends State<MetodeP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Metode Pembayaran', " *"),
+                          buildInputLabel('Nama Add On', " *"),
                           buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
-                            controller: namaMetodeController,
-                            hintText: 'Metode Pembayaran',
-                            prefixIcon: FontAwesomeIcons.moneyCheck,
+                            controller: newAddOnText,
+                            hintText: 'Rebus',
+                            prefixIcon: Icons.add_to_photos_outlined,
                             type: TextInputType.name,
                           ),
+                          SizedBox(height: 10),
+                          buildInputLabel('Harga Add On', " *"),
+                          buildTextField(
+                            inputFormat: LengthLimitingTextInputFormatter(200),
+                            controller: newAddOnHargaText,
+                            hintText: 'Rp. ',
+                            prefixIcon: FontAwesomeIcons.moneyBillWave,
+                            type: TextInputType.number,
+                          ),
+                          SizedBox(height: 10),
                         ],
                       ),
                       SizedBox(height: 24),
@@ -663,14 +620,16 @@ class _MetodePState extends State<MetodeP> {
                           SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: () async {
-                              await metodeController.editMetode(
+                              await addOnC.editAddOn(
                                 id,
-                                namaMetodeController.text,
+                                newAddOnText.text,
+                                newAddOnHargaText.text,
                                 fromButton: true,
                               );
-                              await metodeController.refresh();
+                              await addOnC.refresh();
                               Navigator.pop(context);
-                              namaMetodeController.clear();
+                              newAddOnText.clear();
+                              newAddOnHargaText.clear();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: PrimaryColor().blue,
@@ -711,31 +670,23 @@ class _MetodePState extends State<MetodeP> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        color: Colors.black,
+        color: Colors.white,
         elevation: 2,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 120),
-            child: Row(
+            child: Column(
               children: [
-                Icon(
-                  FontAwesomeIcons.creditCard,
-                  color: Colors.amber.shade300,
-                  size: 24,
-                ),
-                SizedBox(width: 12),
-                Flexible(
-                  child: Text(
-                    truncateWords(metodeLama, 10),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                Text(
+                  truncateWords(addOn, 10),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ],
             ),

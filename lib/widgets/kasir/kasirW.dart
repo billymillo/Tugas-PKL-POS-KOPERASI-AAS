@@ -47,7 +47,7 @@ class KasirW {
                     Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
                           child: Container(
                             padding: EdgeInsets.all(25),
@@ -157,8 +157,19 @@ class KasirW {
     );
   }
 
-  GestureDetector product(nama, mitra, harga, stok, foto, varian, listDibeli,
-      tambahKeKeranjangFunc, kurangKeKeranjangFunc, context) {
+  GestureDetector product(
+      nama,
+      mitra,
+      harga,
+      stok,
+      foto,
+      varian,
+      addOn,
+      listDibeli,
+      tambahKeKeranjangFunc,
+      kurangKeKeranjangFunc,
+      context,
+      index) {
     return GestureDetector(
       onTap: () {
         print(listDibeli.length.toString());
@@ -293,9 +304,25 @@ class KasirW {
                       ))
                   : stok != 'Stok : 0'
                       ? GestureDetector(
-                          onTap: varian == null
-                              ? tambahKeKeranjangFunc
-                              : tambahKeKeranjangFunc,
+                          onTap: () {
+                            if (addOn != '1') {
+                              final int hargaAsli = int.tryParse(
+                                      harga.replaceAll(RegExp(r'[^\d]'), '')) ??
+                                  0; // Mengambil harga asli dari harga yang diformat
+                              showAddOnDialog(
+                                  context,
+                                  index,
+                                  nama,
+                                  hargaAsli,
+                                  stok,
+                                  addOn,
+                                  kurangKeKeranjangFunc,
+                                  tambahKeKeranjangFunc,
+                                  foto);
+                            } else {
+                              tambahKeKeranjangFunc();
+                            }
+                          },
                           child: Container(
                             width: double.infinity,
                             padding: EdgeInsets.symmetric(vertical: 6),
@@ -331,6 +358,277 @@ class KasirW {
                         )
             ],
           )),
+    );
+  }
+
+  void showAddOnDialog(BuildContext context, int index, nama, harga, stok,
+      addOn, kurangKeKeranjangFunc, tambahKeKeranjangFunc, foto) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Add On',
+                style: GoogleFonts.nunito(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          image: DecorationImage(
+                              image: NetworkImage(foto), fit: BoxFit.cover),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 5),
+                        Text(
+                          nama,
+                          style: GoogleFonts.nunito(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '$stok',
+                          style: GoogleFonts.nunito(
+                              fontSize: 12, color: Colors.grey),
+                        ),
+                        SizedBox(height: 5),
+                        Row(
+                          children: [
+                            Obx(() {
+                              final int jumlah = controller.jumlahPesanan.value;
+                              final int hargaTambahan =
+                                  controller.addOnHarga(addOn);
+                              final int totalHarga =
+                                  (controller.selectedAddOn.value == 'Rebus')
+                                      ? harga * jumlah + hargaTambahan
+                                      : harga * jumlah;
+
+                              return Text(
+                                "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(totalHarga.toString()))}",
+                                style: GoogleFonts.nunito(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: PrimaryColor().blue,
+                                ),
+                              );
+                            }),
+                            SizedBox(width: 10),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Obx(() {
+                          return Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  controller.selectedAddOn.value = 'Tidak';
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 8, horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    color: controller.selectedAddOn.value ==
+                                            'Tidak'
+                                        ? PrimaryColor().blue
+                                        : Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: controller.selectedAddOn.value ==
+                                              'Tidak'
+                                          ? PrimaryColor().blue
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Tidak',
+                                    style: GoogleFonts.nunito(
+                                      color: controller.selectedAddOn.value ==
+                                              'Tidak'
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              GestureDetector(
+                                onTap: () {
+                                  controller.selectedAddOn.value = 'Rebus';
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 8, horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    color: controller.selectedAddOn.value ==
+                                            'Rebus'
+                                        ? PrimaryColor().blue
+                                        : Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: controller.selectedAddOn.value ==
+                                              'Rebus'
+                                          ? PrimaryColor().blue
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    controller.addOnName(addOn),
+                                    style: GoogleFonts.nunito(
+                                      color: controller.selectedAddOn.value ==
+                                              'Rebus'
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                      width: 300,
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        color: PrimaryColor().grey,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              controller.jumlahPesanan.value--;
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                  color: PrimaryColor().blue,
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Icon(
+                                size: 13,
+                                FontAwesomeIcons.minus,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          Obx(() => Text(
+                                '${controller.jumlahPesanan.value}',
+                                style: GoogleFonts.nunito(
+                                  fontSize: 14,
+                                  color: PrimaryColor().blue,
+                                ),
+                              )),
+                          GestureDetector(
+                            onTap: () {
+                              controller.jumlahPesanan.value++;
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                  color: PrimaryColor().blue,
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Icon(
+                                size: 13,
+                                FontAwesomeIcons.plus,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
+                ],
+              ),
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  final stok = int.tryParse(
+                          controller.filteredProduk[index]['jumlah']) ??
+                      0;
+                  final dibeli =
+                      controller.filteredProduk[index]['listDibeli'].length;
+                  final sisaStok = stok - dibeli;
+
+                  final selectedAddOn = controller.selectedAddOn.value;
+                  final addOnValue =
+                      selectedAddOn == 'Rebus' ? addOn.toString() : '1';
+
+                  if (controller.jumlahPesanan.value <= sisaStok) {
+                    for (int i = 0; i < controller.jumlahPesanan.value; i++) {
+                      controller.tambahKeKeranjang(index, null,
+                          addOnValue: addOnValue);
+                    }
+                    controller.jumlahPesanan.value = 0;
+                    Navigator.pop(context);
+                  } else {
+                    Get.snackbar(
+                        "Stok Tidak Cukup", "Jumlah melebihi stok tersedia");
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 6),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      color: PrimaryColor().blue,
+                      border: Border.all(width: 1, color: PrimaryColor().blue)),
+                  child: Text(
+                    'Simpan',
+                    style: GoogleFonts.nunito(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -397,7 +695,7 @@ class KasirW {
     );
   }
 
-  Column bill(produk, harga, jumlah, tipe) {
+  Column bill(produk, harga, addOn, jumlah, tipe) {
     return Column(
       children: [
         Row(
@@ -420,6 +718,27 @@ class KasirW {
             ),
           ],
         ),
+        SizedBox(
+          height: 5,
+        ),
+        if (addOn != '1')
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                controller.addOnName(addOn),
+                style: GoogleFonts.nunito(
+                  fontSize: 10,
+                ),
+              ),
+              Text(
+                "+ ${NumberFormat('#,##0', 'id_ID').format(controller.addOnHarga(addOn))}",
+                style: GoogleFonts.nunito(
+                    fontSize: 10, color: PrimaryColor().blue),
+              ),
+            ],
+          ),
+        if (addOn == '1') SizedBox(height: 1),
         SizedBox(
           height: 5,
         ),
@@ -539,8 +858,7 @@ class KasirW {
                       data: qrisData,
                       version: QrVersions.auto,
                       size: 200,
-                      embeddedImage:
-                          const AssetImage("assets/image/aas_logo.png"),
+                      embeddedImage: AssetImage("assets/image/aas_logo.png"),
                     ),
 
                     SizedBox(height: 10),
@@ -573,8 +891,8 @@ class KasirW {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 5),
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 5),
                                         child: SizedBox(
                                           child: CircularProgressIndicator(
                                             color: Colors.white,
@@ -697,7 +1015,7 @@ class KasirW {
                                 shape: BoxShape.circle,
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.only(right: 7),
+                                padding: EdgeInsets.only(right: 7),
                                 child: Icon(
                                   FontAwesomeIcons.moneyBill1,
                                   color: Colors.green,
@@ -782,8 +1100,8 @@ class KasirW {
                                   style: TextStyle(fontSize: 14),
                                   decoration: InputDecoration(
                                     prefixIcon: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, left: 10),
+                                      padding:
+                                          EdgeInsets.only(top: 10, left: 10),
                                       child: Text('Rp. ',
                                           style: TextStyle(
                                               fontSize: 16,
@@ -819,9 +1137,8 @@ class KasirW {
                                                 MainAxisAlignment.center,
                                             children: [
                                               Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5),
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 5),
                                                 child: SizedBox(
                                                   child:
                                                       CircularProgressIndicator(

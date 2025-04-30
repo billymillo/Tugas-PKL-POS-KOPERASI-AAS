@@ -50,7 +50,7 @@ class AdminW {
         child: ListView.builder(
           physics: ScrollPhysics(), // <-- Also change physics
           scrollDirection: Axis.horizontal,
-          itemCount: 3,
+          itemCount: 5,
           itemBuilder: (context, count) {
             return Container(
                 width: 155,
@@ -64,13 +64,13 @@ class AdminW {
                       child: Image(
                           width: 150,
                           height: 140,
-                          image: NetworkImage(produk[count]['image'])),
+                          image: NetworkImage("http://10.10.20.172/POS_CI/uploads/${produk[count]['gambar_barang']}")),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          produk[count]['nama'],
+                          produk[count]['nama_barang'],
                           maxLines: 1,
                           style: GoogleFonts.roboto(
                             fontWeight: FontWeight.w600,
@@ -79,7 +79,7 @@ class AdminW {
                           ),
                         ),
                         Text(
-                          produk[count]['stock'].toString() + ' pcs',
+                          produk[count]['stok'].toString() + ' pcs',
                           style: GoogleFonts.roboto(
                             fontSize: 17,
                             color: PrimaryColor().blue,
@@ -90,84 +90,10 @@ class AdminW {
                   ],
                 ));
           },
-        )
-        // Column(
-        //   crossAxisAlignment: CrossAxisAlignment.start,
-        //   children: [
-        //     Text(
-        //       namaProduk,
-        //       style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-        //     ),
-        //     SizedBox(
-        //       height: 5,
-        //     ),
-        //     Row(
-        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //       children: [
-        //         Text(
-        //           'Tanggal Masuk',
-        //           style: TextStyle(fontWeight: FontWeight.w200, fontSize: 17),
-        //         ),
-        //         Text(
-        //           tanggalMasuk,
-        //           style: TextStyle(fontWeight: FontWeight.w200, fontSize: 17),
-        //         ),
-        //       ],
-        //     ),
-        //     SizedBox(
-        //       height: 5,
-        //     ),
-        //     Row(
-        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //       children: [
-        //         Text(
-        //           'Jumlah Masuk',
-        //           style: TextStyle(fontWeight: FontWeight.w200, fontSize: 17),
-        //         ),
-        //         Text(
-        //           jumlahMasuk,
-        //           style: TextStyle(fontWeight: FontWeight.w200, fontSize: 17),
-        //         ),
-        //       ],
-        //     ),
-        //     SizedBox(
-        //       height: 5,
-        //     ),
-        //     Row(
-        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //       children: [
-        //         Text(
-        //           'Jumlah Keluar',
-        //           style: TextStyle(fontWeight: FontWeight.w200, fontSize: 17),
-        //         ),
-        //         Text(
-        //           jumlahKeluar,
-        //           style: TextStyle(fontWeight: FontWeight.w200, fontSize: 17),
-        //         ),
-        //       ],
-        //     ),
-        //     SizedBox(
-        //       height: 5,
-        //     ),
-        //     Row(
-        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //       children: [
-        //         Text(
-        //           'Sisa Stock',
-        //           style: TextStyle(fontWeight: FontWeight.w200, fontSize: 17),
-        //         ),
-        //         Text(
-        //           sisaStock,
-        //           style: TextStyle(fontWeight: FontWeight.w200, fontSize: 17),
-        //         ),
-        //       ],
-        //     ),
-        //   ],
-        // )
-        );
+        ));
   }
 
-  Container aktivitasTerbaru(namaProduk, harga, qty, metode, tanggalPembelian) {
+  Container aktivitasTerbaru(namaProduk, harga, qty, noTr, tanggal) {
     return Container(
         margin: EdgeInsets.only(top: 10),
         padding: const EdgeInsets.all(10),
@@ -183,16 +109,16 @@ class AdminW {
                 Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                        color: metode == 'QRIS'
+                        color: noTr == 'QRIS'
                             ? PrimaryColor().red
-                            : metode == 'Cash'
+                            : noTr == 'Cash'
                                 ? PrimaryColor().green
                                 : PrimaryColor().blue,
                         borderRadius: BorderRadius.circular(10)),
                     child: Icon(
-                      metode == 'QRIS'
+                      noTr == 'QRIS'
                           ? FontAwesomeIcons.qrcode
-                          : metode == 'Cash'
+                          : noTr == 'Cash'
                               ? FontAwesomeIcons.moneyBill
                               : FontAwesomeIcons.wallet,
                       color: Colors.white,
@@ -205,14 +131,14 @@ class AdminW {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Golda Coffee',
+                      namaProduk,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(
                       height: 5,
                     ),
-                    Text('Aldilan - 2 hari yang lalu'),
+                    Text('$noTr ' + '($tanggal)'),
                   ],
                 )
               ],
@@ -221,11 +147,11 @@ class AdminW {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '7 pcs',
+                  '$qty pcs',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'Rp.7000',
+                  harga,
                   style: TextStyle(color: PrimaryColor().green),
                 ),
               ],
@@ -234,6 +160,8 @@ class AdminW {
         ));
   }
 }
+
+
 
 class ClipPathDahboardAdminClass extends CustomClipper<Path> {
   @override

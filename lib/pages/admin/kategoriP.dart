@@ -159,7 +159,7 @@ class _KategoriPState extends State<KategoriP> {
             decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
-                    "http://10.10.20.240/POS_CI/kategori/${item['gambar_kategori']}",
+                    "http://10.10.20.172/POS_CI/kategori/${item['gambar_kategori']}",
                   ),
                   fit: BoxFit.cover,
                 ),
@@ -231,7 +231,7 @@ class _KategoriPState extends State<KategoriP> {
                                   context,
                                   item['id'],
                                   item['kategori'],
-                                  "http://10.10.20.240/POS_CI/kategori/${item['gambar_kategori']}",
+                                  "http://10.10.20.172/POS_CI/kategori/${item['gambar_kategori']}",
                                 );
                               },
                             ),
@@ -456,8 +456,7 @@ class _KategoriPState extends State<KategoriP> {
                           children: [
                             buildInputLabel('Nama Kategori', " *"),
                             buildTextField(
-                              inputFormat:
-                                  LengthLimitingTextInputFormatter(200),
+                              inputFormat: LengthLimitingTextInputFormatter(30),
                               controller: newKategoriController,
                               hintText: 'Makanan',
                               prefixIcon: CupertinoIcons.square_grid_2x2,
@@ -690,8 +689,7 @@ class _KategoriPState extends State<KategoriP> {
                     hintText: kategoriLama,
                     prefixIcon: CupertinoIcons.square_grid_2x2,
                     type: TextInputType.name,
-                    inputFormat:
-                        FilteringTextInputFormatter.singleLineFormatter,
+                    inputFormat: LengthLimitingTextInputFormatter(30),
                   ),
                   SizedBox(height: 20),
                   buildInputLabel('Gambar Kategori', ' *'),

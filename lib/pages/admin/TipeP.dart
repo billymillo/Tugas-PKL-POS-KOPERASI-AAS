@@ -647,16 +647,28 @@ class _TipePState extends State<TipeP> {
         elevation: 2,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 120),
             child: Text(
-              tipeLama,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+              truncateWords(tipeLama, 10),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
         ),
       ),
     );
+  }
+
+  String truncateWords(String text, int maxWords) {
+    final words = text.trim().split(RegExp(r'\s+'));
+    if (words.length <= maxWords) return text;
+    return words.take(maxWords).join(' ') + '...';
   }
 
   Widget buildInputLabel(String label, String label2) {

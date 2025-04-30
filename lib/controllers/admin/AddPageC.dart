@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:bluetooth_thermal_printer_example/services/apiService.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddPageController extends GetxController {
   final ApiService apiService = ApiService();
@@ -18,6 +19,7 @@ class AddPageController extends GetxController {
   var selectedTipe = Rxn<String>();
   var selectedKategori = Rxn<String>();
   var selectedMitra = Rxn<String>();
+  var selectedAddOn = Rxn<String>();
   var imagePath = Rxn<File>();
   var imagePathK = Rxn<File>();
   var isPickingImage = false.obs;
@@ -31,6 +33,7 @@ class AddPageController extends GetxController {
   var tipe = <Map<String, dynamic>>[].obs;
   var kategori = <Map<String, dynamic>>[].obs;
   var mitra = <Map<String, dynamic>>[].obs;
+  var addOn = <Map<String, dynamic>>[].obs;
 
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
@@ -52,6 +55,27 @@ class AddPageController extends GetxController {
 
         if (jsonData['status'] == true) {
           mitra.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchAddon() async {
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(url + "/add_on"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOn.value = List<Map<String, dynamic>>.from(jsonData['data']);
         } else {
           throw Exception('Failed to load products');
         }
@@ -113,6 +137,7 @@ class AddPageController extends GetxController {
     String id_kategori_barang,
     String id_tipe_barang,
     String id_mitra_barang,
+    String id_add_on,
     String harga_pack,
     String jml_pcs_pack,
     String harga_satuan,
@@ -127,6 +152,7 @@ class AddPageController extends GetxController {
         id_kategori_barang,
         id_tipe_barang,
         id_mitra_barang,
+        id_add_on,
         harga_pack,
         jml_pcs_pack,
         harga_satuan,
@@ -200,7 +226,9 @@ class AddPageController extends GetxController {
   Future<void> addNewTipe(String tipe) async {
     isLoading.value = true;
     try {
-      final response = await apiService.tipe(tipe);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiService.tipe(tipe, userInput);
       if (response['status'] == 'true') {
         Get.snackbar(
           'Success',
@@ -248,7 +276,10 @@ class AddPageController extends GetxController {
   Future<void> addNewKategori(String kategori, File gambar_kategori) async {
     isLoading.value = true;
     try {
-      final response = await apiService.kategori(kategori, gambar_kategori);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response =
+          await apiService.kategori(kategori, gambar_kategori, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',
@@ -278,7 +309,47 @@ class AddPageController extends GetxController {
     }
     isLoading.value = true;
     try {
-      final response = await apiService.mitra(nama, no_tlp, email);
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiService.mitra(nama, no_tlp, email, userInput);
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+      } else if (response['status'] == false) {
+        String errorMessage = _parseErrorMessages(response['message']);
+        Get.snackbar(
+          'Error',
+          errorMessage,
+          backgroundColor: DarkColor().red.withOpacity(0.5),
+          icon: Icon(Icons.crisis_alert, color: Colors.black),
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: DarkColor().red.withOpacity(0.5),
+        icon: Icon(Icons.crisis_alert, color: Colors.black),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> addNewAddOn(String addOn, String harga,
+      {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiService.addAddOn(addOn, harga, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',
@@ -318,5 +389,6 @@ class AddPageController extends GetxController {
     await fetchTipe();
     await fetchKategori();
     await fetchMitra();
+    await fetchAddon();
   }
 }

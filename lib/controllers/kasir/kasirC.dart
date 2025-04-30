@@ -44,6 +44,7 @@ class KasirC extends GetxController {
 
   var urlTr = ApiServiceTr.baseUrlTr;
   var member = <Map<String, dynamic>>[].obs;
+  var addOn = <Map<String, dynamic>>[].obs;
   var struk = <Map<String, dynamic>>[].obs;
   var selectedMember = Rxn<String>();
   var filteredMembers = <Map<String, dynamic>>[].obs;
@@ -58,9 +59,13 @@ class KasirC extends GetxController {
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
   BluetoothDevice? device;
   RxBool isConnected = false.obs;
+  var selectedAddOn = ''.obs;
+  var jumlahPesanan = 0.obs;
 
   double get totalHarga {
     double total = 0;
+    bool addOnAdded = false;
+
     for (var produk in listProduk) {
       if (produk['listDibeli'] != null) {
         for (var item in produk['listDibeli']) {
@@ -68,10 +73,27 @@ class KasirC extends GetxController {
         }
       }
     }
+    if (!addOnAdded) {
+      for (var produk in listProduk) {
+        if (produk['listDibeli'] != null) {
+          for (var item in produk['listDibeli']) {
+            var addOn = item['addOn'];
+            if (addOn != null && addOn != '1') {
+              total += double.tryParse(addOnHarga(addOn).toString()) ?? 0;
+              addOnAdded = true;
+              break;
+            }
+          }
+        }
+        if (addOnAdded) break;
+      }
+    }
+
     double diskon = 0;
     if (checkbox.value && double.tryParse(MemberPoin.toString())! < total) {
-      diskon = double.tryParse(MemberPoin.toString()) ?? 0 * 10;
+      diskon = (double.tryParse(MemberPoin.toString()) ?? 0) * 10;
     }
+
     return total - diskon;
   }
 
@@ -175,11 +197,31 @@ class KasirC extends GetxController {
     }
   }
 
+  String addOnName(String idAddon) {
+    var selected = addOn.firstWhere(
+      (m) => m['id'].toString() == idAddon,
+      orElse: () => {'add_on': 'Tidak Ada'},
+    );
+    return selected['add_on'] ?? "Tidak Ada";
+  }
+
+  int addOnHarga(String idAddon) {
+    var selected = addOn.firstWhere(
+      (m) => m['id'].toString() == idAddon,
+      orElse: () => {'harga': '0'},
+    );
+
+    final hargaStr = selected['harga']?.toString() ?? '0';
+
+    return int.tryParse(hargaStr) ?? 0;
+  }
+
   void onInit() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     fetchProduk();
     fetchKategori();
     fetchMember();
+    fetchAddon();
     fetchTransaksiStruk();
 
     if (listProduk.isEmpty || filteredProduk.isEmpty) {
@@ -197,7 +239,6 @@ class KasirC extends GetxController {
       filteredProduk[i]['listDibeli']
           .removeAt(filteredProduk[i]['listDibeli'].length - 1);
       filteredProduk.refresh();
-      print(listProduk[i]['listDibeli']);
     }
   }
 
@@ -205,26 +246,47 @@ class KasirC extends GetxController {
     searchQuery.value = query;
     filteredProduk.assignAll(listProduk.where((produk) {
       return produk['nama'].toLowerCase().contains(query.toLowerCase()) ||
-          produk['kategori_name'].toString().toLowerCase().contains(query.toLowerCase()) ||
-          produk['tipe_name'].toString().toLowerCase().contains(query.toLowerCase()) ||
-          produk['mitra_name'].toString().toLowerCase().contains(query.toLowerCase());
+          produk['kategori_name']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()) ||
+          produk['tipe_name']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()) ||
+          produk['mitra_name']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase());
     }).toList());
   }
 
-  void tambahKeKeranjang(i, varian) {
+  void tambahKeKeranjang(int i, varian, {String addOnValue = '1'}) {
     if (int.parse(filteredProduk[i]['jumlah']) >
         filteredProduk[i]['jumlahDibeli']) {
       filteredProduk[i]['jumlahDibeli'] = filteredProduk[i]['jumlahDibeli'] + 1;
+
       if (varian.toString() == 'null') {
         banyakDibeli.value = banyakDibeli.value + 1;
+
         filteredProduk[i]['listDibeli'].add({
           "id": filteredProduk[i]['id'],
           "tipe": null,
           "Jumlah": '1',
           'harga': filteredProduk[i]['harga'],
-          "harga_satuan": filteredProduk[i]['harga_satuan']
+          "harga_satuan": filteredProduk[i]['harga_satuan'],
+          'addOn': addOnValue,
         });
       }
+
+      print('Produk yang berhasil ditambahkan ke Bills:');
+      print('Nama Produk: ${filteredProduk[i]['nama']}');
+      print('Jumlah Dibeli: ${filteredProduk[i]['jumlahDibeli']}');
+      print('Harga Satuan: ${filteredProduk[i]['harga_satuan']}');
+      print('Total Harga: ${filteredProduk[i]['harga']}');
+      print('AddOn: $addOnValue');
+      print('--------------------------------------');
+
       filteredProduk.refresh();
     } else {
       Get.snackbar(
@@ -325,10 +387,11 @@ class KasirC extends GetxController {
           "tipe": item['id_tipe_barang'].toString(),
           "mitra": item['mitra_name'] ?? "Tidak Memiliki Mitra",
           "kategori": item['kategori_name'],
+          "addOn": item['id_add_on'],
           "jumlah": item['stok'].toString(),
           "jumlahDibeli": 0,
           "listDibeli": [],
-          "foto": "http://10.10.20.240/POS_CI/uploads/${item['gambar_barang']}",
+          "foto": "http://10.10.20.172/POS_CI/uploads/${item['gambar_barang']}",
         }));
   }
 
@@ -340,6 +403,27 @@ class KasirC extends GetxController {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
           member.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchAddon() async {
+    try {
+      isLoading.value = true;
+      var response = await http.get(Uri.parse(url + "/add_on"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOn.value = List<Map<String, dynamic>>.from(jsonData['data']);
         } else {
           throw Exception('Failed to load products');
         }
@@ -680,6 +764,7 @@ class KasirC extends GetxController {
         item['Jumlah'].toString(),
         item['harga_satuan'].toString(),
         item['harga'].toString(),
+        addOnHarga(item['addOn']).toString(),
       );
       await kurangStok(item['id'] ?? '', item['Jumlah'].toString());
     }
@@ -690,6 +775,7 @@ class KasirC extends GetxController {
     String jumlah,
     String hargaSatuan,
     String hargaJual,
+    String hargaAddOn,
   ) async {
     isLoading.value = true;
     final prefs = await SharedPreferences.getInstance();
@@ -700,6 +786,7 @@ class KasirC extends GetxController {
         jumlah,
         hargaSatuan,
         hargaJual,
+        hargaAddOn,
         userInput,
       );
       if (response['status'] == true) {
@@ -824,7 +911,6 @@ class KasirC extends GetxController {
                 '${listProduk[i]['nama']}-${listProduk[i]['listDibeli'][x]['tipe']}';
             if (!displayedProducts.contains(productKey)) {
               displayedProducts.add(productKey);
-
               String productName = listProduk[i]['nama'];
               String productPrice = NumberFormat('#,##0', 'id_ID').format(
                   double.parse(
@@ -842,8 +928,17 @@ class KasirC extends GetxController {
                   NumberFormat('#,##0', 'id_ID').format(totalHarga);
 
               // Mencetak nama produk dan subtotal
-              printer.printLeftRight(productName, "$formattedTotal", 0);
+              printer.printLeftRight("$productName", "$formattedTotal", 0);
               printer.printLeftRight("Qty: $quantity x $productPrice", "", 0);
+              String idAddOn =
+                  listProduk[i]['listDibeli'][x]['addOn'].toString();
+              if (idAddOn != "1") {
+                String addOnNama = addOnName(idAddOn);
+                String addOnHargaStr =
+                    NumberFormat('#,##0', 'id_ID').format(addOnHarga(idAddOn));
+                printer.printLeftRight(
+                    "$addOnNama", "+$addOnHargaStr", 0);
+              }
             }
           }
         }

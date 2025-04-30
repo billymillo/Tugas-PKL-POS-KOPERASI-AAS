@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiServiceTr {
-  static const String baseUrlTr = 'http://10.10.20.240/POS_CI/api';
+  static const String baseUrlTr = 'http://10.10.20.172/POS_CI/api';
+  // static const String baseUrlTr = 'http://192.168.1.8/POS_CI/api';
 
   Future<String?> getUserInput() async {
     final prefs = await SharedPreferences.getInstance();
@@ -123,16 +124,17 @@ class ApiServiceTr {
   }
 
   Future<Map<String, dynamic>> member(String nama, String idPeg, String no_tlp,
-      String saldo, String poin) async {
+      String saldo, String poin, String userInput,) async {
     final url = '$baseUrlTr/member';
     final response = await http.post(
       Uri.parse(url),
       body: {
-        'nama': nama,
+        'nama': nama, 
         'id_peg_system': idPeg,
         'no_tlp': no_tlp,
         'saldo': saldo,
         'poin': poin,
+        'user_input': userInput
       },
     );
     if (response.statusCode == 200) {
@@ -143,7 +145,7 @@ class ApiServiceTr {
   }
 
   Future<Map<String, dynamic>> editMember(
-      String id, String nama, String no_tlp, String saldo, String poin) async {
+      String id, String nama, String no_tlp, String saldo, String poin, String update) async {
     final url = '$baseUrlTr/member/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -153,6 +155,7 @@ class ApiServiceTr {
         'no_tlp': no_tlp,
         'saldo': saldo,
         'poin': poin,
+        'user_update' : update,
       },
     );
     if (response.statusCode == 200) {
@@ -179,7 +182,7 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> metode(String metode) async {
+  Future<Map<String, dynamic>> metode(String metode, String userInput,) async {
     final url = '$baseUrlTr/transaksi_in/pembayaran';
     final response = await http.post(
       Uri.parse(url),
@@ -194,13 +197,14 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> editMetode(String id, String metode) async {
+  Future<Map<String, dynamic>> editMetode(String id, String metode, String update) async {
     final url = '$baseUrlTr/transaksi_in/pembayaran/$id';
     final response = await http.put(
       Uri.parse(url),
       body: {
         'id': id,
         'metode': metode,
+        'user_update': update
       },
     );
     if (response.statusCode == 200) {
@@ -360,6 +364,7 @@ class ApiServiceTr {
     String jumlah,
     String hargaSatuan,
     String hargaJual,
+    String hargaAddOn,
     String userInput,
   ) async {
     final url = '$baseUrlTr/transaksi_out/detail';
@@ -372,6 +377,7 @@ class ApiServiceTr {
           'jumlah': jumlah,
           'harga_satuan': hargaSatuan,
           'harga_jual': hargaJual,
+          'harga_add_on' : hargaAddOn,
           'user_input': userInput,
         },
       );

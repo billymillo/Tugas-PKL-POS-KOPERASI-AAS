@@ -1,5 +1,6 @@
 import 'package:bluetooth_thermal_printer_example/controllers/admin/OpNameC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +18,9 @@ class OpNameDet extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.grey[800]),
-          onPressed: () => Get.back(),
+          onPressed: () {
+            Get.back();
+          },
         ),
         title: Text(
           'Opname Detail',
@@ -36,7 +39,7 @@ class OpNameDet extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: SingleChildScrollView(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 1000),
+            constraints: BoxConstraints(maxWidth: 1250),
             child: Card(
               elevation: 1,
               shape: RoundedRectangleBorder(
@@ -135,6 +138,9 @@ class OpNameDet extends StatelessWidget {
                                             produkItem['harga_satuan'],
                                     'harga_jual': opnameItem['harga_jual'] ??
                                         produkItem['harga_jual'],
+                                    'stok_input': produkItem['stok_input'],
+                                    'stok_asli_input':
+                                        produkItem['stok_asli_input'],
                                     'isEdit': produkItem['isEdit'],
                                     'checked': produkItem['checked'],
                                     'hasBeenSaved': opnameItem.isNotEmpty,
@@ -178,54 +184,38 @@ class OpNameDet extends StatelessWidget {
                                                   produkItem['stok_input'] =
                                                       int.tryParse(val) ?? 0,
                                             )),
-                                      DataCell(product['hasBeenSaved'] == true
-                                          ? Text(
-                                              product['stok_asli'].toString() +
-                                                  ' pcs')
-                                          : buildTextField(
-                                              product['stok_asli']
-                                                      ?.toString() ??
-                                                  '',
-                                              (val) => produkItem[
-                                                      'stok_asli_input'] =
-                                                  int.tryParse(val) ?? 0,
-                                            )),
-                                      DataCell(product['hasBeenSaved'] == true
-                                          ? Text(currencyFormat.format(
-                                              int.tryParse(
-                                                      product['harga_satuan']
-                                                          .toString()) ??
-                                                  0))
-                                          : buildTextField(
-                                              product['harga_satuan']
-                                                  .toString(),
-                                              (val) => produkItem[
-                                                      'harga_satuan_input'] =
-                                                  int.tryParse(val) ?? 0,
-                                            )),
-                                      DataCell(product['hasBeenSaved'] == true
-                                          ? Text(currencyFormat.format(
-                                              int.tryParse(product['harga_jual']
-                                                      .toString()) ??
-                                                  0))
-                                          : buildTextField(
-                                              product['harga_jual'].toString(),
-                                              (val) => produkItem[
-                                                      'harga_jual_input'] =
-                                                  int.tryParse(val) ?? 0,
-                                            )),
+                                      DataCell(
+                                        product['hasBeenSaved'] == true
+                                            ? Text(product['stok_asli']
+                                                    .toString() +
+                                                ' pcs')
+                                            : buildTextField(
+                                                product['stok_asli_input']
+                                                        ?.toString() ??
+                                                    '',
+                                                (val) => produkItem[
+                                                        'stok_asli_input'] =
+                                                    int.tryParse(val) ?? 0,
+                                              ),
+                                      ),
+                                      DataCell(Text(currencyFormat.format(
+                                          int.tryParse(product['harga_satuan']
+                                                  .toString()) ??
+                                              0))),
+                                      DataCell(Text(currencyFormat.format(
+                                          int.tryParse(product['harga_jual']
+                                                  .toString()) ??
+                                              0))),
                                       DataCell(product['hasBeenSaved'] == false
                                           ? ElevatedButton(
                                               onPressed: () async {
                                                 if (product['hasBeenSaved'] ==
                                                     true) {
-                                                  // Jangan kirim ke API kalau sudah disimpan
                                                   controller.toggleEdit(index);
                                                   return;
                                                 }
 
                                                 if (!isEdit) {
-                                                  // Kirim ke API hanya saat pertama kali disimpan
                                                   final stok = int.tryParse(
                                                           produkItem['stok_input']
                                                                   ?.toString() ??
@@ -236,18 +226,6 @@ class OpNameDet extends StatelessWidget {
                                                                   ?.toString() ??
                                                               '') ??
                                                       produkItem['stok_asli'];
-                                                  final hargaSatuan =
-                                                      int.tryParse(produkItem[
-                                                                      'harga_satuan_input']
-                                                                  ?.toString() ??
-                                                              '') ??
-                                                          produkItem[
-                                                              'harga_satuan'];
-                                                  final hargaJual = int.tryParse(
-                                                          produkItem['harga_jual_input']
-                                                                  ?.toString() ??
-                                                              '') ??
-                                                      produkItem['harga_jual'];
 
                                                   final catatan = '';
 
@@ -256,8 +234,10 @@ class OpNameDet extends StatelessWidget {
                                                     idOpname,
                                                     stok.toString(),
                                                     stokAsli.toString(),
-                                                    hargaSatuan.toString(),
-                                                    hargaJual.toString(),
+                                                    produkItem['harga_satuan']
+                                                        .toString(),
+                                                    produkItem['harga_jual']
+                                                        .toString(),
                                                     catatan,
                                                   );
 
@@ -383,6 +363,273 @@ class OpNameDet extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(width: 12),
+                                Obx(() {
+                                  final idOpname =
+                                      Get.arguments?['id_opname']?.toString() ??
+                                          '';
+                                  final opnameItem =
+                                      controller.opname.firstWhere(
+                                    (item) => item['id'].toString() == idOpname,
+                                    orElse: () => {},
+                                  );
+
+                                  final statusOpname = int.tryParse(
+                                          opnameItem['status_opname']
+                                                  ?.toString() ??
+                                              '0') ??
+                                      0;
+
+                                  if (statusOpname == 3) {
+                                    return SizedBox();
+                                  }
+
+                                  if (statusOpname == 4) {
+                                    return ElevatedButton(
+                                      onPressed: () async {
+                                        final idOpname = Get.arguments != null
+                                            ? Get.arguments['id_opname']
+                                                    ?.toString() ??
+                                                ''
+                                            : '';
+                                        await showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return Dialog(
+                                              elevation: 0,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.3,
+                                                padding: EdgeInsets.all(20),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Column(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      20,
+                                                                  vertical: 10),
+                                                          child: Container(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    25),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      255,
+                                                                      255,
+                                                                      163,
+                                                                      163),
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                            ),
+                                                            child: Icon(
+                                                              Icons
+                                                                  .all_inbox_rounded,
+                                                              color: DarkColor()
+                                                                  .red,
+                                                              size: 50,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 25),
+                                                        Text(
+                                                          "Selesaikan Opname?",
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 25,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 10),
+                                                        Text(
+                                                          'Anda akan Menyimpan seluruh item pada Opname. Lanjutkan?',
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 15,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(height: 10),
+                                                    Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        ElevatedButton(
+                                                          onPressed: () async {
+                                                            await controller
+                                                                .saveAllUnsavedItems(
+                                                                    idOpname);
+                                                            if (!controller
+                                                                .isAllItemSaved(
+                                                                    idOpname)) {
+                                                              Get.snackbar(
+                                                                'Gagal',
+                                                                'Beberapa item gagal disimpan. Silakan cek ulang.',
+                                                                backgroundColor:
+                                                                    DarkColor()
+                                                                        .red
+                                                                        .withOpacity(
+                                                                            0.5),
+                                                                icon: Icon(
+                                                                    Icons
+                                                                        .crisis_alert,
+                                                                    color: Colors
+                                                                        .white),
+                                                                colorText:
+                                                                    Colors
+                                                                        .white,
+                                                              );
+                                                              return;
+                                                            }
+                                                            await controller
+                                                                .editOpname(
+                                                                    idOpname,
+                                                                    '3');
+                                                            await controller
+                                                                .fetchOpName();
+                                                            Get.back();
+                                                            Get.toNamed(
+                                                                Routes.OPNAMEP);
+                                                            Get.snackbar(
+                                                              'Success',
+                                                              'Berhasil menyelesaikan Opname, dan mengubah status Opname',
+                                                              backgroundColor:
+                                                                  Colors.green
+                                                                      .withOpacity(
+                                                                          0.5),
+                                                              icon: Icon(
+                                                                  Icons
+                                                                      .check_circle,
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                Colors.red,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          12),
+                                                            ),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              SizedBox(
+                                                                  width: 8),
+                                                              Text(
+                                                                'Selesai',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 5),
+                                                        ElevatedButton(
+                                                          onPressed: () async {
+                                                            Get.back();
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                Colors.grey
+                                                                    .shade200,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          12),
+                                                            ),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              SizedBox(
+                                                                  width: 8),
+                                                              Text(
+                                                                'Batal',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .black54,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Text('Selesaikan Opname'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: PrimaryColor().green,
+                                        foregroundColor: Colors.white,
+                                        textStyle: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500),
+                                        minimumSize: Size(0, 32),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                    );
+                                  }
+
+                                  return SizedBox();
+                                }),
+                                SizedBox(width: 12),
                                 ElevatedButton(
                                   onPressed: () async {
                                     final idOpname = Get.arguments != null
@@ -390,24 +637,171 @@ class OpNameDet extends StatelessWidget {
                                                 ?.toString() ??
                                             ''
                                         : '';
-                                    if (!controller.isAllItemSaved(idOpname)) {
-                                      Get.snackbar(
-                                        'Gagal',
-                                        'Seluruh data harus disimpan terlebih dahulu.',
-                                        backgroundColor:
-                                            DarkColor().red.withOpacity(0.5),
-                                        icon: Icon(Icons.crisis_alert,
-                                            color: Colors.white),
-                                        colorText: Colors.white,
-                                      );
-                                      return;
-                                    }
-                                    await controller.editOpname(idOpname, '3');
-                                    await controller.fetchOpName();
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return Dialog(
+                                          elevation: 0,
+                                          backgroundColor: Colors.transparent,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.5,
+                                            padding: EdgeInsets.all(20),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 20,
+                                                          vertical: 10),
+                                                      child: Container(
+                                                        padding:
+                                                            EdgeInsets.all(25),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              169,
+                                                              163),
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                        child: Icon(
+                                                          Icons.delete_outline,
+                                                          color: Colors.red,
+                                                          size: 50,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 25),
+                                                    Text(
+                                                      "Hapus Opname",
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 25,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 10),
+                                                    Text(
+                                                      "Apakah anda yakin untuk menghapus Opname ini?",
+                                                      style: TextStyle(
+                                                        color: Colors
+                                                            .grey.shade400,
+                                                        fontSize: 15,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 10),
+                                                Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    ElevatedButton(
+                                                      onPressed: () async {
+                                                        await controller
+                                                            .deleteOpname(
+                                                                idOpname);
+                                                        await controller
+                                                            .fetchOpName();
+                                                        Get.back();
+                                                        Get.toNamed(
+                                                            Routes.OPNAMEP);
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          SizedBox(width: 8),
+                                                          Text(
+                                                            'Hapus',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 5),
+                                                    ElevatedButton(
+                                                      onPressed: () async {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor: Colors
+                                                            .grey.shade200,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          SizedBox(width: 8),
+                                                          Text(
+                                                            'Batal',
+                                                            style: TextStyle(
+                                                              color: Colors
+                                                                  .black54,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
                                   },
-                                  child: Text('Simpan Opname'),
+                                  child: Text('Hapus Opname'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: PrimaryColor().green,
+                                    backgroundColor: Colors.red,
                                     foregroundColor: Colors.white,
                                     textStyle: TextStyle(
                                         fontSize: 13,
