@@ -74,7 +74,6 @@ class TransaksiC extends GetxController {
     fetchTransaksiLunas();
     fetchMember();
     fetchTransaksiDetail();
-    loadMoreTransaksiLunas();
     fetchKasbon();
     fetchKasbonDetail();
     fetchMetode();
@@ -113,22 +112,19 @@ class TransaksiC extends GetxController {
           var transaksiList = (jsonData['data'] as List)
               .map((item) => Map<String, dynamic>.from(item))
               .toList();
-
           var detailList = transaksiList
               .expand((item) => item['detail_transaksi'] as List)
               .cast<Map<String, dynamic>>()
               .toList();
-
           for (var item in transaksiList) {
             item.remove('detail_transaksi');
           }
-
           var memberList = transaksiList
               .map((item) => item['id_member'].toString())
               .where((id) => id.isNotEmpty)
               .toSet()
               .toList();
-          
+
           if (isLoadMore) {
             transaksiLunas.addAll(transaksiList);
             allTransaksiLunas.addAll(transaksiList);
@@ -137,7 +133,6 @@ class TransaksiC extends GetxController {
             memberTransaksi.value = memberTransaksi.toSet().toList();
           } else {
             transaksiLunas.value = transaksiList;
-            allTransaksiLunas.value = transaksiList;
             detailTr.value = detailList;
             memberTransaksi.value = memberList;
           }

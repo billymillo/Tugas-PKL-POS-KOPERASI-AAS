@@ -242,6 +242,35 @@ class KasirC extends GetxController {
     }
   }
 
+  void tambahKeKeranjang(int i, varian, {String addOnValue = '1'}) {
+    if (int.parse(filteredProduk[i]['jumlah']) >
+        filteredProduk[i]['jumlahDibeli']) {
+      filteredProduk[i]['jumlahDibeli'] = filteredProduk[i]['jumlahDibeli'] + 1;
+
+      if (varian.toString() == 'null') {
+        banyakDibeli.value = banyakDibeli.value + 1;
+        filteredProduk[i]['listDibeli'].add({
+          "id": filteredProduk[i]['id'],
+          "tipe": null,
+          "Jumlah": '1',
+          'harga': filteredProduk[i]['harga'],
+          "harga_satuan": filteredProduk[i]['harga_satuan'],
+          'addOn': addOnValue,
+        });
+      }
+      print('Jumlah Dibeli: ${filteredProduk[i]['jumlahDibeli']}');
+      print('List Dibeli: ${filteredProduk[i]['listDibeli']}');
+      filteredProduk.refresh();
+    } else {
+      Get.snackbar(
+        'Stok Produk Terbatas',
+        'Tidak Bisa Membeli Produk Lebih Dari Stok Yang Ada.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
   void searchProduk(String query) {
     searchQuery.value = query;
     filteredProduk.assignAll(listProduk.where((produk) {
@@ -259,43 +288,6 @@ class KasirC extends GetxController {
               .toLowerCase()
               .contains(query.toLowerCase());
     }).toList());
-  }
-
-  void tambahKeKeranjang(int i, varian, {String addOnValue = '1'}) {
-    if (int.parse(filteredProduk[i]['jumlah']) >
-        filteredProduk[i]['jumlahDibeli']) {
-      filteredProduk[i]['jumlahDibeli'] = filteredProduk[i]['jumlahDibeli'] + 1;
-
-      if (varian.toString() == 'null') {
-        banyakDibeli.value = banyakDibeli.value + 1;
-
-        filteredProduk[i]['listDibeli'].add({
-          "id": filteredProduk[i]['id'],
-          "tipe": null,
-          "Jumlah": '1',
-          'harga': filteredProduk[i]['harga'],
-          "harga_satuan": filteredProduk[i]['harga_satuan'],
-          'addOn': addOnValue,
-        });
-      }
-
-      print('Produk yang berhasil ditambahkan ke Bills:');
-      print('Nama Produk: ${filteredProduk[i]['nama']}');
-      print('Jumlah Dibeli: ${filteredProduk[i]['jumlahDibeli']}');
-      print('Harga Satuan: ${filteredProduk[i]['harga_satuan']}');
-      print('Total Harga: ${filteredProduk[i]['harga']}');
-      print('AddOn: $addOnValue');
-      print('--------------------------------------');
-
-      filteredProduk.refresh();
-    } else {
-      Get.snackbar(
-        'Stok Produk Terbatas',
-        'Tidak Bisa Membeli Produk Lebih Dari Stok Yang Ada.',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
   }
 
   Future<void> fetchProduk() async {
@@ -344,33 +336,25 @@ class KasirC extends GetxController {
 
   void kategoriProduk(String query) {
     if (query.isEmpty) {
-      filteredProduk.assignAll(listProduk.asMap().entries.map((entry) {
-        return {...entry.value, 'originalIndex': entry.key};
-      }).toList());
+      filteredProduk.assignAll(listProduk); // ambil referensi asli
     } else {
-      var filtered = listProduk.asMap().entries.where((entry) {
-        return entry.value['kategori']
+      var filtered = listProduk.where((produk) {
+        return produk['kategori']
             .toString()
             .toLowerCase()
             .contains(query.toLowerCase());
-      }).map((entry) {
-        return {...entry.value, 'originalIndex': entry.key};
       }).toList();
 
       if (filtered.isEmpty) {
         addAllItems();
+      } else {
+        filteredProduk.assignAll(filtered); // tetap referensi asli
       }
-      filteredProduk.assignAll(filtered);
     }
   }
 
   void kategoriProdukTipe() {
-    var filtered = listProduk.asMap().entries.where((entry) {
-      return entry.value['tipe'] == '2';
-    }).map((entry) {
-      return {...entry.value, 'originalIndex': entry.key};
-    }).toList();
-    print(filtered);
+    var filtered = listProduk.where((produk) => produk['tipe'] == '2').toList();
     filteredProduk.assignAll(filtered);
   }
 
@@ -557,9 +541,9 @@ class KasirC extends GetxController {
         stok,
       );
       if (response['status'] == true) {
-        print("Transaksi Berhasil" + response['message']);
+        print(response['message']);
       } else {
-        print("Transaksi Gagal" + response['message']);
+        print(response['message']);
       }
     } catch (e) {
       print(e);
@@ -758,15 +742,21 @@ class KasirC extends GetxController {
   }
 
   Future<void> addAllDetailTransaksiOut(List<dynamic> listDibeli) async {
+    print('MENERIMA ITEM UNTUK DIPROSES: $listDibeli');
     for (var item in listDibeli) {
-      await addDetailTransaksiOut(
-        item['id'] ?? '', // Sesuaikan dengan idProduk jika ada
-        item['Jumlah'].toString(),
-        item['harga_satuan'].toString(),
-        item['harga'].toString(),
-        addOnHarga(item['addOn']).toString(),
-      );
-      await kurangStok(item['id'] ?? '', item['Jumlah'].toString());
+      try {
+        print('Memproses item: ${item['id']}');
+        await addDetailTransaksiOut(
+          item['id'] ?? '',
+          item['Jumlah'].toString(),
+          item['harga_satuan'].toString(),
+          item['harga'].toString(),
+          addOnHarga(item['addOn']).toString(),
+        );
+        await kurangStok(item['id'] ?? '', item['Jumlah'].toString());
+      } catch (e) {
+        print('Gagal memproses item: ${item['id']} - Error: $e');
+      }
     }
   }
 
@@ -790,9 +780,9 @@ class KasirC extends GetxController {
         userInput,
       );
       if (response['status'] == true) {
-        print("Hasil Dari Detail" + response['message']);
+        print("Hasil Dari Detail BERHASIl" + response['message']);
       } else if (response['status'] == false) {
-        print("Hasil Dari Detail" + response['message']);
+        print("Hasil Dari Detail GAGAL" + response['message']);
       }
     } catch (e) {
       print(e);
@@ -936,8 +926,7 @@ class KasirC extends GetxController {
                 String addOnNama = addOnName(idAddOn);
                 String addOnHargaStr =
                     NumberFormat('#,##0', 'id_ID').format(addOnHarga(idAddOn));
-                printer.printLeftRight(
-                    "$addOnNama", "+$addOnHargaStr", 0);
+                printer.printLeftRight("$addOnNama", "+$addOnHargaStr", 0);
               }
             }
           }

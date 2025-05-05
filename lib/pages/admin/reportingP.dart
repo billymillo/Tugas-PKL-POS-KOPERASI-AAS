@@ -255,7 +255,7 @@ class ReportingP extends StatelessWidget {
                               child: Obx(() {
                                 final selected = controller.selectedIndexes;
                                 final List<Widget> chartWidgets = [];
-                                if (selected[0]) {
+                                if (selected.isNotEmpty && selected[0]) {
                                   chartWidgets.add(buildChart(
                                     text: 'Data Produk Terjual',
                                     spots: controller.produkChartSpots,
@@ -266,7 +266,7 @@ class ReportingP extends StatelessWidget {
                                   ));
                                 }
 
-                                if (selected[1]) {
+                                if (selected.isNotEmpty && selected[1]) {
                                   chartWidgets.add(buildChart(
                                     text: 'Data Transaksi',
                                     spots: controller.transaksiChartSpots,
@@ -277,7 +277,7 @@ class ReportingP extends StatelessWidget {
                                   ));
                                 }
 
-                                if (selected[2]) {
+                                if (selected.isNotEmpty && selected[2]) {
                                   chartWidgets.add(buildChart(
                                     text: 'Data Pendapatan',
                                     spots: controller.pendapatanChartSpots,
@@ -288,7 +288,7 @@ class ReportingP extends StatelessWidget {
                                   ));
                                 }
 
-                                if (selected[3]) {
+                                if (selected.isNotEmpty && selected[3]) {
                                   chartWidgets.add(buildChart(
                                     text: 'Data Pendapatan',
                                     spots: controller.pengeluaranChartSpots,
@@ -1313,6 +1313,55 @@ Widget buildChart({
   required BuildContext context,
   required double interval,
 }) {
+  if (spots.isEmpty) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 20),
+        Container(
+          padding: EdgeInsets.only(left: 20),
+          child: Text(
+            text,
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 17, color: color),
+          ),
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: 150,
+          decoration: BoxDecoration(
+            color: ShadowColor().aqua,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.bar_chart, size: 64, color: PrimaryColor().blue),
+                SizedBox(height: 10),
+                Text(
+                  "Tidak ada data penjualan.",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  "Silakan pilih bulan atau tahun lain.",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
   return SingleChildScrollView(
     scrollDirection: Axis.horizontal,
     child: Column(

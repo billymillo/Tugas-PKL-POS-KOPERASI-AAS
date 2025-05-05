@@ -948,12 +948,15 @@ class _KasirPState extends State<KasirP> {
                                               c.poinUpdate.toString(),
                                               fromButton: true,
                                             );
+                                            c.kategoriProduk('');
                                             for (var produk
                                                 in c.filteredProduk) {
-                                              print(produk['listDibeli']);
+                                              print(
+                                                  'List Dibeli: ${produk['listDibeli']}');
                                               await c.addAllDetailTransaksiOut(
                                                   produk['listDibeli']);
                                             }
+
                                             if (c.checkboxSaldo.value == true) {
                                               await c.kurangSaldo(
                                                   c.selectedMember.string,
@@ -1310,8 +1313,12 @@ class _KasirPState extends State<KasirP> {
                                                 c.poinUpdate.toString(),
                                                 fromButton: true,
                                               );
+
+                                              c.kategoriProduk('');
                                               for (var produk
                                                   in c.filteredProduk) {
+                                                print(
+                                                  'List Dibeli: ${produk['listDibeli']}');
                                                 await c
                                                     .addAllDetailTransaksiOut(
                                                         produk['listDibeli']);
@@ -1690,59 +1697,6 @@ class _KasirPState extends State<KasirP> {
                           },
                           child: Icon(
                             FontAwesomeIcons.circleDollarToSlot,
-                            color: PrimaryColor().blue,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 30,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Get.dialog(
-                              AlertDialog(
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                      Text('This is a dialog'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          child: Icon(
-                            FontAwesomeIcons.receipt,
                             color: PrimaryColor().blue,
                           ),
                         ),

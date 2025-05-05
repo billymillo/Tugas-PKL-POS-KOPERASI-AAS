@@ -285,9 +285,7 @@ class KasirW {
                                 fontSize: 14, color: PrimaryColor().blue),
                           ),
                           GestureDetector(
-                            onTap: varian == null
-                                ? tambahKeKeranjangFunc
-                                : tambahKeKeranjangFunc,
+                            onTap: tambahKeKeranjangFunc,
                             child: Container(
                               padding: EdgeInsets.all(6),
                               decoration: BoxDecoration(

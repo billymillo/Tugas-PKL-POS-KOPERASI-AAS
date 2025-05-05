@@ -229,61 +229,58 @@ class DashboardController extends GetxController {
   }
 
   Future<void> fetchTransaksiIn() async {
-  var url = ApiService.baseUrl + '/transaksi_in';
-  try {
-    isLoading(true);
-    var response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      var jsonData = json.decode(response.body);
-      if (jsonData['status'] == true) {
-        transaksi.value = List<Map<String, dynamic>>.from(jsonData['data']);
-        int total = 0;
-        for (var item in transaksi) {
-          total += int.tryParse(item['total_transaksi'].toString()) ?? 0;
+    var url = ApiService.baseUrl + '/transaksi_in';
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          transaksi.value = List<Map<String, dynamic>>.from(jsonData['data']);
+          int total = 0;
+          for (var item in transaksi) {
+            total += int.tryParse(item['total_transaksi'].toString()) ?? 0;
+          }
+          totalTransaksiIn.value = total;
+        } else {
+          throw Exception('Failed to load products');
         }
-        totalTransaksiIn.value = total;
-
       } else {
-        throw Exception('Failed to load products');
+        throw Exception('Failed to load data');
       }
-    } else {
-      throw Exception('Failed to load data');
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
     }
-  } catch (e) {
-    print('Error: $e');
-  } finally {
-    isLoading(false);
   }
-}
 
   Future<void> fetchKasbon() async {
-  var url = ApiService.baseUrl + '/kasbon';
-  try {
-    isLoading(true);
-    var response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      var jsonData = json.decode(response.body);
-      if (jsonData['status'] == true) {
-        transaksi.value = List<Map<String, dynamic>>.from(jsonData['data']);
-        int total = 0;
-        for (var item in transaksi) {
-          total += int.tryParse(item['total_kasbon'].toString()) ?? 0;
+    var url = ApiService.baseUrl + '/kasbon';
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          transaksi.value = List<Map<String, dynamic>>.from(jsonData['data']);
+          int total = 0;
+          for (var item in transaksi) {
+            total += int.tryParse(item['total_kasbon'].toString()) ?? 0;
+          }
+          totalKasbon.value = total;
+        } else {
+          throw Exception('Failed to load products');
         }
-        totalKasbon.value = total;
-
       } else {
-        throw Exception('Failed to load products');
+        throw Exception('Failed to load data');
       }
-    } else {
-      throw Exception('Failed to load data');
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
     }
-  } catch (e) {
-    print('Error: $e');
-  } finally {
-    isLoading(false);
   }
-}
-
 
   Future<void> fetchProduk() async {
     var url = ApiService.baseUrl + '/product';

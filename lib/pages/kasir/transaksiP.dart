@@ -91,8 +91,7 @@ class TransaksiP extends StatelessWidget {
                         },
                         child: ListView.builder(
                           padding: const EdgeInsets.all(16),
-                          itemCount: controller.transaksiLunas.length +
-                              (controller.isLastPageLunas.value ? 1 : 0),
+                          itemCount: controller.transaksiLunas.length,
                           itemBuilder: (context, index) {
                             if (index == controller.transaksiLunas.length) {
                               return const Center(
@@ -985,7 +984,7 @@ class TransaksiP extends StatelessWidget {
                                       child: Container(
                                         width:
                                             MediaQuery.of(context).size.width *
-                                                0.4,
+                                                0.9,
                                         child: SingleChildScrollView(
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,

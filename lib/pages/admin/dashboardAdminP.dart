@@ -198,7 +198,7 @@ class DashboardAdminP extends StatelessWidget {
                                       'Feb',
                                       'Mar',
                                       'Apr',
-                                      'May',
+                                      'Mei',
                                       'Jun',
                                       'Jul',
                                       'Agu',
@@ -258,8 +258,33 @@ class DashboardAdminP extends StatelessWidget {
                                     final spots = c.produkChartSpots;
                                     if (spots.isEmpty) {
                                       return Center(
-                                          child: Text(
-                                              "Tidak ada data penjualan."));
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.bar_chart,
+                                                size: 64,
+                                                color: PrimaryColor().blue),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              "Tidak ada data penjualan.",
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            SizedBox(height: 4),
+                                            Text(
+                                              "Silakan pilih bulan atau tahun lain.",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black54,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
                                     }
                                     return SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
