@@ -68,7 +68,6 @@ class TransaksiInP extends StatelessWidget {
                                         ),
                                         child: SingleChildScrollView(
                                           child: Column(
-                                            mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Row(
                                                 children: [
@@ -156,6 +155,7 @@ class TransaksiInP extends StatelessWidget {
                                                           builder: (BuildContext
                                                               context) {
                                                             return Dialog(
+                                                              elevation: 2,
                                                               backgroundColor:
                                                                   Colors
                                                                       .transparent,
