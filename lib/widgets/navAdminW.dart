@@ -68,56 +68,20 @@ Widget buildDrawer(BuildContext context) {
             childrenPadding: EdgeInsets.symmetric(horizontal: 22, vertical: 0),
             expandedCrossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ListTile(
-                leading: Icon(
-                  Icons.category,
-                  color: DarkColor().grey,
-                  size: 20,
-                ),
-                title: Text(
-                  "Kategori",
-                  style: TextStyle(
-                    color: DarkColor().grey,
-                    fontSize: 17,
-                  ),
-                ),
-                onTap: () {
-                  Get.toNamed(Routes.KATEGORIP);
-                },
+              drawerItem(
+                icon: Icons.category_outlined,
+                title: "Kategori",
+                routeName: Routes.KATEGORIP,
               ),
-              ListTile(
-                leading: Icon(
-                  FontAwesomeIcons.peopleArrows,
-                  color: DarkColor().grey,
-                  size: 20,
-                ),
-                title: Text(
-                  "Mitra",
-                  style: TextStyle(
-                    color: DarkColor().grey,
-                    fontSize: 17,
-                  ),
-                ),
-                onTap: () {
-                  Get.toNamed(Routes.MITRAP);
-                },
+              drawerItem(
+                icon: FontAwesomeIcons.peopleArrows,
+                title: "Mitra",
+                routeName: Routes.MITRAP,
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.people,
-                  color: DarkColor().grey,
-                  size: 20,
-                ),
-                title: Text(
-                  "Tipe",
-                  style: TextStyle(
-                    color: DarkColor().grey,
-                    fontSize: 17,
-                  ),
-                ),
-                onTap: () {
-                  Get.toNamed(Routes.TIPEP);
-                },
+              drawerItem(
+                icon: Icons.people_outlined,
+                title: "Tipe",
+                routeName: Routes.TIPEP,
               ),
             ],
             collapsedShape: RoundedRectangleBorder(
@@ -130,20 +94,10 @@ Widget buildDrawer(BuildContext context) {
             ),
           ),
         ),
-        ListTile(
-          leading: Icon(
-            Icons.person_outline_sharp,
-            color: DarkColor().grey,
-          ),
-          title: Text(
-            "Stok Opname",
-            style: TextStyle(
-              color: DarkColor().grey,
-            ),
-          ),
-          onTap: () {
-            Get.toNamed(Routes.OPNAMEP);
-          },
+        drawerItem(
+          icon: Icons.person_outline_sharp,
+          title: "Stok Opname",
+          routeName: Routes.OPNAMEP,
         ),
         Container(
           child: ExpansionTile(
@@ -154,39 +108,15 @@ Widget buildDrawer(BuildContext context) {
             childrenPadding: EdgeInsets.symmetric(horizontal: 22, vertical: 0),
             expandedCrossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ListTile(
-                leading: Icon(
-                  Icons.turn_left_rounded,
-                  color: DarkColor().grey,
-                  size: 20,
-                ),
-                title: Text(
-                  "Transaksi In",
-                  style: TextStyle(
-                    color: DarkColor().grey,
-                    fontSize: 17,
-                  ),
-                ),
-                onTap: () {
-                  Get.toNamed(Routes.TRANSAKSIINP);
-                },
+              drawerItem(
+                icon: Icons.turn_left_outlined,
+                title: "Transaksi In",
+                routeName: Routes.TRANSAKSIINP,
               ),
-              ListTile(
-                leading: Icon(
-                  Icons.turn_right_outlined,
-                  color: DarkColor().grey,
-                  size: 20,
-                ),
-                title: Text(
-                  "Transaksi In Mitra",
-                  style: TextStyle(
-                    color: DarkColor().grey,
-                    fontSize: 17,
-                  ),
-                ),
-                onTap: () {
-                  Get.toNamed(Routes.TRANSAKSIINMITRAP);
-                },
+              drawerItem(
+                icon: Icons.turn_right_outlined,
+                title: "Transaksi In Mitra",
+                routeName: Routes.TRANSAKSIINMITRAP,
               ),
             ],
             collapsedShape: RoundedRectangleBorder(
@@ -199,52 +129,20 @@ Widget buildDrawer(BuildContext context) {
             ),
           ),
         ),
-        ListTile(
-          leading: Icon(
-            Icons.insert_chart_outlined_sharp,
-            color: DarkColor().grey,
-          ),
-          title: Text(
-            "Reporting",
-            style: TextStyle(
-              color: DarkColor().grey,
-            ),
-          ),
-          onTap: () {
-            Get.toNamed(Routes.REPORTINGP);
-          },
+        drawerItem(
+          icon: Icons.insert_chart_outlined_sharp,
+          title: "Reporting",
+          routeName: Routes.REPORTINGP,
         ),
-        ListTile(
-          leading: Icon(
-            CupertinoIcons.person_alt,
-            color: DarkColor().grey,
-          ),
-          title: Text(
-            "Member",
-            style: TextStyle(
-              color: DarkColor().grey,
-            ),
-          ),
-          onTap: () {
-            Get.toNamed(Routes.MEMBERP);
-          },
+        drawerItem(
+          icon: CupertinoIcons.person_alt,
+          title: "Member",
+          routeName: Routes.MEMBERP,
         ),
-        ListTile(
-          leading: Icon(
-            FontAwesomeIcons.gear,
-            color: DarkColor().grey,
-            size: 20,
-          ),
-          title: Text(
-            "Settings",
-            style: TextStyle(
-              color: DarkColor().grey,
-              fontSize: 17,
-            ),
-          ),
-          onTap: () {
-            Get.toNamed(Routes.METODEP);
-          },
+        drawerItem(
+          icon: FontAwesomeIcons.gear,
+          title: "Settings",
+          routeName: Routes.METODEP,
         ),
       ],
     ),
@@ -254,7 +152,6 @@ Widget buildDrawer(BuildContext context) {
 Widget NavbarDrawer(
     BuildContext context, GlobalKey<ScaffoldState> scaffoldKey) {
   final AuthController logoutController = Get.put(AuthController());
-  final ValidationC logoutController2 = Get.put(ValidationC());
   return Container(
     height: 70,
     decoration: BoxDecoration(

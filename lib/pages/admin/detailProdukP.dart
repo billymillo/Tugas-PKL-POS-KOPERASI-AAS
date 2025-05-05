@@ -171,41 +171,77 @@ class DetailProdukP extends StatelessWidget {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  await productController
-                                                      .delete(item['id'],
-                                                          fromButton: true);
-                                                  await productController
-                                                      .fetchProduk();
-                                                  await productController
-                                                      .refresh();
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.red,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(width: 8),
-                                                    Text(
-                                                      'Hapus',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600,
+                                              Obx(() => ElevatedButton(
+                                                    onPressed:
+                                                        productController
+                                                                .isLoading.value
+                                                            ? null
+                                                            : () async {
+                                                                productController
+                                                                    .isLoading
+                                                                    .value = true;
+                                                                try {
+                                                                  await productController.delete(
+                                                                      item[
+                                                                          'id'],
+                                                                      fromButton:
+                                                                          true);
+                                                                  await productController
+                                                                      .fetchProduk();
+                                                                  await productController
+                                                                      .refresh();
+                                                                } catch (e) {
+                                                                } finally {
+                                                                  productController
+                                                                      .isLoading
+                                                                      .value = false;
+                                                                }
+                                                              },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
-                                              ),
+                                                    child: productController
+                                                            .isLoading.value
+                                                        ? SizedBox(
+                                                            height: 16,
+                                                            width: 16,
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color:
+                                                                  Colors.white,
+                                                              strokeWidth: 2,
+                                                            ),
+                                                          )
+                                                        : Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              SizedBox(
+                                                                  width: 8),
+                                                              Text(
+                                                                'Hapus',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                  )),
                                               SizedBox(height: 5),
                                               ElevatedButton(
                                                 onPressed: () async {

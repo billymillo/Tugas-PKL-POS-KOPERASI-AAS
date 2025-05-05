@@ -673,7 +673,7 @@ class _AddOnPState extends State<AddOnP> {
         color: Colors.white,
         elevation: 2,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 120),
             child: Column(

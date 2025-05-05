@@ -1119,7 +1119,8 @@ class KasirW {
                               ),
                             ),
                             SizedBox(height: 10),
-                            Obx(() => Container(
+                            Obx(() => 
+                            Container(
                                   width: 300,
                                   child: ElevatedButton(
                                     onPressed: isLoading.value ? null : onTap,

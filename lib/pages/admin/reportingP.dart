@@ -1034,9 +1034,10 @@ class ReportingP extends StatelessWidget {
                                       width:
                                           MediaQuery.of(context).size.width * 1,
                                       child: DataTable(
-                                        columnSpacing: 24,
-                                        horizontalMargin: 16,
+                                        columnSpacing: 10,
+                                        horizontalMargin: 9,
                                         dividerThickness: 1,
+                                        headingRowHeight: 48,
                                         headingRowColor:
                                             MaterialStateProperty.all(
                                           Color(0xFFEEF2F7),
@@ -1337,7 +1338,7 @@ Widget buildChart({
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.bar_chart, size: 64, color: PrimaryColor().blue),
+                Icon(Icons.bar_chart, size: 64, color: color),
                 SizedBox(height: 10),
                 Text(
                   "Tidak ada data penjualan.",

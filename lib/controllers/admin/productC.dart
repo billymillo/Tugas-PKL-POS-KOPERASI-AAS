@@ -112,7 +112,6 @@ class ProductController extends GetxController {
     }
     isLoading(false);
   }
-  
 
   Future<void> delete(String id, {bool fromButton = false}) async {
     if (!fromButton) {
@@ -124,10 +123,21 @@ class ProductController extends GetxController {
         id,
       );
       if (response['status'] == true) {
-        print("Delete Berhasil" + response['message']);
+        Get.snackbar(
+          'Berhasil',
+          response['message'],
+          colorText: Colors.white,
+          backgroundColor: Colors.green,
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
         Get.toNamed(Routes.PRODUCTP);
       } else {
-        print("Gagal" + response['message']);
+        Get.snackbar(
+          'Error',
+          response['message'],
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
       }
     } catch (e) {
       print(e);
