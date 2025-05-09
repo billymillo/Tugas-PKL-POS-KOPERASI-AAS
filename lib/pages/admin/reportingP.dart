@@ -533,7 +533,7 @@ class ReportingP extends StatelessWidget {
                                                 children: [
                                                   Image.network(
                                                     // "http://10.0.2.2/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
-                                                    "http://192.168.1.8/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
+                                                    "http://10.10.20.50/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
                                                     width: 50, // atur lebar
                                                     height: 50, // atur tinggi
                                                     fit: BoxFit
@@ -662,7 +662,7 @@ class ReportingP extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Image.network(
-                                          "http://10.10.20.172/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
+                                          "http://10.10.20.50/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
                                           // "http://192.168.1.8/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
                                           width: 50, // atur lebar
                                           height: 50, // atur tinggi

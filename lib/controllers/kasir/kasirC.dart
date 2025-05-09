@@ -375,7 +375,7 @@ class KasirC extends GetxController {
           "jumlah": item['stok'].toString(),
           "jumlahDibeli": 0,
           "listDibeli": [],
-          "foto": "http://10.10.20.172/POS_CI/uploads/${item['gambar_barang']}",
+          "foto": "http://10.10.20.50/POS_CI/uploads/${item['gambar_barang']}",
         }));
   }
 

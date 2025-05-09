@@ -42,7 +42,7 @@ class DetailProdukP extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
                       image: NetworkImage(
-                        "http://10.10.20.172/POS_CI/uploads/${item['gambar_barang']}",
+                        "http://10.10.20.50/POS_CI/uploads/${item['gambar_barang']}",
                       ),
                       fit: BoxFit.cover,
                     ),

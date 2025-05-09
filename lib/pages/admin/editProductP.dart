@@ -45,7 +45,7 @@ class _EditProductPState extends State<EditProductP> {
     hargaPackProdukController.text = item['harga_pack']?.toString() ?? '';
     jumlahIsiProdukController.text = item['jml_pcs_pack']?.toString() ?? '';
     editController.imageUrl.value =
-        "http://192.168.1.7/POS_CI/uploads/${item['gambar_barang']}";
+        "http://10.10.20.50/POS_CI/uploads/${item['gambar_barang']}";
     editController.hasNewImage.value = false;
 
     fetchData();

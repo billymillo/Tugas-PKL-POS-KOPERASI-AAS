@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiServiceTr {
-  static const String baseUrlTr = 'http://10.10.20.172/POS_CI/api';
+  static const String baseUrlTr = 'http://10.10.20.50/POS_CI/api';
   // static const String baseUrlTr = 'http://192.168.1.8/POS_CI/api';
 
   Future<String?> getUserInput() async {

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 // Fetch Api
 class ApiService {
-  static const String baseUrl = 'http://10.10.20.172/POS_CI/api/';
+  static const String baseUrl = 'http://10.10.20.50/POS_CI/api/';
   // static const String baseUrl = 'http://10.10.20.240/POS_CI/api/';
   // static const String baseUrl = 'http://192.168.1.7/POS_CI/api/';
   // static const String baseUrl = 'http://192.168.1.8/POS_CI/api/';

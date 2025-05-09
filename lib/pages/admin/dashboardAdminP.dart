@@ -106,12 +106,9 @@ class DashboardAdminP extends StatelessWidget {
                         ),
                         Obx(() {
                           final int totalTransaksiIn = c.totalTransaksiIn.value;
-                          final int totalKasbon = c.totalKasbon.value;
-                          final int totalHarga = c.totalHarga.value;
-
-                          final int pengeluaran =
-                              totalTransaksiIn - totalKasbon;
-                          final int labaBersih = totalHarga - pengeluaran;
+                          final int totalTransaksiOut = c.totalHarga.value;
+                          final int labaBersih =
+                              totalTransaksiOut - totalTransaksiIn;
 
                           return Text(
                             'Rp ${NumberFormat('#,##0', 'id_ID').format(labaBersih)}',

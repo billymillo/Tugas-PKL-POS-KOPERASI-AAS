@@ -64,7 +64,7 @@ class AdminW {
                       child: Image(
                           width: 150,
                           height: 140,
-                          image: NetworkImage("http://10.10.20.172/POS_CI/uploads/${produk[count]['gambar_barang']}")),
+                          image: NetworkImage("http://10.10.20.50/POS_CI/uploads/${produk[count]['gambar_barang']}")),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

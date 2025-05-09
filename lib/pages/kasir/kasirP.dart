@@ -150,7 +150,7 @@ class _KasirPState extends State<KasirP> {
                                                   return Container(
                                                     child: KasirW().kategori(
                                                       item['kategori'],
-                                                      "http://10.10.20.172/POS_CI/kategori/${item['gambar_kategori']}",
+                                                      "http://10.10.20.50/POS_CI/kategori/${item['gambar_kategori']}",
                                                       Icons.fastfood,
                                                       (kategori) {
                                                         print(
