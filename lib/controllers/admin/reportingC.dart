@@ -25,7 +25,9 @@ class ReportingController extends GetxController {
   var transaksiOutDet = <Map<String, dynamic>>[].obs;
   var transaksiInDet = <Map<String, dynamic>>[].obs;
   var transaksi = <Map<String, dynamic>>[].obs;
+  var kasbon = <Map<String, dynamic>>[].obs;
   var produk = <Map<String, dynamic>>[].obs;
+  var member = <Map<String, dynamic>>[].obs;
 
   var totalTransaksi = 0.obs;
   var totalProduk = 0.obs;
@@ -38,6 +40,7 @@ class ReportingController extends GetxController {
   var selectedStartDate = DateTime.now().obs;
   var selectedEndDate = DateTime.now().obs;
   RxBool isFiltered = false.obs;
+  var groupedProduk = <Map<String, dynamic>>[].obs;
 
   final RxList<String> _produkLabels = <String>[].obs;
   List<String> get produkChartLabels => _produkLabels;
@@ -61,12 +64,22 @@ class ReportingController extends GetxController {
     fetchProduk();
     fetchTransaksiInDet();
     fetchTransaksiIn();
+    fetchKasbon();
+    fetchMember();
   }
 
   void toggleCard(int index) {
     if (index >= 0 && index < selectedIndexes.length) {
       selectedIndexes[index] = !selectedIndexes[index];
     }
+  }
+
+  String MemberName(String idMember) {
+    var selected = member.firstWhere(
+      (m) => m['id'].toString() == idMember,
+      orElse: () => {'nama': 'Non Member'},
+    );
+    return selected['nama'] ?? "Non Member";
   }
 
   void filterData() {
@@ -91,6 +104,39 @@ class ReportingController extends GetxController {
     }
     totalProduk.value = jumlah;
     pendapatan.value = totalPendapatan;
+  }
+
+  void groupAndSortTransaksi(List<Map<String, dynamic>> transaksi) {
+    final Map<int, Map<String, dynamic>> grouped = {};
+
+    for (var item in transaksi) {
+      final idProduk = int.tryParse(item['id_produk'].toString()) ?? 0;
+      final jumlah = int.tryParse(item['jumlah'].toString()) ?? 0;
+      final totalHarga = int.tryParse(item['total_harga'].toString()) ?? 0;
+      final totalHargaDasar =
+          int.tryParse(item['total_harga_dasar'].toString()) ?? 0;
+
+      if (grouped.containsKey(idProduk)) {
+        grouped[idProduk]!['jumlah'] =
+            (grouped[idProduk]!['jumlah'] ?? 0) + jumlah;
+        grouped[idProduk]!['total_harga'] =
+            (grouped[idProduk]!['total_harga'] ?? 0) + totalHarga;
+        grouped[idProduk]!['total_harga_dasar'] =
+            (grouped[idProduk]!['total_harga_dasar'] ?? 0) + totalHargaDasar;
+      } else {
+        grouped[idProduk] = {
+          ...item,
+          'jumlah': jumlah,
+          'total_harga': totalHarga,
+          'total_harga_dasar': totalHargaDasar,
+        };
+      }
+    }
+
+    final result = grouped.values.toList()
+      ..sort((a, b) => (b['jumlah'] ?? 0).compareTo(a['jumlah'] ?? 0));
+
+    groupedProduk.value = result;
   }
 
   void filterTransaksiOutDet() {
@@ -140,9 +186,9 @@ class ReportingController extends GetxController {
   String GambarBarang(String idProduk) {
     var selected = produk.firstWhere(
       (m) => m['id'].toString() == idProduk,
-      orElse: () => {'gambar_barang': 'Produk Tidak Ditemukan'},
+      orElse: () => {'gambar_barang': 'default.png'},
     );
-    return selected['gambar_barang'] ?? "Produk Tidak Ditemukan";
+    return selected['gambar_barang'] ?? "default.png";
   }
 
   String NoTransaksi(String idTransaksi) {
@@ -276,8 +322,8 @@ class ReportingController extends GetxController {
           List<Map<String, dynamic>> rawData =
               List<Map<String, dynamic>>.from(jsonData['data']);
 
-          allTransaksiOutDet.value = rawData; // simpan data mentah
-          filterTransaksiOutDet(); // lakukan filter dan proses
+          allTransaksiOutDet.value = rawData;
+          filterTransaksiOutDet();
         } else {
           throw Exception('Failed to load products');
         }
@@ -337,6 +383,70 @@ class ReportingController extends GetxController {
     }
   }
 
+  Future<void> fetchMember() async {
+    var url = ApiService.baseUrl + '/member';
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          member.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchKasbon() async {
+    var url = ApiService.baseUrl + '/kasbon';
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          List<Map<String, dynamic>> data =
+              List<Map<String, dynamic>>.from(jsonData['data']);
+
+          Map<int, int> dataKasbon = {};
+          for (var item in data) {
+            int idMember = int.parse(item['id_member'].toString());
+            int totalKasbon = int.parse(item['total_kasbon'].toString());
+
+            if (dataKasbon.containsKey(idMember)) {
+              dataKasbon[idMember] = dataKasbon[idMember]! + totalKasbon;
+            } else {
+              dataKasbon[idMember] = totalKasbon;
+            }
+          }
+
+          kasbon.value = dataKasbon.entries.map((entry) {
+            return {
+              'id_member': entry.key,
+              'total_kasbon': entry.value,
+            };
+          }).toList();
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<void> fetchProduk() async {
     var url = ApiService.baseUrl + '/product';
     try {
@@ -380,7 +490,7 @@ class ReportingController extends GetxController {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Laporan Transaksi', style: pw.TextStyle(fontSize: 24)),
+            pw.Text('Laporan Transaksi Out', style: pw.TextStyle(fontSize: 24)),
             pw.SizedBox(height: 10),
             pw.TableHelper.fromTextArray(
               context: context,
@@ -448,8 +558,7 @@ class ReportingController extends GetxController {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Laporan Transaksi Masuk',
-                style: pw.TextStyle(fontSize: 24)),
+            pw.Text('Laporan Transaksi In', style: pw.TextStyle(fontSize: 24)),
             pw.SizedBox(height: 10),
             pw.TableHelper.fromTextArray(
               context: context,
@@ -483,6 +592,103 @@ class ReportingController extends GetxController {
 
     final output = await getTemporaryDirectory();
     final file = File('${output.path}/transaksi_masuk_report.pdf');
+    await file.writeAsBytes(await pdf.save());
+
+    OpenFile.open(file.path);
+  }
+
+  Future<void> pdfProduk() async {
+    final pdf = pw.Document();
+
+    if (groupedProduk.isEmpty) return;
+
+    pdf.addPage(pw.Page(
+      build: (pw.Context context) {
+        return pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('Laporan Produk', style: pw.TextStyle(fontSize: 24)),
+            pw.SizedBox(height: 10),
+            pw.TableHelper.fromTextArray(
+              context: context,
+              data: [
+                [
+                  'No',
+                  'Nama Produk',
+                  'Jumlah',
+                  'Harga Dasar',
+                  'Total Harga',
+                  'Laba'
+                ],
+                ...List.generate(groupedProduk.length, (index) {
+                  final item = groupedProduk[index];
+
+                  final jumlah = item['jumlah'] ?? 0;
+                  final hargaDasar = item['total_harga_dasar'] ?? 0;
+                  final totalHarga = item['total_harga'] ?? 0;
+                  final laba = totalHarga - hargaDasar;
+
+                  return [
+                    '${index + 1}',
+                    ProdukName(item['id_produk'].toString()),
+                    '$jumlah pcs',
+                    'Rp ${NumberFormat('#,##0', 'id_ID').format(hargaDasar)}',
+                    'Rp ${NumberFormat('#,##0', 'id_ID').format(totalHarga)}',
+                    'Rp ${NumberFormat('#,##0', 'id_ID').format(laba)}',
+                  ];
+                }),
+              ],
+            ),
+          ],
+        );
+      },
+    ));
+
+    final output = await getTemporaryDirectory();
+    final file = File('${output.path}/grouped_produk_report.pdf');
+    await file.writeAsBytes(await pdf.save());
+
+    OpenFile.open(file.path);
+  }
+
+  Future<void> pdfKasbon() async {
+    final pdf = pw.Document();
+
+    if (kasbon.isEmpty) return;
+
+    final sortedKasbon = [...kasbon];
+    sortedKasbon.sort((a, b) => int.parse(b['total_kasbon'].toString())
+        .compareTo(int.parse(a['total_kasbon'].toString())));
+
+    pdf.addPage(pw.Page(
+      build: (pw.Context context) {
+        return pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('Laporan Kasbon Member', style: pw.TextStyle(fontSize: 24)),
+            pw.SizedBox(height: 10),
+            pw.TableHelper.fromTextArray(
+              context: context,
+              data: [
+                ['No', 'ID Member', 'Nama Member', 'Total Kasbon'],
+                ...List.generate(sortedKasbon.length, (index) {
+                  final item = sortedKasbon[index];
+                  return [
+                    '${index + 1}',
+                    item['id_member'].toString(),
+                    MemberName(item['id_member'].toString()), // Fungsi opsional
+                    'Rp ${NumberFormat('#,##0', 'id_ID').format(item['total_kasbon'])}',
+                  ];
+                }),
+              ],
+            ),
+          ],
+        );
+      },
+    ));
+
+    final output = await getTemporaryDirectory();
+    final file = File('${output.path}/laporan_kasbon.pdf');
     await file.writeAsBytes(await pdf.save());
 
     OpenFile.open(file.path);

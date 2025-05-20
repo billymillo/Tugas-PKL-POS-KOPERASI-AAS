@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:ui';
 
 import 'package:bluetooth_thermal_printer_example/controllers/authC.dart';
@@ -171,9 +172,7 @@ class KasirW {
       context,
       index) {
     return GestureDetector(
-      onTap: () {
-        print(listDibeli.length.toString());
-      },
+      onTap: () {},
       child: Container(
           decoration: BoxDecoration(
               color: Colors.white, borderRadius: BorderRadius.circular(10)),
@@ -255,87 +254,204 @@ class KasirW {
                 height: 7,
               ),
               listDibeli.length.toString() != '0'
-                  ? Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(6),
-                        color: PrimaryColor().grey,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: kurangKeKeranjangFunc,
-                            child: Container(
-                              padding: EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                  color: PrimaryColor().blue,
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Icon(
-                                size: 13,
-                                FontAwesomeIcons.minus,
-                                color: Colors.white,
+                  ? Column(
+                      children: [
+                        addOn.length.toString() == '0'
+                            ? Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  color: PrimaryColor().grey,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: kurangKeKeranjangFunc,
+                                      child: Container(
+                                        padding: EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                            color: PrimaryColor().blue,
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        child: Icon(
+                                          size: 13,
+                                          FontAwesomeIcons.minus,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      listDibeli.length.toString(),
+                                      style: GoogleFonts.nunito(
+                                          fontSize: 14,
+                                          color: PrimaryColor().blue),
+                                    ),
+                                    GestureDetector(
+                                      onTap: tambahKeKeranjangFunc,
+                                      child: Container(
+                                        padding: EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                            color: PrimaryColor().blue,
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        child: Icon(
+                                          size: 13,
+                                          FontAwesomeIcons.plus,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ))
+                            : Column(
+                                children: [
+                                  Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(6),
+                                        color: PrimaryColor().grey,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: kurangKeKeranjangFunc,
+                                            child: Container(
+                                              padding: EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                  color: PrimaryColor().blue,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              child: Icon(
+                                                size: 13,
+                                                FontAwesomeIcons.minus,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            listDibeli.length.toString(),
+                                            style: GoogleFonts.nunito(
+                                                fontSize: 14,
+                                                color: PrimaryColor().blue),
+                                          ),
+                                          GestureDetector(
+                                            onTap: tambahKeKeranjangFunc,
+                                            child: Container(
+                                              padding: EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                  color: PrimaryColor().blue,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              child: Icon(
+                                                size: 13,
+                                                FontAwesomeIcons.plus,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      controller.updateAddOnToProduk();
+                                      if (!addOn.isEmpty) {
+                                        final int hargaAsli = int.tryParse(
+                                                harga.replaceAll(
+                                                    RegExp(r'[^\d]'), '')) ??
+                                            0;
+
+                                        print('cek addon $addOn');
+                                        showAddOnDialog(
+                                            context,
+                                            index,
+                                            nama,
+                                            hargaAsli,
+                                            stok,
+                                            addOn,
+                                            kurangKeKeranjangFunc,
+                                            tambahKeKeranjangFunc,
+                                            foto);
+                                      } else {
+                                        tambahKeKeranjangFunc();
+                                      }
+                                    },
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 6),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          color: PrimaryColor().grey,
+                                          border: Border.all(
+                                              width: 1,
+                                              color: PrimaryColor().blue)),
+                                      child: Text(
+                                        'Tambahkan',
+                                        style: GoogleFonts.nunito(
+                                            fontSize: 11,
+                                            color: PrimaryColor().blue),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ),
-                          Text(
-                            listDibeli.length.toString(),
-                            style: GoogleFonts.nunito(
-                                fontSize: 14, color: PrimaryColor().blue),
-                          ),
-                          GestureDetector(
-                            onTap: tambahKeKeranjangFunc,
-                            child: Container(
-                              padding: EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                  color: PrimaryColor().blue,
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Icon(
-                                size: 13,
-                                FontAwesomeIcons.plus,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ))
+                        SizedBox(height: 10),
+                      ],
+                    )
                   : stok != 'Stok : 0'
-                      ? GestureDetector(
-                          onTap: () {
-                            if (addOn != '1') {
-                              final int hargaAsli = int.tryParse(
-                                      harga.replaceAll(RegExp(r'[^\d]'), '')) ??
-                                  0; // Mengambil harga asli dari harga yang diformat
-                              showAddOnDialog(
-                                  context,
-                                  index,
-                                  nama,
-                                  hargaAsli,
-                                  stok,
-                                  addOn,
-                                  kurangKeKeranjangFunc,
-                                  tambahKeKeranjangFunc,
-                                  foto);
-                            } else {
-                              tambahKeKeranjangFunc();
-                            }
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(vertical: 6),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(6),
-                                color: PrimaryColor().grey,
-                                border: Border.all(
-                                    width: 1, color: PrimaryColor().blue)),
-                            child: Text(
-                              'Tambahkan',
-                              style: GoogleFonts.nunito(
-                                  fontSize: 11, color: PrimaryColor().blue),
-                              textAlign: TextAlign.center,
+                      ? Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                controller.updateAddOnToProduk();
+                                if (!addOn.isEmpty) {
+                                  final int hargaAsli = int.tryParse(harga
+                                          .replaceAll(RegExp(r'[^\d]'), '')) ??
+                                      0;
+                                  showAddOnDialog(
+                                      context,
+                                      index,
+                                      nama,
+                                      hargaAsli,
+                                      stok,
+                                      addOn,
+                                      kurangKeKeranjangFunc,
+                                      tambahKeKeranjangFunc,
+                                      foto);
+                                } else {
+                                  tambahKeKeranjangFunc();
+                                }
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(vertical: 6),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(6),
+                                    color: PrimaryColor().grey,
+                                    border: Border.all(
+                                        width: 1, color: PrimaryColor().blue)),
+                                child: Text(
+                                  'Tambahkan',
+                                  style: GoogleFonts.nunito(
+                                      fontSize: 11, color: PrimaryColor().blue),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         )
                       : GestureDetector(
                           child: Container(
@@ -426,11 +542,10 @@ class KasirW {
                             Obx(() {
                               final int jumlah = controller.jumlahPesanan.value;
                               final int hargaTambahan =
-                                  controller.addOnHarga(addOn);
-                              final int totalHarga =
-                                  (controller.selectedAddOn.value == 'Rebus')
-                                      ? harga * jumlah + hargaTambahan
-                                      : harga * jumlah;
+                                  controller.totalAddOnHarga();
+                              final int totalHarga = (jumlah > 1)
+                                  ? harga * jumlah + (hargaTambahan * jumlah)
+                                  : harga * jumlah + hargaTambahan;
 
                               return Text(
                                 "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(totalHarga.toString()))}",
@@ -446,78 +561,49 @@ class KasirW {
                         ),
                         SizedBox(height: 10),
                         Obx(() {
-                          return Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  controller.selectedAddOn.value = 'Tidak';
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 16),
-                                  decoration: BoxDecoration(
-                                    color: controller.selectedAddOn.value ==
-                                            'Tidak'
-                                        ? PrimaryColor().blue
-                                        : Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: controller.selectedAddOn.value ==
-                                              'Tidak'
+                          return SingleChildScrollView(
+                            child: Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: addOn.map<Widget>((item) {
+                                final id = item['id_add_on'].toString();
+                                final selected =
+                                    controller.selectedAddOn.contains(id);
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    controller.toggleAddOnSelection(id);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      color: selected
                                           ? PrimaryColor().blue
-                                          : Colors.grey,
+                                          : Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: selected
+                                            ? PrimaryColor().blue
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      controller.addOnName(id),
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.nunito(
+                                        color: selected
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    'Tidak',
-                                    style: GoogleFonts.nunito(
-                                      color: controller.selectedAddOn.value ==
-                                              'Tidak'
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () {
-                                  controller.selectedAddOn.value = 'Rebus';
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 16),
-                                  decoration: BoxDecoration(
-                                    color: controller.selectedAddOn.value ==
-                                            'Rebus'
-                                        ? PrimaryColor().blue
-                                        : Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: controller.selectedAddOn.value ==
-                                              'Rebus'
-                                          ? PrimaryColor().blue
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    controller.addOnName(addOn),
-                                    style: GoogleFonts.nunito(
-                                      color: controller.selectedAddOn.value ==
-                                              'Rebus'
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                                );
+                              }).toList(),
+                            ),
                           );
-                        }),
+                        })
                       ],
                     ),
                   )
@@ -542,12 +628,12 @@ class KasirW {
                               controller.jumlahPesanan.value--;
                             },
                             child: Container(
-                              padding: EdgeInsets.all(6),
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                   color: PrimaryColor().blue,
                                   borderRadius: BorderRadius.circular(20)),
                               child: Icon(
-                                size: 13,
+                                size: 20,
                                 FontAwesomeIcons.minus,
                                 color: Colors.white,
                               ),
@@ -556,7 +642,7 @@ class KasirW {
                           Obx(() => Text(
                                 '${controller.jumlahPesanan.value}',
                                 style: GoogleFonts.nunito(
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   color: PrimaryColor().blue,
                                 ),
                               )),
@@ -565,12 +651,12 @@ class KasirW {
                               controller.jumlahPesanan.value++;
                             },
                             child: Container(
-                              padding: EdgeInsets.all(6),
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                   color: PrimaryColor().blue,
                                   borderRadius: BorderRadius.circular(20)),
                               child: Icon(
-                                size: 13,
+                                size: 20,
                                 FontAwesomeIcons.plus,
                                 color: Colors.white,
                               ),
@@ -590,16 +676,20 @@ class KasirW {
                       controller.filteredProduk[index]['listDibeli'].length;
                   final sisaStok = stok - dibeli;
 
-                  final selectedAddOn = controller.selectedAddOn.value;
+                  final selectedAddOns = controller.selectedAddOn;
                   final addOnValue =
-                      selectedAddOn == 'Rebus' ? addOn.toString() : '1';
+                      selectedAddOns.map((e) => e.toString()).toList();
 
                   if (controller.jumlahPesanan.value <= sisaStok) {
                     for (int i = 0; i < controller.jumlahPesanan.value; i++) {
-                      controller.tambahKeKeranjang(index, null,
-                          addOnValue: addOnValue);
+                      controller.tambahKeKeranjang(
+                        index,
+                        null,
+                        addOnValue: addOnValue,
+                      );
                     }
                     controller.jumlahPesanan.value = 0;
+                    controller.selectedAddOn.clear();
                     Navigator.pop(context);
                   } else {
                     Get.snackbar(
@@ -627,7 +717,10 @@ class KasirW {
           ),
         );
       },
-    );
+    ).whenComplete(() {
+      controller.jumlahPesanan.value = 0;
+      controller.selectedAddOn.clear();
+    });
   }
 
   GestureDetector kategori(
@@ -693,19 +786,26 @@ class KasirW {
     );
   }
 
-  Column bill(produk, harga, addOn, jumlah, tipe) {
+  Column bill(produk, harga, List addOn, jumlah, tipe, VoidCallback onTap) {
     return Column(
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Flexible(
-              child: Text(
-                produk,
-                style: GoogleFonts.nunito(
-                    fontWeight: FontWeight.bold, fontSize: 11),
-              ),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: onTap,
+                  child: Icon(Icons.close, size: 20, color: Colors.red),
+                ),
+                SizedBox(width: 6),
+                Text(
+                  produk,
+                  style: GoogleFonts.nunito(
+                      fontWeight: FontWeight.bold, fontSize: 11),
+                ),
+              ],
             ),
             Text(
               harga,
@@ -719,24 +819,26 @@ class KasirW {
         SizedBox(
           height: 5,
         ),
-        if (addOn != '1')
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                controller.addOnName(addOn),
-                style: GoogleFonts.nunito(
-                  fontSize: 10,
-                ),
-              ),
-              Text(
-                "+ ${NumberFormat('#,##0', 'id_ID').format(controller.addOnHarga(addOn))}",
-                style: GoogleFonts.nunito(
-                    fontSize: 10, color: PrimaryColor().blue),
-              ),
-            ],
+        if (addOn.isNotEmpty && addOn.first != '1')
+          Column(
+            children: addOn.map<Widget>((id) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    controller.addOnName(id.toString()),
+                    style: GoogleFonts.nunito(fontSize: 10),
+                  ),
+                  Text(
+                    "+ ${NumberFormat('#,##0', 'id_ID').format(controller.addOnHarga(id.toString()))}",
+                    style: GoogleFonts.nunito(
+                        fontSize: 10, color: PrimaryColor().blue),
+                  ),
+                ],
+              );
+            }).toList(),
           ),
-        if (addOn == '1') SizedBox(height: 1),
+        if (addOn.isEmpty) SizedBox(height: 1),
         SizedBox(
           height: 5,
         ),
@@ -1119,8 +1221,7 @@ class KasirW {
                               ),
                             ),
                             SizedBox(height: 10),
-                            Obx(() => 
-                            Container(
+                            Obx(() => Container(
                                   width: 300,
                                   child: ElevatedButton(
                                     onPressed: isLoading.value ? null : onTap,

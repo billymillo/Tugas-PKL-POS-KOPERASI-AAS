@@ -19,8 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class KasirC extends GetxController {
   TextEditingController searchController = TextEditingController();
-
   final LibraryController poinController = Get.put(LibraryController());
+  var saldoController = TextEditingController();
 
   var listProduk = <Map<String, dynamic>>[].obs;
   RxList<dynamic> selectedVarian = [].obs;
@@ -45,6 +45,8 @@ class KasirC extends GetxController {
   var urlTr = ApiServiceTr.baseUrlTr;
   var member = <Map<String, dynamic>>[].obs;
   var addOn = <Map<String, dynamic>>[].obs;
+  var addOnPr = <Map<String, dynamic>>[].obs;
+  var addOnTr = <Map<String, dynamic>>[].obs;
   var struk = <Map<String, dynamic>>[].obs;
   var selectedMember = Rxn<String>();
   var filteredMembers = <Map<String, dynamic>>[].obs;
@@ -59,42 +61,39 @@ class KasirC extends GetxController {
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
   BluetoothDevice? device;
   RxBool isConnected = false.obs;
-  var selectedAddOn = ''.obs;
+  var selectedAddOn = <String>[].obs;
   var jumlahPesanan = 0.obs;
+
+  var saldoInput = 0.obs;
 
   double get totalHarga {
     double total = 0;
-    bool addOnAdded = false;
-
     for (var produk in listProduk) {
       if (produk['listDibeli'] != null) {
         for (var item in produk['listDibeli']) {
           total += double.tryParse(item['harga'].toString()) ?? 0;
-        }
-      }
-    }
-    if (!addOnAdded) {
-      for (var produk in listProduk) {
-        if (produk['listDibeli'] != null) {
-          for (var item in produk['listDibeli']) {
-            var addOn = item['addOn'];
-            if (addOn != null && addOn != '1') {
-              total += double.tryParse(addOnHarga(addOn).toString()) ?? 0;
-              addOnAdded = true;
-              break;
+          var addOns = item['addOn'];
+          if (addOns is List && addOns.isNotEmpty && addOns.first != '1') {
+            for (var id in addOns) {
+              double hargaAddOn =
+                  double.tryParse(addOnHarga(id.toString()).toString()) ?? 0;
+              total += hargaAddOn;
             }
           }
         }
-        if (addOnAdded) break;
       }
     }
 
     double diskon = 0;
+    double saldo = 0;
     if (checkbox.value && double.tryParse(MemberPoin.toString())! < total) {
-      diskon = (double.tryParse(MemberPoin.toString()) ?? 0) * 10;
+      diskon = (double.tryParse(MemberPoin.toString()) ?? 0) * 1;
+    }
+    if (checkboxSaldo.value && saldoController.text.isNotEmpty) {
+      saldo = double.tryParse(saldoInput.toString()) ?? 0;
     }
 
-    return total - diskon;
+    return total - diskon - saldo;
   }
 
   double get totalHargaSebelum {
@@ -119,19 +118,6 @@ class KasirC extends GetxController {
       } else if (checkbox.value &&
           double.tryParse(MemberPoin.toString())! < totalHarga) {
         return currentMemberPoin;
-      } else {
-        return 0;
-      }
-    }
-  }
-
-  int get saldoUpdate {
-    int currentMemberSaldo = int.tryParse(MemberSaldo) ?? 0;
-    if (selectedMember.value == null) {
-      return 0;
-    } else {
-      if (checkboxSaldo.value == true) {
-        return currentMemberSaldo - totalHarga.toInt();
       } else {
         return 0;
       }
@@ -222,6 +208,8 @@ class KasirC extends GetxController {
     fetchKategori();
     fetchMember();
     fetchAddon();
+    fetchAddonPr();
+    fetchAddonTr();
     fetchTransaksiStruk();
 
     if (listProduk.isEmpty || filteredProduk.isEmpty) {
@@ -242,24 +230,29 @@ class KasirC extends GetxController {
     }
   }
 
-  void tambahKeKeranjang(int i, varian, {String addOnValue = '1'}) {
+  void tambahKeKeranjang(int i, varian, {List<String> addOnValue = const []}) {
     if (int.parse(filteredProduk[i]['jumlah']) >
         filteredProduk[i]['jumlahDibeli']) {
-      filteredProduk[i]['jumlahDibeli'] = filteredProduk[i]['jumlahDibeli'] + 1;
+      filteredProduk[i]['jumlahDibeli'] += 1;
 
       if (varian.toString() == 'null') {
-        banyakDibeli.value = banyakDibeli.value + 1;
+        banyakDibeli.value += 1;
         filteredProduk[i]['listDibeli'].add({
           "id": filteredProduk[i]['id'],
           "tipe": null,
           "Jumlah": '1',
-          'harga': filteredProduk[i]['harga'],
+          "harga": filteredProduk[i]['harga'],
           "harga_satuan": filteredProduk[i]['harga_satuan'],
-          'addOn': addOnValue,
+          "addOn": addOnValue,
         });
       }
-      print('Jumlah Dibeli: ${filteredProduk[i]['jumlahDibeli']}');
-      print('List Dibeli: ${filteredProduk[i]['listDibeli']}');
+
+      simpanJumlahDibeli(
+        filteredProduk[i]['id'],
+        filteredProduk[i]['jumlahDibeli'],
+        filteredProduk[i]['listDibeli'],
+      );
+
       filteredProduk.refresh();
     } else {
       Get.snackbar(
@@ -268,6 +261,51 @@ class KasirC extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    }
+    print("Jumlah Dibeli: ${filteredProduk[i]['jumlahDibeli']}");
+    print("List Dibeli: ${filteredProduk[i]['listDibeli']}");
+  }
+
+  void simpanJumlahDibeli(
+      String idProduk, int jumlahDibeliBaru, List listDibeliBaru) {
+    final index = listProduk.indexWhere((e) => e['id'] == idProduk);
+    if (index != -1) {
+      listProduk[index]['jumlahDibeli'] = jumlahDibeliBaru;
+      listProduk[index]['listDibeli'] = listDibeliBaru;
+    }
+  }
+
+  void hapusKeranjang({
+    required String nama,
+    required List<String> addOn,
+  }) {
+    for (var i = 0; i < filteredProduk.length; i++) {
+      var produk = filteredProduk[i];
+      if (produk['nama'] == nama) {
+        for (var j = 0; j < produk['listDibeli'].length; j++) {
+          var item = produk['listDibeli'][j];
+
+          List<String> itemAddOn = List<String>.from(item['addOn'] ?? []);
+          List<String> addOnParam = List<String>.from(addOn);
+          itemAddOn.sort();
+          addOnParam.sort();
+
+          bool isSameAddOn = itemAddOn.join(',') == addOnParam.join(',');
+
+          if (isSameAddOn) {
+            var idTerhapus = item['id'];
+            var namaTerhapus = produk['nama'];
+            print(
+                "Barang dihapus: ID: $idTerhapus | Nama: $namaTerhapus | AddOn: $itemAddOn");
+
+            produk['listDibeli'].removeAt(j);
+            produk['jumlahDibeli'] -= 1;
+            banyakDibeli.value -= 1;
+            filteredProduk.refresh();
+            return;
+          }
+        }
+      }
     }
   }
 
@@ -343,19 +381,18 @@ class KasirC extends GetxController {
             .toString()
             .toLowerCase()
             .contains(query.toLowerCase());
-      }).toList();
-
+      });
       if (filtered.isEmpty) {
         addAllItems();
       } else {
-        filteredProduk.assignAll(filtered); // tetap referensi asli
+        filteredProduk.assignAll(filtered); // referensi asli, bukan .toList()
       }
     }
   }
 
   void kategoriProdukTipe() {
-    var filtered = listProduk.where((produk) => produk['tipe'] == '2').toList();
-    filteredProduk.assignAll(filtered);
+    var filtered = listProduk.where((produk) => produk['tipe'] == '2');
+    filteredProduk.assignAll(filtered); // tanpa .toList()
   }
 
   void addAllItems() {
@@ -371,7 +408,7 @@ class KasirC extends GetxController {
           "tipe": item['id_tipe_barang'].toString(),
           "mitra": item['mitra_name'] ?? "Tidak Memiliki Mitra",
           "kategori": item['kategori_name'],
-          "addOn": item['id_add_on'],
+          "addOn": [],
           "jumlah": item['stok'].toString(),
           "jumlahDibeli": 0,
           "listDibeli": [],
@@ -403,7 +440,7 @@ class KasirC extends GetxController {
   Future<void> fetchAddon() async {
     try {
       isLoading.value = true;
-      var response = await http.get(Uri.parse(url + "/add_on"));
+      var response = await http.get(Uri.parse(urlTr + "/addon"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
@@ -419,6 +456,102 @@ class KasirC extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> fetchAddonPr() async {
+    try {
+      isLoading.value = true;
+      var response = await http.get(Uri.parse(urlTr + "/addon/produk"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOnPr.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchAddonTr() async {
+    try {
+      isLoading.value = true;
+      var response = await http.get(Uri.parse(urlTr + "/addon/transaksi"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOnTr.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> addTransaksiAddOn(String idAddon, String idDetTransaksi) async {
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response = await apiServiceTr.addTransaksiAddOn(
+          idAddon, idDetTransaksi, userInput);
+      if (response['status'] == true) {
+        print('ID : $idAddon dan $idDetTransaksi');
+        print('AddOn Success: $response');
+      } else if (response['status'] == false) {
+        print('AddOn Gagal: $response');
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: DarkColor().red.withOpacity(0.5),
+        icon: Icon(Icons.crisis_alert, color: Colors.black),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void updateAddOnToProduk() {
+    for (var i = 0; i < listProduk.length; i++) {
+      var produk = listProduk[i];
+      var matchingAddOns = addOnPr
+          .where(
+              (item) => item['id_produk'].toString() == produk['id'].toString())
+          .toList();
+      produk['addOn'] = matchingAddOns.isNotEmpty ? matchingAddOns : [];
+      listProduk[i] = Map<String, dynamic>.from(produk);
+    }
+    listProduk.refresh();
+  }
+
+  void toggleAddOnSelection(String id) {
+    if (selectedAddOn.contains(id)) {
+      selectedAddOn.remove(id);
+    } else {
+      selectedAddOn.add(id);
+    }
+  }
+
+  int totalAddOnHarga() {
+    int total = 0;
+    for (var id in selectedAddOn) {
+      total += addOnHarga(id);
+    }
+    return total;
   }
 
   Future<void> refreshPage() async {
@@ -443,6 +576,32 @@ class KasirC extends GetxController {
             id.contains(query.toLowerCase());
       }).toList());
     }
+  }
+
+  void simpanSaldo() {
+    int inputSaldo = int.tryParse(saldoController.text) ?? 0;
+    int memberSaldo = int.tryParse(MemberSaldo) ?? 0;
+
+    if (inputSaldo > memberSaldo) {
+      Get.snackbar(
+        "Saldo Melebihi",
+        "Jumlah saldo yang dimasukkan melebihi saldo member",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (inputSaldo > totalHarga.toInt()) {
+      Get.snackbar(
+        "Melebihi Total",
+        "Saldo yang dimasukkan melebihi total harga",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+    saldoInput.value = inputSaldo;
   }
 
   void clearSearch() {
@@ -562,7 +721,7 @@ class KasirC extends GetxController {
   Future<void> fetchStatus() async {
     try {
       isLoading(true);
-      var response = await http.get(Uri.parse(urlTr + "/member/status"));
+      var response = await http.get(Uri.parse(urlTr + "/status"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
@@ -646,7 +805,6 @@ class KasirC extends GetxController {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
           var transaksiData = jsonData['data'];
-          // Ambil nilai yang diinginkan
           idTransaksiOut = transaksiData['id'] ?? 'Tidak ada';
           print('ID TRANSAKSI!' + ' $idTransaksiOut');
           noTransaksi = transaksiData['no_transaksi_out'] ?? 'Tidak ada';
@@ -743,17 +901,59 @@ class KasirC extends GetxController {
 
   Future<void> addAllDetailTransaksiOut(List<dynamic> listDibeli) async {
     print('MENERIMA ITEM UNTUK DIPROSES: $listDibeli');
+
+    List<Map<String, dynamic>> groupedList = [];
+
     for (var item in listDibeli) {
+      final String idProduk = item['id'].toString();
+      final List addOnList = item['addOn'] ?? [];
+      final String addOnKey = addOnList.isEmpty
+          ? ''
+          : addOnList.map((e) => e.toString()).toList().join(',');
+
+      final String groupKey = '$idProduk|$addOnKey';
+
+      final existingIndex =
+          groupedList.indexWhere((e) => e['groupKey'] == groupKey);
+
+      int itemJumlah = int.tryParse(item['Jumlah'].toString()) ?? 1;
+      int itemHarga = int.tryParse(item['harga'].toString()) ?? 0;
+      int itemHargaSatuan = int.tryParse(item['harga_satuan'].toString()) ?? 0;
+
+      int itemAddOnHarga = 0;
+      for (var addOnId in addOnList) {
+        itemAddOnHarga +=
+            int.tryParse(addOnHarga(addOnId.toString()).toString()) ?? 0;
+      }
+
+      if (existingIndex != -1) {
+        groupedList[existingIndex]['Jumlah'] += itemJumlah;
+        groupedList[existingIndex]['totalAddOn'] += itemAddOnHarga;
+      } else {
+        groupedList.add({
+          'groupKey': groupKey,
+          'id': idProduk,
+          'Jumlah': itemJumlah,
+          'harga_satuan': itemHargaSatuan,
+          'harga': itemHarga,
+          'addOn': addOnList,
+          'totalAddOn': itemAddOnHarga,
+        });
+      }
+    }
+
+    // Proses kirim hasil akhir
+    for (var item in groupedList) {
       try {
-        print('Memproses item: ${item['id']}');
         await addDetailTransaksiOut(
-          item['id'] ?? '',
+          item['id'].toString(),
           item['Jumlah'].toString(),
           item['harga_satuan'].toString(),
           item['harga'].toString(),
-          addOnHarga(item['addOn']).toString(),
+          item['totalAddOn'].toString(),
+          item['addOn'],
         );
-        await kurangStok(item['id'] ?? '', item['Jumlah'].toString());
+        await kurangStok(item['id'].toString(), item['Jumlah'].toString());
       } catch (e) {
         print('Gagal memproses item: ${item['id']} - Error: $e');
       }
@@ -766,6 +966,7 @@ class KasirC extends GetxController {
     String hargaSatuan,
     String hargaJual,
     String hargaAddOn,
+    List addOn,
   ) async {
     isLoading.value = true;
     final prefs = await SharedPreferences.getInstance();
@@ -779,10 +980,19 @@ class KasirC extends GetxController {
         hargaAddOn,
         userInput,
       );
+
       if (response['status'] == true) {
-        print("Hasil Dari Detail BERHASIl" + response['message']);
-      } else if (response['status'] == false) {
-        print("Hasil Dari Detail GAGAL" + response['message']);
+        print(
+            "Hasil Dari Detail BERHASIL " + response['data']['id'].toString());
+        print("Hasil Dari Detail BERHASIL " + response['message']);
+        final String idDetTransaksi = response['data']['id'].toString();
+        if (addOn.isNotEmpty) {
+          for (var idAddOn in addOn) {
+            await addTransaksiAddOn(idAddOn.toString(), idDetTransaksi);
+          }
+        }
+      } else {
+        print("Hasil Dari Detail GAGAL " + response['message']);
       }
     } catch (e) {
       print(e);
@@ -864,8 +1074,6 @@ class KasirC extends GetxController {
       String totalHargaSt = NumberFormat('#,##0', 'id_ID')
           .format(double.parse(totalHarga.toString()));
 
-      String totalHargaSebelumSt = NumberFormat('#,##0', 'id_ID')
-          .format(double.parse(totalHargaSebelum.toString()));
       String totalBayar = NumberFormat('#,##0', 'id_ID')
           .format(double.parse(bayarTransaksi.toString()));
       double kembalian = double.parse(bayarTransaksi.toString()) -
@@ -893,55 +1101,77 @@ class KasirC extends GetxController {
       printer.printLeftRight("Nama Produk", "Harga", 0);
       printer.printCustom("--------------------------------", 0, 1);
       // Loop here
-      Set<String> displayedProducts = {};
+      Map<String, Map<String, dynamic>> groupedProducts = {};
+
       for (var i = 0; i < listProduk.length; i++) {
-        if (listProduk[i]['listDibeli'].isNotEmpty) {
-          for (var x = 0; x < listProduk[i]['listDibeli'].length; x++) {
-            String productKey =
-                '${listProduk[i]['nama']}-${listProduk[i]['listDibeli'][x]['tipe']}';
-            if (!displayedProducts.contains(productKey)) {
-              displayedProducts.add(productKey);
-              String productName = listProduk[i]['nama'];
-              String productPrice = NumberFormat('#,##0', 'id_ID').format(
-                  double.parse(
-                      listProduk[i]['listDibeli'][x]['harga'].toString()));
-              String quantity = listProduk[i]['listDibeli'].length.toString();
-              // Ambil harga per produk dalam bentuk double
-              double hargaPerItem = double.parse(
-                  listProduk[i]['listDibeli'][x]['harga'].toString());
+        var produk = listProduk[i];
+        var namaProduk = produk['nama'];
+        var idProduk = produk['id_produk'].toString();
 
-              int jumlah = listProduk[i]['listDibeli'].length;
+        if (produk['listDibeli'].isNotEmpty) {
+          for (var item in produk['listDibeli']) {
+            var harga = double.parse(item['harga'].toString());
+            List<dynamic> addonList = item['addOn'] ?? [];
 
-              double totalHarga = hargaPerItem * jumlah;
+            // Sort dan gabungkan ID addOn agar konsisten
+            List<String> addonIds = addonList.map((a) => a.toString()).toList();
+            addonIds.sort();
+            String addonKey = addonIds.join(',');
 
-              String formattedTotal =
-                  NumberFormat('#,##0', 'id_ID').format(totalHarga);
+            // Kombinasi key unik berdasarkan produk dan addon
+            String key = '$idProduk|$addonKey';
 
-              // Mencetak nama produk dan subtotal
-              printer.printLeftRight("$productName", "$formattedTotal", 0);
-              printer.printLeftRight("Qty: $quantity x $productPrice", "", 0);
-              String idAddOn =
-                  listProduk[i]['listDibeli'][x]['addOn'].toString();
-              if (idAddOn != "1") {
-                String addOnNama = addOnName(idAddOn);
-                String addOnHargaStr =
-                    NumberFormat('#,##0', 'id_ID').format(addOnHarga(idAddOn));
-                printer.printLeftRight("$addOnNama", "+$addOnHargaStr", 0);
-              }
+            if (!groupedProducts.containsKey(key)) {
+              groupedProducts[key] = {
+                'nama': namaProduk,
+                'harga': harga,
+                'jumlah': 1,
+                'addOn': addonIds,
+              };
+            } else {
+              groupedProducts[key]!['jumlah'] += 1;
             }
           }
         }
       }
+      groupedProducts.forEach((key, value) {
+        String nama = value['nama'];
+        double harga = value['harga'];
+        int jumlah = value['jumlah'];
+        double totalHarga = harga;
+        double totalHargaAddOn = 0;
+
+        String formattedTotal =
+            NumberFormat('#,##0', 'id_ID').format(totalHarga);
+
+        // Cetak add-on jika ada
+        List<String> addonIds = value['addOn'];
+        for (var addOnId in addonIds) {
+          totalHargaAddOn += addOnHarga(addOnId);
+        }
+        double hargaSatuanDenganAddOn = harga + totalHargaAddOn;
+        String formattedTotalHarga = NumberFormat('#,##0', 'id_ID')
+            .format(hargaSatuanDenganAddOn * jumlah);
+        printer.printLeftRight("$nama", "$formattedTotalHarga", 0);
+        printer.printLeftRight("Qty: $jumlah x $formattedTotal", "", 0);
+        if (addonIds.isNotEmpty) {
+          for (var addOnId in addonIds) {
+            String namaAddOn = addOnName(addOnId);
+            int hargaAddOn = addOnHarga(addOnId);
+            String hargaAddOnFormat =
+                NumberFormat('#,##0', 'id_ID').format(hargaAddOn);
+            printer.printCustom(" + $namaAddOn ($hargaAddOnFormat) x 2", 0, 0);
+          }
+        }
+      });
 
       printer.printCustom("--------------------------------", 0, 1);
 
       // Total Pembayaran
-      printer.printLeftRight("Subtotal", totalHargaSebelumSt.toString(), 0);
       printer.printLeftRight("Diskon", diskonRupiah ?? "null", 0);
       printer.printLeftRight("Total", totalHargaSt.toString(), 0);
       // Nanti diambil setelah Transaksi selesai dikirim
       printer.printLeftRight("Bayar ($metode)", totalBayar ?? "0", 0);
-      // Nanti diambil setelah Transaksi selesai dikirim
       printer.printLeftRight("Kembalian", kembalianSt, 0);
       printer.printCustom("--------------------------------", 0, 1);
 

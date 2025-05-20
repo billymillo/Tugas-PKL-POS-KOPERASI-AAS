@@ -207,9 +207,11 @@ class _OpNamePageState extends State<OpNamePage> {
                             itemCount: controller.opname.length,
                             itemBuilder: (context, index) {
                               final item = controller.opname[index];
-                              Color textColor = item['status_opname'] == '4'
-                                  ? Colors.red
-                                  : Colors.green;
+                              Color textColor = item['status_opname'] == '3'
+                                  ? Colors.green
+                                  : item['status_opname'] == '5'
+                                      ? Colors.orange
+                                      : Colors.red;
                               return Card(
                                 margin: const EdgeInsets.only(top: 15),
                                 elevation: 2,
@@ -226,7 +228,8 @@ class _OpNamePageState extends State<OpNamePage> {
                                     Get.toNamed(
                                       Routes.OPNAMEDET,
                                       arguments: {
-                                        'id_opname': item['id']
+                                        'id_opname': item['id'],
+                                        'status': item['status_opname'],
                                       }, // bukan 'id_opname', tapi 'id'
                                     );
                                   },

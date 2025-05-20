@@ -6,9 +6,6 @@ import 'package:http/http.dart' as http;
 // Fetch Api
 class ApiService {
   static const String baseUrl = 'http://10.10.20.50/POS_CI/api/';
-  // static const String baseUrl = 'http://10.10.20.240/POS_CI/api/';
-  // static const String baseUrl = 'http://192.168.1.7/POS_CI/api/';
-  // static const String baseUrl = 'http://192.168.1.8/POS_CI/api/';
 
   Future<List<dynamic>> fetchUsers({String? id}) async {
     final url = id == null ? '$baseUrl/users' : '$baseUrl/users?id=$id';
@@ -483,7 +480,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> addAddOn(
       String addOn, String harga, String userInput) async {
-    final url = '$baseUrl/product/add_on';
+    final url = '$baseUrl/addon';
     final response = await http.post(
       Uri.parse(url),
       body: {
@@ -501,7 +498,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> editAddOn(
       String id, String add_on, String harga, String update) async {
-    final url = '$baseUrl/product/add_on/$id';
+    final url = '$baseUrl/addon/$id';
     final response = await http.put(
       Uri.parse(url),
       body: {'id': id, 'add_on': add_on, 'harga': harga, 'user_update': update},
@@ -515,12 +512,72 @@ class ApiService {
 
   Future<Map<String, dynamic>> deleteAddOn(
     String id,
+    String userUpdate,
   ) async {
-    final url = '$baseUrl/product/add_on/$id';
+    final url = '$baseUrl/addon/$id';
     final response = await http.delete(
       Uri.parse(url),
       body: {
         'id': id,
+        'user_update': userUpdate,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  // Jika produk baru ditambahkan pake ini
+  // karena id_produk diambil dari latest produk dari CI
+  Future<Map<String, dynamic>> addProdukAddOnNewest(
+      String idAddon, String userInput) async {
+    final url = '$baseUrl/addon/produk';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'id_add_on': idAddon,
+        'user_input': userInput,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  // Jika produk lama pake ini
+  // karena id_produk diambil dari id_produk yang ada di ProdukPage
+  Future<Map<String, dynamic>> addProdukAddOnOld(
+      String idAddon, String idProduk, String userInput) async {
+    final url = '$baseUrl/addon/produk';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'id_add_on': idAddon,
+        'id_produk': idProduk,
+        'user_input': userInput,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteProdukAddOn(
+    String id,
+    String userUpdate,
+  ) async {
+    final url = '$baseUrl/addon/produk/';
+    final response = await http.delete(
+      Uri.parse(url),
+      body: {
+        'id': id,
+        'user_update': userUpdate,
       },
     );
     if (response.statusCode == 200) {

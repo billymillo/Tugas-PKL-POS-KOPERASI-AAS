@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiServiceTr {
   static const String baseUrlTr = 'http://10.10.20.50/POS_CI/api';
-  // static const String baseUrlTr = 'http://192.168.1.8/POS_CI/api';
 
   Future<String?> getUserInput() async {
     final prefs = await SharedPreferences.getInstance();
@@ -72,8 +71,7 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> kurangStok(
-      String id, String stok) async {
+  Future<Map<String, dynamic>> kurangStok(String id, String stok) async {
     final url = '$baseUrlTr/product/kurang';
     final response = await http.put(
       Uri.parse(url),
@@ -123,13 +121,19 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> member(String nama, String idPeg, String no_tlp,
-      String saldo, String poin, String userInput,) async {
+  Future<Map<String, dynamic>> member(
+    String nama,
+    String idPeg,
+    String no_tlp,
+    String saldo,
+    String poin,
+    String userInput,
+  ) async {
     final url = '$baseUrlTr/member';
     final response = await http.post(
       Uri.parse(url),
       body: {
-        'nama': nama, 
+        'nama': nama,
         'id_peg_system': idPeg,
         'no_tlp': no_tlp,
         'saldo': saldo,
@@ -144,8 +148,8 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> editMember(
-      String id, String nama, String no_tlp, String saldo, String poin, String update) async {
+  Future<Map<String, dynamic>> editMember(String id, String nama, String no_tlp,
+      String saldo, String poin, String update) async {
     final url = '$baseUrlTr/member/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -155,7 +159,7 @@ class ApiServiceTr {
         'no_tlp': no_tlp,
         'saldo': saldo,
         'poin': poin,
-        'user_update' : update,
+        'user_update': update,
       },
     );
     if (response.statusCode == 200) {
@@ -182,7 +186,10 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> metode(String metode, String userInput,) async {
+  Future<Map<String, dynamic>> metode(
+    String metode,
+    String userInput,
+  ) async {
     final url = '$baseUrlTr/transaksi_in/pembayaran';
     final response = await http.post(
       Uri.parse(url),
@@ -197,15 +204,12 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> editMetode(String id, String metode, String update) async {
+  Future<Map<String, dynamic>> editMetode(
+      String id, String metode, String update) async {
     final url = '$baseUrlTr/transaksi_in/pembayaran/$id';
     final response = await http.put(
       Uri.parse(url),
-      body: {
-        'id': id,
-        'metode': metode,
-        'user_update': update
-      },
+      body: {'id': id, 'metode': metode, 'user_update': update},
     );
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -324,16 +328,16 @@ class ApiServiceTr {
     String userUpdate,
   ) async {
     final url = '$baseUrlTr/transaksi_out/';
-      final response = await http.put(
-        Uri.parse(url),
-        body: {
-          'id' : id,
-          'total_transaksi': totalKasbon,
-          'status_transaksi': statusTr,
-          'user_update': userUpdate,
-        },
-      );
-      if (response.statusCode == 200) {
+    final response = await http.put(
+      Uri.parse(url),
+      body: {
+        'id': id,
+        'total_transaksi': totalKasbon,
+        'status_transaksi': statusTr,
+        'user_update': userUpdate,
+      },
+    );
+    if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
       return jsonDecode(response.body);
@@ -341,12 +345,10 @@ class ApiServiceTr {
   }
 
   Future<Map<String, dynamic>> deleteKasbon(
-    String id,
-    String userUpdate
-  ) async {
+      String id, String userUpdate) async {
     final url = '$baseUrlTr/kasbon';
     final response = await http.delete(
-      Uri.parse(url), 
+      Uri.parse(url),
       body: {
         'id': id,
         'user_update': userUpdate,
@@ -377,13 +379,18 @@ class ApiServiceTr {
           'jumlah': jumlah,
           'harga_satuan': hargaSatuan,
           'harga_jual': hargaJual,
-          'harga_add_on' : hargaAddOn,
+          'harga_add_on': hargaAddOn,
           'user_input': userInput,
         },
       );
 
-      if (response.statusCode == 201) {
-        return jsonDecode(response.body);
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        return {
+          'status': true,
+          'message': jsonData['message'],
+          'data': jsonData['data'],
+        };
       } else {
         return {
           'status': false,
@@ -462,7 +469,6 @@ class ApiServiceTr {
     }
   }
 
-
   static Future<Map<String, dynamic>> addTransaksiIn(
     String jumlah,
     String total,
@@ -505,10 +511,10 @@ class ApiServiceTr {
       final response = await http.post(
         Uri.parse(url),
         body: {
-          'id_mitra' : mitra,
+          'id_mitra': mitra,
           'jumlah_produk': jumlah,
           'total_transaksi': total,
-          'status_transaksi' : status,
+          'status_transaksi': status,
           'user_input': userInput,
         },
       );
@@ -525,7 +531,6 @@ class ApiServiceTr {
       return {'status': false, 'message': 'Request failed: $e'};
     }
   }
-
 
   Future<Map<String, dynamic>> duplikatProduk(
     String idProduk,
@@ -561,8 +566,8 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> editProduk(
-    String id, String stok, String hargaSatuan, String hargaJual, String userUpdate) async {
+  Future<Map<String, dynamic>> editProduk(String id, String stok,
+      String hargaSatuan, String hargaJual, String userUpdate) async {
     final url = '$baseUrlTr/product/ubah/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -570,7 +575,7 @@ class ApiServiceTr {
         'id': id,
         'stok': stok,
         'harga_satuan': hargaSatuan,
-        'harga_jual':hargaJual,
+        'harga_jual': hargaJual,
         'user_update': userUpdate,
       },
     );
@@ -581,5 +586,21 @@ class ApiServiceTr {
     }
   }
 
-
+  Future<Map<String, dynamic>> addTransaksiAddOn(
+      String idAddon, String idDetTransaksi, String userInput) async {
+    final url = '$baseUrlTr/addon/transaksi';
+    final response = await http.post(
+      Uri.parse(url),
+      body: {
+        'id_add_on': idAddon,
+        'id_det_transaksi_out': idDetTransaksi,
+        'user_input': userInput,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
 }

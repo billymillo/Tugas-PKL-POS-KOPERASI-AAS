@@ -62,6 +62,7 @@ class ReportingP extends StatelessWidget {
                                     value: [
                                       'Perhari',
                                       'Kustom Tanggal',
+                                      'Bulanan'
                                     ].contains(controller.selectedValue.value)
                                         ? controller.selectedValue.value
                                         : null,
@@ -76,12 +77,14 @@ class ReportingP extends StatelessWidget {
                                     onChanged: (String? newValue) {
                                       controller.selectedValue.value =
                                           newValue ?? '';
-                                      pickDate(
-                                          context); // Panggil fungsi untuk pilih tanggal
+                                      pickDate(context);
                                     },
-                                    items: ['Perhari', 'Kustom Tanggal']
-                                        .map<DropdownMenuItem<String>>(
-                                            (String value) {
+                                    items: [
+                                      'Perhari',
+                                      'Kustom Tanggal',
+                                      'Bulanan'
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
                                         child: Text(value),
@@ -105,6 +108,8 @@ class ReportingP extends StatelessWidget {
                                 controller.filterData();
                                 controller.filterTransaksiOutDet();
                                 controller.filterTransaksiInDet();
+                                controller.groupAndSortTransaksi(
+                                    controller.transaksiOutDet);
                               },
                               icon: Icon(Icons.search, color: Colors.white),
                               label: Text('Filter',
@@ -135,7 +140,7 @@ class ReportingP extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Laporan Penjualan',
+                          'Laporan Transaksi',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 17,
@@ -290,7 +295,7 @@ class ReportingP extends StatelessWidget {
 
                                 if (selected.isNotEmpty && selected[3]) {
                                   chartWidgets.add(buildChart(
-                                    text: 'Data Pendapatan',
+                                    text: 'Data Pengeluaran',
                                     spots: controller.pengeluaranChartSpots,
                                     labels: controller.pengeluaranChartLabels,
                                     color: DarkColor().yellow,
@@ -421,7 +426,7 @@ class ReportingP extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        SizedBox(height: 20),
                         Obx(() {
                           final data = controller.transaksiOutDet;
                           if (data.isEmpty) {
@@ -458,12 +463,7 @@ class ReportingP extends StatelessWidget {
                     color: Colors.white,
                     child: InkWell(
                       onTap: () {
-                        final allItems = List<Map<String, dynamic>>.from(
-                            controller.transaksiOutDet);
-                        allItems.sort((a, b) =>
-                            (int.tryParse(b['jumlah'].toString()) ?? 0)
-                                .compareTo(
-                                    int.tryParse(a['jumlah'].toString()) ?? 0));
+                        final allItems = controller.groupedProduk;
                         showDialog(
                           context: context,
                           builder: (context) {
@@ -510,102 +510,117 @@ class ReportingP extends StatelessWidget {
                                     ),
                                     SizedBox(height: 20),
                                     Expanded(
-                                      child: ListView.builder(
-                                        itemCount: allItems.length,
-                                        itemBuilder: (context, index) {
-                                          final item = allItems[index];
-                                          return Card(
-                                            elevation: 0,
-                                            margin: EdgeInsets.only(bottom: 10),
-                                            shape: RoundedRectangleBorder(
+                                        child: SingleChildScrollView(
+                                      scrollDirection: Axis.vertical,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                1,
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFFEEF2F7),
                                               borderRadius:
-                                                  BorderRadius.circular(8),
-                                              side: BorderSide(
-                                                  color: Colors.grey.shade200),
+                                                  BorderRadius.circular(12),
                                             ),
-                                            color: Colors.white,
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 16, vertical: 12),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Image.network(
-                                                    // "http://10.0.2.2/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
-                                                    "http://10.10.20.50/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
-                                                    width: 50, // atur lebar
-                                                    height: 50, // atur tinggi
-                                                    fit: BoxFit
-                                                        .cover, // atau BoxFit.contain, sesuai kebutuhan
-                                                    errorBuilder: (context,
-                                                        error, stackTrace) {
-                                                      return Center(
-                                                          child: Icon(
-                                                              Icons.error));
-                                                    },
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          controller.ProdukName(
-                                                              item[
-                                                                  'id_produk']),
-                                                          maxLines: 2,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontSize: 14,
-                                                          ),
-                                                        ),
-                                                        SizedBox(height: 4),
-                                                        Text(
-                                                          '${item['jumlah']} Item terjual',
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .grey.shade700,
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    children: [
-                                                      Text(
-                                                        'Pendapatan Produk : Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}',
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 13,
-                                                          color: Colors.black87,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        'Total Laba : Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['laba'].toString()) ?? 0)}',
-                                                        style: TextStyle(
-                                                          color: Colors.green,
-                                                          fontSize: 12,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                            child: DataTable(
+                                              columnSpacing: 20,
+                                              horizontalMargin: 20,
+                                              dividerThickness: 1,
+                                              headingRowHeight: 48,
+                                              headingRowColor:
+                                                  MaterialStateProperty.all(
+                                                      Color(0xFFEEF2F7)),
+                                              headingTextStyle: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                                color: Color(0xFF374151),
                                               ),
+                                              dataTextStyle: TextStyle(
+                                                fontSize: 13,
+                                                color: Color(0xFF111827),
+                                              ),
+                                              columns: const [
+                                                DataColumn(label: Text('No')),
+                                                DataColumn(
+                                                    label: Text('Nama Produk')),
+                                                DataColumn(
+                                                    label: Text('Jumlah')),
+                                                DataColumn(
+                                                    label: Text('Harga Dasar')),
+                                                DataColumn(
+                                                    label: Text('Total Harga')),
+                                                DataColumn(label: Text('Laba')),
+                                              ],
+                                              rows: List.generate(
+                                                  allItems.length, (index) {
+                                                final item = allItems[index];
+                                                final isEven = index % 2 == 0;
+
+                                                return DataRow(
+                                                  color:
+                                                      MaterialStateProperty.all(
+                                                    isEven
+                                                        ? Colors.white
+                                                        : Color(0xFFF1F5F9),
+                                                  ),
+                                                  cells: [
+                                                    DataCell(
+                                                        Text('${index + 1}')),
+                                                    DataCell(Text(
+                                                      controller.ProdukName(
+                                                          item['id_produk']
+                                                              .toString()),
+                                                      style: TextStyle(
+                                                          fontSize: 12),
+                                                    )),
+                                                    DataCell(Text(
+                                                        '${item['jumlah']} pcs')),
+                                                    DataCell(Text(
+                                                      'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga_dasar'].toString()) ?? 0)}',
+                                                    )),
+                                                    DataCell(Text(
+                                                      'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}',
+                                                    )),
+                                                    DataCell(Text(
+                                                      'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['laba'].toString()) ?? 0)}',
+                                                      style: TextStyle(
+                                                          color: Colors.green),
+                                                    )),
+                                                  ],
+                                                );
+                                              }),
                                             ),
-                                          );
-                                        },
+                                          ),
+                                        ],
                                       ),
-                                    ),
+                                    )),
+                                    SizedBox(height: 20),
+                                    Obx(() {
+                                      final data = controller.transaksiOutDet;
+                                      if (data.isEmpty) {
+                                        return SizedBox(); // Kalau kosong, tombol tidak ditampilkan
+                                      }
+                                      return ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: PrimaryColor().blue,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                8), // radius sudut tombol
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          controller.pdfProduk();
+                                        },
+                                        child: Text('Download PDF',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white)),
+                                      );
+                                    })
                                   ],
                                 ),
                               ),
@@ -617,14 +632,15 @@ class ReportingP extends StatelessWidget {
                         padding:
                             EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Obx(() {
-                          final topItems = List<Map<String, dynamic>>.from(
-                              controller.transaksiOutDet);
-                          topItems.sort((a, b) =>
+                          final sortedItems = List<Map<String, dynamic>>.from(
+                              controller.groupedProduk);
+                          sortedItems.sort((a, b) =>
                               (int.tryParse(b['jumlah'].toString()) ?? 0)
                                   .compareTo(
                                       int.tryParse(a['jumlah'].toString()) ??
                                           0));
-                          final topThree = topItems.take(3).toList();
+                          final topThree = sortedItems.take(3).toList();
+
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -663,7 +679,6 @@ class ReportingP extends StatelessWidget {
                                       children: [
                                         Image.network(
                                           "http://10.10.20.50/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
-                                          // "http://192.168.1.8/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
                                           width: 50, // atur lebar
                                           height: 50, // atur tinggi
                                           fit: BoxFit
@@ -756,10 +771,6 @@ class ReportingP extends StatelessWidget {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              constraints: BoxConstraints(
-                                maxHeight:
-                                    MediaQuery.of(context).size.height * 1,
-                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -787,101 +798,139 @@ class ReportingP extends StatelessWidget {
                                   ),
                                   SizedBox(height: 20),
                                   Expanded(
-                                    child: ListView.builder(
-                                      itemCount: allItems.length,
-                                      itemBuilder: (context, index) {
-                                        final item = allItems[index];
-                                        return Card(
-                                          elevation: 0,
-                                          margin: EdgeInsets.only(bottom: 10),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            side: BorderSide(
-                                                color: Colors.grey.shade200),
-                                          ),
-                                          color: Colors.white,
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 12),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  controller.ProdukName(
-                                                          item['id_produk']) +
-                                                      " (" +
-                                                      controller.NoTransaksi(item[
-                                                          'id_transaksi_in']) +
-                                                      ")",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w700,
-                                                    fontSize: 15,
-                                                    color:
-                                                        Colors.indigo.shade900,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 8),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                        child: Text('Jumlah')),
-                                                    Text(':'),
-                                                    SizedBox(width: 8),
-                                                    Expanded(
-                                                        child: Text(
-                                                            '${item['jumlah']} Pcs')),
-                                                  ],
-                                                ),
-                                                SizedBox(height: 4),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                        child: Text(
-                                                            'Harga Perpcs')),
-                                                    Text(':'),
-                                                    SizedBox(width: 8),
-                                                    Expanded(
-                                                        child: Text(
-                                                            'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['harga_satuan'].toString()) ?? 0)}')),
-                                                  ],
-                                                ),
-                                                SizedBox(height: 4),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                        child: Text(
-                                                            'Total Harga')),
-                                                    Text(':'),
-                                                    SizedBox(width: 8),
-                                                    Expanded(
-                                                        child: Text(
-                                                            'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}')),
-                                                  ],
-                                                ),
-                                                SizedBox(height: 4),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                        child: Text('Waktu')),
-                                                    Text(':'),
-                                                    SizedBox(width: 8),
-                                                    Expanded(
-                                                      child: Text(
-                                                        formatTanggal(
-                                                            item['input_date']),
-                                                      ),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            color: Color(0xFFF9FAFB),
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                1,
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Obx(() {
+                                                final data =
+                                                    controller.transaksiInDet;
+                                                if (data.isEmpty) {
+                                                  return SizedBox(
+                                                    height: 10,
+                                                  );
+                                                }
+                                                return Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      1,
+                                                  child: DataTable(
+                                                    columnSpacing: 10,
+                                                    horizontalMargin: 9,
+                                                    dividerThickness: 1,
+                                                    headingRowHeight: 48,
+                                                    headingRowColor:
+                                                        MaterialStateProperty
+                                                            .all(
+                                                      Color(0xFFEEF2F7),
                                                     ),
-                                                  ],
-                                                ),
-                                              ],
+                                                    headingTextStyle: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 14,
+                                                      color: Color(0xFF374151),
+                                                    ),
+                                                    dataTextStyle: TextStyle(
+                                                      fontSize: 13,
+                                                      color: Color(0xFF111827),
+                                                    ),
+                                                    columns: const [
+                                                      DataColumn(
+                                                          label: Text('No')),
+                                                      DataColumn(
+                                                          label:
+                                                              Text('Tanggal')),
+                                                      DataColumn(
+                                                          label: Text(
+                                                              'No. Transaksi')),
+                                                      DataColumn(
+                                                          label:
+                                                              Text('Produk')),
+                                                      DataColumn(
+                                                          label: Text(
+                                                              'Jumlah Produk')),
+                                                      DataColumn(
+                                                          label: Text(
+                                                              'Total Harga')),
+                                                    ],
+                                                    rows: List.generate(
+                                                        data.length, (index) {
+                                                      final item = data[index];
+                                                      final isEven =
+                                                          index % 2 == 0;
+
+                                                      return DataRow(
+                                                        color:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          isEven
+                                                              ? Colors.white
+                                                              : Color(
+                                                                  0xFFF1F5F9),
+                                                        ),
+                                                        cells: [
+                                                          DataCell(Text(
+                                                              '${index + 1}')),
+                                                          DataCell(Text(
+                                                              formatTanggal(item[
+                                                                  'input_date']))),
+                                                          DataCell(Text(controller
+                                                              .NoTransaksi(item[
+                                                                  'id_transaksi_in']))),
+                                                          DataCell(Text(controller
+                                                              .ProdukName(item[
+                                                                  'id_produk']))),
+                                                          DataCell(Text(
+                                                              '${item['jumlah']} Pcs')),
+                                                          DataCell(Text(
+                                                              'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}')),
+                                                        ],
+                                                      );
+                                                    }),
+                                                  ),
+                                                );
+                                              }),
                                             ),
                                           ),
-                                        );
-                                      },
+                                        ],
+                                      ),
                                     ),
                                   ),
+                                  SizedBox(height: 20),
+                                  Obx(() {
+                                    final data = controller.transaksiInDet;
+                                    if (data.isEmpty) {
+                                      return SizedBox(); // Kalau kosong, tombol tidak ditampilkan
+                                    }
+                                    return ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: PrimaryColor().blue,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              8), // radius sudut tombol
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        controller.pdfTransaksiIn();
+                                      },
+                                      child: Text('Download PDF',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white)),
+                                    );
+                                  })
                                 ],
                               ),
                             ),
@@ -1015,90 +1064,115 @@ class ReportingP extends StatelessWidget {
                                 );
                               }),
                             ),
-                            SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    color: Colors.white,
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Total Kasbon Member',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 20,
+                                )
+                              ],
+                            ),
+                            SizedBox(height: 20),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
                                 color: Color(0xFFF9FAFB),
                                 width: MediaQuery.of(context).size.width * 1,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Obx(() {
-                                    final data = controller.transaksiInDet;
-                                    if (data.isEmpty) {
-                                      return SizedBox(
-                                        height: 10,
-                                      );
-                                    }
-                                    return Container(
-                                      width:
-                                          MediaQuery.of(context).size.width * 1,
-                                      child: DataTable(
-                                        columnSpacing: 10,
-                                        horizontalMargin: 9,
-                                        dividerThickness: 1,
-                                        headingRowHeight: 48,
-                                        headingRowColor:
-                                            MaterialStateProperty.all(
-                                          Color(0xFFEEF2F7),
-                                        ),
-                                        headingTextStyle: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Color(0xFF374151),
-                                        ),
-                                        dataTextStyle: TextStyle(
-                                          fontSize: 13,
-                                          color: Color(0xFF111827),
-                                        ),
-                                        columns: const [
-                                          DataColumn(label: Text('No')),
-                                          DataColumn(label: Text('Tanggal')),
-                                          DataColumn(
-                                              label: Text('No. Transaksi')),
-                                          DataColumn(label: Text('Produk')),
-                                          DataColumn(
-                                              label: Text('Jumlah Produk')),
-                                          DataColumn(
-                                              label: Text('Total Harga')),
-                                        ],
-                                        rows:
-                                            List.generate(data.length, (index) {
-                                          final item = data[index];
-                                          final isEven = index % 2 == 0;
-
-                                          return DataRow(
-                                            color: MaterialStateProperty.all(
-                                              isEven
-                                                  ? Colors.white
-                                                  : Color(0xFFF1F5F9),
-                                            ),
-                                            cells: [
-                                              DataCell(Text('${index + 1}')),
-                                              DataCell(Text(formatTanggal(
-                                                  item['input_date']))),
-                                              DataCell(Text(
-                                                  controller.NoTransaksi(item[
-                                                      'id_transaksi_in']))),
-                                              DataCell(Text(
-                                                  controller.ProdukName(
-                                                      item['id_produk']))),
-                                              DataCell(Text(
-                                                  '${item['jumlah']} Pcs')),
-                                              DataCell(Text(
-                                                  'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}')),
-                                            ],
-                                          );
-                                        }),
-                                      ),
+                                child: Obx(() {
+                                  final data = controller.kasbon;
+                                  final sortedData = [...data];
+                                  sortedData.sort((a, b) =>
+                                      double.parse(b['total_kasbon'].toString())
+                                          .compareTo(double.parse(
+                                              a['total_kasbon'].toString())));
+                                  if (data.isEmpty) {
+                                    return SizedBox(
+                                      height: 10,
                                     );
-                                  }),
-                                ),
+                                  }
+                                  return Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 1,
+                                    child: DataTable(
+                                      columnSpacing: 1,
+                                      horizontalMargin: 20,
+                                      dividerThickness: 1,
+                                      headingRowHeight: 48,
+                                      headingRowColor:
+                                          MaterialStateProperty.all(
+                                        Color(0xFFEEF2F7),
+                                      ),
+                                      headingTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: Color(0xFF374151),
+                                      ),
+                                      dataTextStyle: TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xFF111827),
+                                      ),
+                                      columns: const [
+                                        DataColumn(label: Text('No')),
+                                        DataColumn(label: Text('Nama Member')),
+                                        DataColumn(label: Text('Total Kasbon')),
+                                      ],
+                                      rows: List.generate(sortedData.length,
+                                          (index) {
+                                        final item = sortedData[index];
+                                        final isEven = index % 2 == 0;
+
+                                        return DataRow(
+                                          color: MaterialStateProperty.all(
+                                            isEven
+                                                ? Colors.white
+                                                : Color(0xFFF1F5F9),
+                                          ),
+                                          cells: [
+                                            DataCell(Text('${index + 1}')),
+                                            DataCell(Text(
+                                                '${controller.MemberName(item['id_member'].toString())}'
+                                                    .toString())),
+                                            DataCell(Text(
+                                                'Rp ${NumberFormat('#,##0', 'id_ID').format(item['total_kasbon'] ?? 0)}')),
+                                          ],
+                                        );
+                                      }),
+                                    ),
+                                  );
+                                }),
                               ),
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(height: 20),
                             Obx(() {
-                              final data = controller.transaksiInDet;
+                              final data = controller.transaksiOutDet;
                               if (data.isEmpty) {
                                 return SizedBox(); // Kalau kosong, tombol tidak ditampilkan
                               }
@@ -1113,16 +1187,14 @@ class ReportingP extends StatelessWidget {
                                   ),
                                 ),
                                 onPressed: () {
-                                  controller.pdfTransaksiIn();
+                                  controller.pdfKasbon();
                                 },
                                 child: Text('Download PDF',
                                     style: TextStyle(
                                         fontSize: 16, color: Colors.white)),
                               );
                             })
-                          ],
-                        ),
-                      ),
+                          ]),
                     ),
                   ),
                 ],
@@ -1157,23 +1229,17 @@ class ReportingP extends StatelessWidget {
         initialDate: DateTime.now(),
         firstDate: DateTime(2022),
         lastDate: DateTime.now(),
-        builder: (context, child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: PrimaryColor().blue,
-                onPrimary: Colors.white,
-                onSurface: Colors.black,
-                surface: Colors.white,
-              ),
-              dialogBackgroundColor: Colors.white,
-              textTheme: TextTheme(
-                bodyMedium: TextStyle(color: Colors.black),
-              ),
+        builder: (context, child) => Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: PrimaryColor().blue,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+              surface: Colors.white,
             ),
-            child: child!,
-          );
-        },
+          ),
+          child: child!,
+        ),
       );
 
       if (picked != null) {
@@ -1183,7 +1249,10 @@ class ReportingP extends StatelessWidget {
             DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(picked);
         controller.filterTransaksiOutDet();
       }
-    } else {
+    }
+
+    // 👉 Kustom Tanggal (range)
+    else if (controller.selectedValue.value == 'Kustom Tanggal') {
       DateTimeRange? picked = await showDateRangePicker(
         context: context,
         firstDate: DateTime(2022),
@@ -1192,23 +1261,17 @@ class ReportingP extends StatelessWidget {
           start: controller.selectedStartDate.value,
           end: controller.selectedEndDate.value,
         ),
-        builder: (context, child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: ColorScheme.light(
-                primary: PrimaryColor().blue,
-                onPrimary: Colors.white,
-                onSurface: Colors.black,
-                surface: Colors.white,
-              ),
-              dialogBackgroundColor: Colors.white,
-              textTheme: TextTheme(
-                bodyMedium: TextStyle(color: Colors.black),
-              ),
+        builder: (context, child) => Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: PrimaryColor().blue,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+              surface: Colors.white,
             ),
-            child: child!,
-          );
-        },
+          ),
+          child: child!,
+        ),
       );
 
       if (picked != null) {
@@ -1219,7 +1282,61 @@ class ReportingP extends StatelessWidget {
         controller.filterTransaksiOutDet();
       }
     }
+
+    // 👉 Bulanan
+    else if (controller.selectedValue.value == 'Bulanan') {
+      DateTime? pickedMonth = await showMonthYearPicker(
+        context: context,
+        initialDate: controller.selectedStartDate.value,
+        firstDate: DateTime(2022),
+        lastDate: DateTime.now(),
+      );
+
+      if (pickedMonth != null) {
+        // Start: hari pertama bulan
+        final start = DateTime(pickedMonth.year, pickedMonth.month, 1);
+        // End: hari terakhir bulan
+        final end = DateTime(pickedMonth.year, pickedMonth.month + 1, 0);
+
+        controller.selectedStartDate.value = start;
+        controller.selectedEndDate.value = end;
+        controller.dateLabel.value =
+            DateFormat('MMMM yyyy', 'id_ID').format(pickedMonth);
+        controller.filterTransaksiOutDet();
+      }
+    }
   }
+}
+
+Future<DateTime?> showMonthYearPicker({
+  required BuildContext context,
+  required DateTime initialDate,
+  required DateTime firstDate,
+  required DateTime lastDate,
+}) async {
+  DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: initialDate,
+    firstDate: firstDate,
+    lastDate: lastDate,
+    initialDatePickerMode: DatePickerMode.year, // default buka tampilan tahun
+    builder: (context, child) => Theme(
+      data: Theme.of(context).copyWith(
+        colorScheme: ColorScheme.light(
+          primary: PrimaryColor().blue,
+          onPrimary: Colors.white,
+          onSurface: Colors.black,
+        ),
+      ),
+      child: child!,
+    ),
+  );
+
+  if (picked != null) {
+    return DateTime(picked.year, picked.month);
+  }
+
+  return null;
 }
 
 Widget CardReport(

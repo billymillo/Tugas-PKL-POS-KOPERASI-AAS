@@ -30,6 +30,9 @@ class TransaksiC extends GetxController {
   var produkDetail = <Map<String, dynamic>>[].obs;
   var metodePem = <Map<String, dynamic>>[].obs;
 
+  var addOn = <Map<String, dynamic>>[].obs;
+  var addOnTr = <Map<String, dynamic>>[].obs;
+
   var isLoadingLunas = false.obs;
   var isLastPageLunas = false.obs;
   var pageLunas = 1.obs;
@@ -61,6 +64,25 @@ class TransaksiC extends GetxController {
     return selected['metode'] ?? "Tidak Ada";
   }
 
+  String addOnName(String idAddon) {
+    var selected = addOn.firstWhere(
+      (m) => m['id'].toString() == idAddon,
+      orElse: () => {'add_on': 'Tidak Ada'},
+    );
+    return selected['add_on'] ?? "Tidak Ada";
+  }
+
+  int addOnHarga(String idAddon) {
+    var selected = addOn.firstWhere(
+      (m) => m['id'].toString() == idAddon,
+      orElse: () => {'harga': '0'},
+    );
+
+    final hargaStr = selected['harga']?.toString() ?? '0';
+
+    return int.tryParse(hargaStr) ?? 0;
+  }
+
   String totalKasbon(String idTransaksi) {
     var selected = kasbonDet.firstWhere(
       (m) => m['id_transaksi_out'].toString() == idTransaksi,
@@ -77,6 +99,8 @@ class TransaksiC extends GetxController {
     fetchKasbon();
     fetchKasbonDetail();
     fetchMetode();
+    fetchAddonTr();
+    fetchAddon();
     initializeCheckboxList();
 
     super.onInit();
@@ -461,6 +485,48 @@ class TransaksiC extends GetxController {
           metodePem.value = List<Map<String, dynamic>>.from(jsonData['data']);
         } else {
           metodePem.clear();
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchAddon() async {
+    try {
+      isLoading.value = true;
+      var response = await http.get(Uri.parse(urlTr + "/addon"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOn.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchAddonTr() async {
+    try {
+      isLoading.value = true;
+      var response = await http.get(Uri.parse(urlTr + "/addon/transaksi"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOnTr.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
         }
       } else {
         throw Exception('Failed to load data');

@@ -7,6 +7,7 @@ import 'package:bluetooth_thermal_printer_example/controllers/validationC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/productP.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/navAdminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -50,12 +51,8 @@ class _AddProductPState extends State<AddProductP> {
 
   void initState() {
     super.initState();
-    addController.fetchAddon();
-    addController.fetchMitra();
-    addController.fetchTipe();
-    addController.fetchKategori();
-    addController.addNewAddOn(namaAddOnNewController.text,
-        hargaAddOnNewController.text);
+    addController.addNewAddOn(
+        namaAddOnNewController.text, hargaAddOnNewController.text);
     addController.addNewTipe(newTipeController.text);
     addController.addNewKategori(
         newKategoriController.text, gambarKategoriController.file);
@@ -737,16 +734,117 @@ class _AddProductPState extends State<AddProductP> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildInputLabel('Add On', " *"),
-                        buildDropdown(
-                          selectedValue: addController.selectedAddOn,
-                          label: 'Pilih Add On',
-                          items: addController.addOn,
-                          onChanged: (newValue) {
-                            addController.selectedAddOn.value = newValue;
-                          },
-                          key: 'add_on',
+                        buildInputLabel('Add On Produk', " "),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              AdminW().AddOnDialog(context, addController);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              elevation: 1,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(color: Colors.grey.shade300),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 14),
+                            ),
+                            child: Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.start, // rata kiri
+                              children: [
+                                Icon(Icons.add, color: Colors.black54),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Pilih Add On',
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
+                        Obx(() {
+                          return addController.selectedAddOn.isNotEmpty
+                              ? Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: addController.selectedAddOn
+                                      .map<Widget>((item) {
+                                    final addOn =
+                                        item['add_on'] ?? 'Tidak ada nama';
+
+                                    return Stack(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(top: 20),
+                                          child: Card(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            color: Colors.white,
+                                            elevation: 2,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 10),
+                                              child: ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                    maxWidth: 120),
+                                                child: Text(
+                                                  addOn,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: 0,
+                                          top: 0,
+                                          child: GestureDetector(
+                                            onTap: () =>
+                                                addController.selectAddOn(item),
+                                            child: Container(
+                                              width: 20,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                color: Colors.red,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 1.5),
+                                              ),
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  }).toList(),
+                                )
+                              : const SizedBox(height: 1);
+                        }),
                         buildDialogButton(
                           label: "Tambah Add On Baru",
                           showDialog: () {
@@ -798,7 +896,7 @@ class _AddProductPState extends State<AddProductP> {
                                                     namaAddOnNewController,
                                                 hintText: 'Rebus',
                                                 prefixIcon:
-                                                    CupertinoIcons.person_2_alt,
+                                                    Icons.add_box_outlined,
                                                 type: TextInputType.name,
                                               ),
                                               SizedBox(height: 10),
@@ -811,8 +909,8 @@ class _AddProductPState extends State<AddProductP> {
                                                 controller:
                                                     hargaAddOnNewController,
                                                 hintText: 'Rp. ',
-                                                prefixIcon:
-                                                    CupertinoIcons.phone_circle,
+                                                prefixIcon: FontAwesomeIcons
+                                                    .moneyBillWave,
                                                 type: TextInputType.number,
                                               ),
                                               SizedBox(height: 10),
@@ -1195,7 +1293,7 @@ class _AddProductPState extends State<AddProductP> {
                                         addController.selectedKategori.string,
                                         addController.selectedTipe.string,
                                         addController.selectedMitra.string,
-                                        addController.selectedAddOn.string,
+                                        '2',
                                         hargaPackProdukController.text
                                             .replaceAll('.', ''),
                                         jumlahIsiProdukController.text
@@ -1207,6 +1305,13 @@ class _AddProductPState extends State<AddProductP> {
                                         stokProdukController.text
                                             .replaceAll('.', ''),
                                       );
+
+                                      for (var item
+                                          in addController.selectedAddOn) {
+                                        await addController.addProdukAddOn(
+                                            item['id'].toString());
+                                      }
+
                                       addController.imagePath.value = null;
                                       namaProdukController.clear();
                                       hargaPackProdukController.clear();
@@ -1214,11 +1319,11 @@ class _AddProductPState extends State<AddProductP> {
                                       hargaSatuanProdukController.clear();
                                       hargaJualProdukController.clear();
                                       stokProdukController.clear();
+                                      addController.selectedAddOn.clear();
                                       addController.selectedKategori.value =
                                           null;
                                       addController.selectedTipe.value = null;
                                       addController.selectedMitra.value = null;
-                                      addController.selectedAddOn.value = null;
                                     } catch (e) {
                                       Get.snackbar(
                                         'Error',

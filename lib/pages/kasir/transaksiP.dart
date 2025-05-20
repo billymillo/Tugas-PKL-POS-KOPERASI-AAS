@@ -316,6 +316,19 @@ class TransaksiP extends StatelessWidget {
                                                     // Product list
                                                     ...transaksiDetail
                                                         .map((item) {
+                                                      final matchedAddons = controller
+                                                          .addOnTr
+                                                          .where((addon) =>
+                                                              addon['id_transaksi_out']
+                                                                      .toString() ==
+                                                                  item['id_transaksi_out']
+                                                                      .toString() &&
+                                                              addon['id_det_transaksi_out']
+                                                                      .toString() ==
+                                                                  item['id']
+                                                                      .toString())
+                                                          .toList();
+
                                                       return Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -365,7 +378,7 @@ class TransaksiP extends StatelessWidget {
                                                                   Text(
                                                                     'Produk: ' +
                                                                         controller.ProdukName(
-                                                                            item['id_produk']), // Replace with actual product name
+                                                                            item['id_produk']),
                                                                     style:
                                                                         const TextStyle(
                                                                       fontSize:
@@ -379,7 +392,7 @@ class TransaksiP extends StatelessWidget {
                                                                       height:
                                                                           4),
                                                                   Text(
-                                                                    'SKU: #${item['id_produk']}', // Replace with actual SKU
+                                                                    'SKU: #${item['id_produk']}',
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -389,23 +402,64 @@ class TransaksiP extends StatelessWidget {
                                                                           .shade600,
                                                                     ),
                                                                   ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          4),
-                                                                  item['harga_add_on'] !=
-                                                                          "0"
-                                                                      ? Text(
-                                                                          "Add On :",
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize:
-                                                                                13,
-                                                                            color:
-                                                                                Colors.grey.shade600,
-                                                                          ),
+                                                                  matchedAddons
+                                                                          .isNotEmpty
+                                                                      ? Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            SizedBox(width: 20),
+                                                                            ...matchedAddons.map((addon) {
+                                                                              final hargaPerAddon = controller.addOnHarga(addon['id_add_on'].toString());
+                                                                              final jumlah = int.tryParse(item['jumlah'].toString()) ?? 1;
+                                                                              final totalHarga = hargaPerAddon * jumlah;
+                                                                              return Row(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                                  Text(
+                                                                                    '(+) ${controller.addOnName(addon['id_add_on'].toString())} : ',
+                                                                                    style: TextStyle(
+                                                                                      fontSize: 13,
+                                                                                      color: Colors.grey.shade600,
+                                                                                    ),
+                                                                                  ),
+                                                                                  SizedBox(width: 10),
+                                                                                  Text(
+                                                                                    "Rp ${NumberFormat('#,##0', 'id_ID').format(totalHarga)}",
+                                                                                    style: TextStyle(
+                                                                                      fontSize: 13,
+                                                                                      color: Colors.grey.shade600,
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              );
+                                                                            }),
+                                                                          ],
                                                                         )
-                                                                      : SizedBox
-                                                                          .shrink(),
+                                                                      : (item['harga_add_on'] !=
+                                                                              "0"
+                                                                          ? Row(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Text(
+                                                                                  "(+) Add On : ",
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 13,
+                                                                                    color: Colors.grey.shade600,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(width: 10),
+                                                                                Text(
+                                                                                  'Rp ${NumberFormat('#,##0', 'id_ID').format(int.parse(item['harga_add_on']))}',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 13,
+                                                                                    color: Colors.grey.shade600,
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            )
+                                                                          : SizedBox
+                                                                              .shrink()),
                                                                 ],
                                                               ),
                                                             ),
@@ -440,21 +494,6 @@ class TransaksiP extends StatelessWidget {
                                                                 ),
                                                                 SizedBox(
                                                                     height: 4),
-                                                                item['harga_add_on'] !=
-                                                                        "0"
-                                                                    ? Text(
-                                                                        'Rp ${NumberFormat('#,##0', 'id_ID').format(int.parse(item['harga_add_on']))}',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              13,
-                                                                          color: Colors
-                                                                              .grey
-                                                                              .shade600,
-                                                                        ),
-                                                                      )
-                                                                    : SizedBox
-                                                                        .shrink(),
                                                               ],
                                                             ),
                                                           ],

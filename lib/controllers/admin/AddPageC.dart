@@ -15,11 +15,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AddPageController extends GetxController {
   final ApiService apiService = ApiService();
   var url = ApiService.baseUrl + '/product';
+  var urlRaw = ApiService.baseUrl;
 
   var selectedTipe = Rxn<String>();
   var selectedKategori = Rxn<String>();
   var selectedMitra = Rxn<String>();
-  var selectedAddOn = Rxn<String>();
+  var selectedAddOn = <Map<String, dynamic>>[].obs;
   var imagePath = Rxn<File>();
   var imagePathK = Rxn<File>();
   var isPickingImage = false.obs;
@@ -44,6 +45,10 @@ class AddPageController extends GetxController {
   void onInit() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     super.onInit();
+    fetchAddOn();
+    fetchMitra();
+    fetchTipe();
+    fetchKategori();
   }
 
   Future<void> fetchMitra() async {
@@ -68,10 +73,10 @@ class AddPageController extends GetxController {
     }
   }
 
-  Future<void> fetchAddon() async {
+  Future<void> fetchAddOn() async {
     try {
       isLoading(true);
-      var response = await http.get(Uri.parse(url + "/add_on"));
+      var response = await http.get(Uri.parse(urlRaw + "/addon"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
@@ -86,6 +91,23 @@ class AddPageController extends GetxController {
       print('Error: $e');
     } finally {
       isLoading(false);
+    }
+  }
+
+  void selectAddOn(Map<String, dynamic> item) {
+    final selectedItem = {
+      'id': item['id'],
+      'add_on': item['add_on'],
+    };
+
+    final exists = selectedAddOn.any((e) => e['id'] == item['id']);
+
+    if (exists) {
+      selectedAddOn.removeWhere((e) => e['id'] == item['id']);
+      print('Hapus: $selectedAddOn');
+    } else {
+      selectedAddOn.add(selectedItem);
+      print('Tambah: $selectedAddOn');
     }
   }
 
@@ -340,6 +362,31 @@ class AddPageController extends GetxController {
     }
   }
 
+  Future<void> addProdukAddOn(String idAddon) async {
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userInput = prefs.getString('name') ?? 'system';
+      final response =
+          await apiService.addProdukAddOnNewest(idAddon, userInput);
+      if (response['status'] == true) {
+        print('Success' + ' $response');
+      } else if (response['status'] == false) {
+        String errorMessage = _parseErrorMessages(response['message']);
+        print('Error' + ' $errorMessage');
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: DarkColor().red.withOpacity(0.5),
+        icon: Icon(Icons.crisis_alert, color: Colors.black),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> addNewAddOn(String addOn, String harga,
       {bool fromButton = false}) async {
     if (!fromButton) {
@@ -389,6 +436,6 @@ class AddPageController extends GetxController {
     await fetchTipe();
     await fetchKategori();
     await fetchMitra();
-    await fetchAddon();
+    await fetchAddOn();
   }
 }

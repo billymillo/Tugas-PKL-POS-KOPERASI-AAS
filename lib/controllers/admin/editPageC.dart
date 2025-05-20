@@ -15,11 +15,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class EditPageController extends GetxController {
   final ApiService apiService = ApiService();
   var url = ApiService.baseUrl + '/product';
+  var urlRaw = ApiService.baseUrl;
 
   var selectedTipe = Rxn<String>();
   var selectedKategori = Rxn<String>();
   var selectedMitra = Rxn<String>();
-  var selectedAddOn = Rxn<String>();
+  var selectedAddOn = <Map<String, dynamic>>[].obs;
 
   var imagePath = Rxn<File>();
   var imagePathK = Rxn<File>();
@@ -34,6 +35,7 @@ class EditPageController extends GetxController {
   var kategori = <Map<String, dynamic>>[].obs;
   var mitra = <Map<String, dynamic>>[].obs;
   var addOn = <Map<String, dynamic>>[].obs;
+  var addOnPr = <Map<String, dynamic>>[].obs;
 
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
@@ -44,6 +46,10 @@ class EditPageController extends GetxController {
   void onInit() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     super.onInit();
+    fetchAddonPr();
+    fetchMitra();
+    fetchTipe();
+    fetchKategori();
   }
 
   void goToEditProductPage(Map<String, dynamic> item) {
@@ -51,6 +57,23 @@ class EditPageController extends GetxController {
       Routes.EDITPRODUCTP,
       arguments: item, // Kirim data produk ke halaman edit
     );
+  }
+
+  String AddonName(String idProduk) {
+    var selected = addOn.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'add_on': '1'},
+    );
+    return selected['add_on'] ?? "1";
+  }
+
+  void selectAddOn(Map<String, dynamic> item) {
+    final index = selectedAddOn.indexWhere((e) => e['id'] == item['id']);
+    if (index >= 0) {
+      selectedAddOn.removeAt(index);
+    } else {
+      selectedAddOn.add(item);
+    }
   }
 
   Future<void> fetchMitra() async {
@@ -118,14 +141,35 @@ class EditPageController extends GetxController {
     }
   }
 
-  Future<void> fetchAddon() async {
+  Future<void> fetchAddOn() async {
     try {
       isLoading(true);
-      var response = await http.get(Uri.parse(url + "/add_on"));
+      var response = await http.get(Uri.parse(urlRaw + "/addon"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
           addOn.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load add-on');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchAddonPr() async {
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(urlRaw + "/addon/produk"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          addOnPr.value = List<Map<String, dynamic>>.from(jsonData['data']);
         } else {
           throw Exception('Failed to load products');
         }
@@ -137,6 +181,81 @@ class EditPageController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<void> addProdukAddOn(String idAddon, String idProduk) async {
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userInputQ = prefs.getString('name') ?? 'system';
+      final response =
+          await apiService.addProdukAddOnOld(idAddon, idProduk, userInputQ);
+      if (response['status'] == true) {
+        print('Success' + ' $response');
+      } else if (response['status'] == false) {
+        print('Error' + ' $response');
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: DarkColor().red.withOpacity(0.5),
+        icon: Icon(Icons.crisis_alert, color: Colors.black),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> deleteProdukAddOn(String id, {bool fromButton = false}) async {
+    if (!fromButton) {
+      return;
+    }
+    isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    String? userUpdate = prefs.getString('name') ?? 'system';
+    try {
+      final response = await apiService.deleteProdukAddOn(
+        id,
+        userUpdate,
+      );
+      if (response['status'] == true) {
+        Get.snackbar(
+          'Success',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.5),
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+        print('error ${response['message']}');
+      } else {
+        Get.snackbar(
+          'Error',
+          '${response['message']}',
+          backgroundColor: Colors.red.withOpacity(0.5),
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+        print('error ${response['message']}');
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Error',
+        'Terjadi kesalahan saat Menghapus Mitra.',
+        backgroundColor: Colors.red.withOpacity(0.5),
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  List<Map<String, dynamic>> filteredAddOnByProduk(String idProduk) {
+    return addOn.where((item) {
+      final id = item['id'];
+      final exists = addOnPr
+          .any((pr) => pr['id_add_on'] == id && pr['id_produk'] == idProduk);
+      return !exists;
+    }).toList();
   }
 
   Future<void> editProduct(
@@ -167,22 +286,21 @@ class EditPageController extends GetxController {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-    String? userUpdate = prefs.getString('name') ?? 'system';
+      String? userUpdate = prefs.getString('name') ?? 'system';
       final response = await apiService.editProduk(
-        id,
-        nama_barang,
-        hasNewImage.value ? imagePath.value : null,
-        id_kategori_barang,
-        id_tipe_barang,
-        id_mitra_barang,
-        id_add_on,
-        harga_pack,
-        jml_pcs_pack,
-        harga_satuan,
-        harga_jual,
-        stok,
-        userUpdate
-      );
+          id,
+          nama_barang,
+          hasNewImage.value ? imagePath.value : null,
+          id_kategori_barang,
+          id_tipe_barang,
+          id_mitra_barang,
+          id_add_on,
+          harga_pack,
+          jml_pcs_pack,
+          harga_satuan,
+          harga_jual,
+          stok,
+          userUpdate);
 
       if (response['status'] == true) {
         Get.back(); // Tutup loading dialog
@@ -265,5 +383,7 @@ class EditPageController extends GetxController {
 
   Future<void> refresh() async {
     await fetchMitra();
+    await fetchAddOn();
+    await fetchAddonPr();
   }
 }

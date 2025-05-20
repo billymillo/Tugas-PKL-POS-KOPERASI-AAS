@@ -17,36 +17,10 @@ class OpNameController extends GetxController {
   final ApiService apiService = ApiService();
   final ApiServiceTr apiServiceTr = ApiServiceTr();
   var url = ApiService.baseUrl;
-  ScrollController scrollController = ScrollController();
-
-  var stokControllers = <TextEditingController>[].obs;
-  var totalHargaList = <int>[].obs;
-
   var isLoading = false.obs;
   var opname = <Map<String, dynamic>>[].obs;
   var opnameDet = <Map<String, dynamic>>[].obs;
   var status = <Map<String, dynamic>>[].obs;
-
-  var isEditList = <bool>[].obs;
-  var isCheckedList = <bool>[].obs;
-  var isLastPage = false.obs;
-  RxMap<int, bool> isEditMap = <int, bool>{}.obs;
-  RxMap<int, bool> hasBeenSavedMap = <int, bool>{}.obs;
-
-  RxList<Map<String, dynamic>> produk = <Map<String, dynamic>>[].obs;
-  RxList<Map<String, dynamic>> get selectedProduk =>
-      produk.where((item) => item['checked'] == true).toList().obs;
-
-  RxInt currentPage = 0.obs;
-  final int itemsPerPage = 10;
-
-  int get totalPages => (produk.length / itemsPerPage).ceil();
-
-  List<Map<String, dynamic>> get paginatedProduk {
-    final start = currentPage.value * itemsPerPage;
-    final end = (start + itemsPerPage).clamp(0, produk.length);
-    return produk.sublist(start, end);
-  }
 
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
@@ -54,94 +28,12 @@ class OpNameController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchProduk();
     fetchOpName();
-    fetchDetOpName();
     fetchStatus();
+    fetchDetOpName();
     WidgetsFlutterBinding.ensureInitialized();
     initializeDateFormatting('id_ID', null);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-  }
-
-  void toggleEdit(int index) {
-    isEditMap[index] = !(isEditMap[index] ?? false);
-  }
-
-  void toggleCheck(int index, bool value) {
-    produk[index]['checked'] = value;
-    produk.refresh();
-  }
-
-  void goToPage(int page) {
-    if (page >= 0 && page < totalPages) {
-      currentPage.value = page;
-    }
-  }
-
-  void nextPage() {
-    if (currentPage.value < totalPages - 1) {
-      currentPage.value++;
-    }
-  }
-
-  void previousPage() {
-    if (currentPage.value > 0) {
-      currentPage.value--;
-    }
-  }
-
-  bool isAllItemSaved(String idOpname) {
-    final currentOpnameDetails = opnameDet
-        .where((op) => op['id_opname'].toString() == idOpname)
-        .toList();
-
-    return produk.every((item) {
-      final matchingDetail = currentOpnameDetails.firstWhere(
-        (op) => op['id_produk'].toString() == item['id'].toString(),
-        orElse: () => {},
-      );
-      return matchingDetail.isNotEmpty;
-    });
-  }
-
-  Future<void> saveAllUnsavedItems(String idOpname) async {
-    for (int i = 0; i < produk.length; i++) {
-      final produkItem = produk[i];
-
-      // Cek apakah item ini sudah ada di opnameDet
-      final alreadySaved = opnameDet.any((item) =>
-          item['id_produk'].toString() == produkItem['id'].toString() &&
-          item['id_opname'].toString() == idOpname);
-
-      // Jika belum ada, baru disimpan
-      if (!alreadySaved) {
-        final stok = int.tryParse(produkItem['stok_input']?.toString() ?? '') ??
-            produkItem['stok'];
-        final stokAsli =
-            int.tryParse(produkItem['stok_asli_input']?.toString() ?? '') ??
-                produkItem['stok_asli'];
-        final hargaSatuan =
-            int.tryParse(produkItem['harga_satuan_input']?.toString() ?? '') ??
-                produkItem['harga_satuan'];
-        final hargaJual =
-            int.tryParse(produkItem['harga_jual_input']?.toString() ?? '') ??
-                produkItem['harga_jual'];
-        final catatan = '';
-
-        await addDetOpname(
-          produkItem['id'].toString(),
-          idOpname,
-          stok.toString(),
-          stokAsli.toString(),
-          hargaSatuan.toString(),
-          hargaJual.toString(),
-          catatan,
-        );
-      }
-    }
-
-    await fetchDetOpName();
-    await fetchProduk();
   }
 
   String statusName(String idStatus) {
@@ -150,31 +42,6 @@ class OpNameController extends GetxController {
       orElse: () => {'status': 'Belum ada pendataan'},
     );
     return selected['status'] ?? "Belum ada pendataan";
-  }
-
-  Future<void> fetchProduk() async {
-    try {
-      isLoading(true);
-      var response = await http.get(Uri.parse(url + "/product"));
-      if (response.statusCode == 200) {
-        var jsonData = json.decode(response.body);
-        if (jsonData['status'] == true) {
-          final filteredData = (jsonData['data'] as List)
-              .where((item) => item['id_tipe_barang'] == '1')
-              .toList();
-
-          produk.value = List<Map<String, dynamic>>.from(filteredData);
-        } else {
-          throw Exception('Failed to load products');
-        }
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      print('Error: $e');
-    } finally {
-      isLoading(false);
-    }
   }
 
   Future<void> fetchOpName() async {
@@ -202,6 +69,7 @@ class OpNameController extends GetxController {
     }
   }
 
+  
   Future<void> fetchDetOpName() async {
     try {
       isLoading(true);
@@ -226,7 +94,7 @@ class OpNameController extends GetxController {
   Future<void> fetchStatus() async {
     try {
       isLoading(true);
-      var response = await http.get(Uri.parse(url + "/member/status"));
+      var response = await http.get(Uri.parse(url + "/status"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
@@ -313,205 +181,6 @@ class OpNameController extends GetxController {
         print('error message: $response');
       }
     } catch (e) {
-      Get.snackbar(
-        'Gagal',
-        e.toString(),
-        backgroundColor: Colors.red.withOpacity(0.8),
-        colorText: Colors.white,
-        icon: Icon(Icons.error, color: Colors.white),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> deleteOpname(String id) async {
-    isLoading.value = true;
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String? userUpdate = prefs.getString('name') ?? 'system';
-      final response = await apiService.deleteOpname(
-        id,
-        userUpdate,
-      );
-      if (response['status'] == true) {
-          Get.snackbar(
-            'Success',
-            response['message'],
-            backgroundColor: Colors.green.withOpacity(0.5),
-            icon: Icon(Icons.check_circle, color: Colors.white),
-          );
-        print('Success: $response');
-      } else {
-        Get.snackbar(
-          'Error',
-          '${response['message']}',
-          backgroundColor: Colors.red.withOpacity(0.5),
-          icon: Icon(Icons.error, color: Colors.white),
-        );
-        print('Gagal: $response');
-      }
-    } catch (e) {
-      print(e);
-      Get.snackbar(
-        'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
-        backgroundColor: Colors.red.withOpacity(0.5),
-        icon: Icon(Icons.error, color: Colors.white),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> addDetOpname(
-    String idProduk,
-    String idOpname,
-    String stok,
-    String stokAsli,
-    String hargaSatuan,
-    String hargaJual,
-    String catatan,
-  ) async {
-    isLoading.value = true;
-    final prefs = await SharedPreferences.getInstance();
-    String? userInput = prefs.getString('name') ?? 'system';
-    final response = await ApiService.addDetOpname(
-      idProduk,
-      idOpname,
-      stok,
-      stokAsli,
-      hargaSatuan,
-      hargaJual,
-      catatan,
-      userInput,
-    );
-    try {
-      if (response['status'] == true) {
-        print("Opname Berhasil" + response['message']);
-      } else if (response['status'] == false) {
-        print("Opname Gagal $response");
-      }
-    } catch (e) {
-      Get.snackbar(
-        'Gagal',
-        e.toString(),
-        backgroundColor: Colors.red.withOpacity(0.8),
-        colorText: Colors.white,
-        icon: Icon(Icons.error, color: Colors.white),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> editDetOpname(
-    String Id,
-    String stok,
-    String stokAsli,
-    String hargaSatuan,
-    String hargaJual,
-    String catatan,
-  ) async {
-    isLoading.value = true;
-    final prefs = await SharedPreferences.getInstance();
-    String? userUpdate = prefs.getString('name') ?? 'system';
-    final response = await ApiService.editDetOpname(
-      Id,
-      stok,
-      stokAsli,
-      hargaSatuan,
-      hargaJual,
-      catatan,
-      userUpdate,
-    );
-    try {
-      if (response['status'] == true) {
-        Get.snackbar(
-          'Success',
-          response['message'],
-          backgroundColor: Colors.green.withOpacity(0.5),
-          icon: Icon(Icons.check_circle, color: Colors.white),
-        );
-      } else if (response['status'] == false) {
-        Get.snackbar(
-          'Error',
-          'Error Saat Mengubah Opname Detail',
-          backgroundColor: DarkColor().red.withOpacity(0.5),
-          icon: Icon(Icons.crisis_alert, color: Colors.black),
-        );
-        print('error message: $response');
-      }
-    } catch (e) {
-      Get.snackbar(
-        'Gagal',
-        e.toString(),
-        backgroundColor: Colors.red.withOpacity(0.8),
-        colorText: Colors.white,
-        icon: Icon(Icons.error, color: Colors.white),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> addPemOpname(
-    String idOpname,
-    String idProduk,
-    String jumlah,
-    String totalBeli,
-  ) async {
-    isLoading.value = true;
-    final prefs = await SharedPreferences.getInstance();
-    String? userInput = prefs.getString('name') ?? 'system';
-    final response = await ApiService.addPemOpname(
-      idOpname,
-      idProduk,
-      jumlah,
-      totalBeli,
-      userInput,
-    );
-    try {
-      if (response['status'] == true) {
-        print("Pembelian Berhasil" + response['message']);
-      } else if (response['status'] == false) {
-        Get.snackbar(
-          'Error',
-          'Error Saat Menambahkan Opname Pembelian',
-          backgroundColor: DarkColor().red.withOpacity(0.5),
-          icon: Icon(Icons.crisis_alert, color: Colors.black),
-        );
-        print('error message: $response');
-      }
-    } catch (e) {
-      Get.snackbar(
-        'Gagal',
-        e.toString(),
-        backgroundColor: Colors.red.withOpacity(0.8),
-        colorText: Colors.white,
-        icon: Icon(Icons.error, color: Colors.white),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> tambahStok(
-    String id,
-    String stok,
-  ) async {
-    isLoading.value = true;
-    final prefs = await SharedPreferences.getInstance();
-    String? userUpdate = prefs.getString('name') ?? 'system';
-    try {
-      final response = await apiServiceTr.tambahStok(id, stok, userUpdate);
-      if (response['status'] == true) {
-        print("TambahStok Berhasil" + response['message']);
-      } else {
-        print("TambahStok Gagal" + response['message']);
-      }
-    } catch (e) {
-      print(e);
       Get.snackbar(
         'Gagal',
         e.toString(),

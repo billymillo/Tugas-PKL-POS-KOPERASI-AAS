@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LibraryController extends GetxController {
   final ApiService apiService = ApiService();
   var url = ApiService.baseUrl + '/product';
+
   final ApiServiceTr apiServiceTr = ApiServiceTr();
   var urlTr = ApiServiceTr.baseUrlTr;
 
@@ -791,7 +792,7 @@ class LibraryController extends GetxController {
   Future<void> fetchAddOn() async {
     try {
       isLoading(true);
-      var response = await http.get(Uri.parse(url + "/add_on"));
+      var response = await http.get(Uri.parse(urlTr + "/addon"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
@@ -814,9 +815,12 @@ class LibraryController extends GetxController {
       return;
     }
     isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    String? userUpdate = prefs.getString('name') ?? 'system';
     try {
       final response = await apiService.deleteAddOn(
         id,
+        userUpdate,
       );
       if (response['status'] == true) {
         Get.snackbar(

@@ -330,9 +330,6 @@ class _KasirPState extends State<KasirP> {
                                               i++) {
                                             if (c.listProduk[i]['listDibeli']
                                                 .isNotEmpty) {
-                                              int jumlahDibeli = c
-                                                  .listProduk[i]['listDibeli']
-                                                  .length;
                                               for (var x = 0;
                                                   x <
                                                       c
@@ -340,24 +337,59 @@ class _KasirPState extends State<KasirP> {
                                                               ['listDibeli']
                                                           .length;
                                                   x++) {
+                                                List<String> addOnList =
+                                                    List<String>.from(c
+                                                                    .listProduk[
+                                                                i]['listDibeli']
+                                                            [x]['addOn'] ??
+                                                        []);
+                                                addOnList.sort();
+                                                String addOnKey =
+                                                    addOnList.join(',');
                                                 String productKey =
-                                                    '${c.listProduk[i]['nama']} - ${c.listProduk[i]['listDibeli'][x]['tipe']}';
+                                                    '${c.listProduk[i]['nama']} - ${c.listProduk[i]['listDibeli'][x]['tipe']} - $addOnKey';
                                                 if (!displayedProducts
                                                     .contains(productKey)) {
                                                   displayedProducts
                                                       .add(productKey);
+                                                  int jumlahDibeli = c
+                                                      .listProduk[i]
+                                                          ['listDibeli']
+                                                      .where((e) {
+                                                    List<String> addOnCompare =
+                                                        List<String>.from(
+                                                            e['addOn'] ?? []);
+                                                    addOnCompare.sort();
+                                                    return addOnCompare
+                                                                .join(',') ==
+                                                            addOnKey &&
+                                                        e['tipe'] ==
+                                                            c.listProduk[i][
+                                                                    'listDibeli']
+                                                                [x]['tipe'];
+                                                  }).length;
+
                                                   billItems.add(
                                                     KasirW().bill(
-                                                      c.listProduk[i]['nama'],
-                                                      "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.listProduk[i]['listDibeli'][x]['harga'].toString()))}/pcs",
-                                                      c.listProduk[i]
-                                                              ['listDibeli'][x]
-                                                          ['addOn'],
-                                                      '$jumlahDibeli',
-                                                      c.listProduk[i]
-                                                              ['listDibeli'][x]
-                                                          ['tipe'],
-                                                    ),
+                                                        c.listProduk[i]['nama'],
+                                                        "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.listProduk[i]['listDibeli'][x]['harga'].toString()))}/pcs",
+                                                        c.listProduk[i]
+                                                                ['listDibeli']
+                                                            [x]['addOn'],
+                                                        '$jumlahDibeli',
+                                                        c.listProduk[i]
+                                                                ['listDibeli']
+                                                            [x]['tipe'], () {
+                                                      c.hapusKeranjang(
+                                                        nama: c.listProduk[i]
+                                                            ['nama'],
+                                                        addOn: List<
+                                                            String>.from(c
+                                                                    .listProduk[
+                                                                i]['listDibeli']
+                                                            [x]['addOn']),
+                                                      );
+                                                    }),
                                                   );
                                                 }
                                               }
@@ -602,18 +634,84 @@ class _KasirPState extends State<KasirP> {
                                                         ),
                                                       ],
                                                     ),
-                                                    Text(
-                                                      c.checkboxSaldo.value
-                                                          ? "Saldo Member : Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.MemberSaldo.toString()))}"
-                                                          : "",
-                                                      style: GoogleFonts.nunito(
-                                                        fontSize: 12,
-                                                        color:
-                                                            PrimaryColor().blue,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
+                                                    SizedBox(height: 10),
+                                                    Obx(() {
+                                                      return c.checkboxSaldo
+                                                              .value
+                                                          ? Row(
+                                                              children: [
+                                                                Expanded(
+                                                                  child:
+                                                                      TextField(
+                                                                    controller:
+                                                                        c.saldoController,
+                                                                    keyboardType:
+                                                                        TextInputType
+                                                                            .number,
+                                                                    style: GoogleFonts.nunito(
+                                                                        fontSize:
+                                                                            12),
+                                                                    decoration:
+                                                                        InputDecoration(
+                                                                      labelText:
+                                                                          "Gunakan Saldo",
+                                                                      labelStyle:
+                                                                          TextStyle(
+                                                                              fontSize: 12),
+                                                                      isDense:
+                                                                          true,
+                                                                      contentPadding: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              10,
+                                                                          horizontal:
+                                                                              12),
+                                                                      border:
+                                                                          OutlineInputBorder(),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                    width: 8),
+                                                                ElevatedButton(
+                                                                  onPressed: () =>
+                                                                      c.simpanSaldo(),
+                                                                  style: ElevatedButton
+                                                                      .styleFrom(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            16,
+                                                                        vertical:
+                                                                            10),
+                                                                  ),
+                                                                  child: Text(
+                                                                    "Simpan",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            12),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            )
+                                                          : SizedBox();
+                                                    }),
+                                                    const SizedBox(height: 5),
+                                                    Obx(() =>
+                                                        c.checkboxSaldo.value
+                                                            ? Text(
+                                                                "Saldo Member: Rp. ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(c.MemberSaldo) ?? 0)}",
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .nunito(
+                                                                  fontSize: 12,
+                                                                  color:
+                                                                      PrimaryColor()
+                                                                          .blue,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              )
+                                                            : SizedBox()),
                                                   ],
                                                 )),
                                         ),
@@ -918,23 +1016,6 @@ class _KasirPState extends State<KasirP> {
                                             );
                                             return;
                                           }
-
-                                          if ((double.tryParse(c.MemberSaldo) ??
-                                                      0) <
-                                                  inputHarga &&
-                                              c.checkboxSaldo.value == true) {
-                                            Get.snackbar(
-                                              'Error',
-                                              'Saldo Anda Kurang, Tidak bisa Menggunakan Saldo!',
-                                              backgroundColor:
-                                                  Colors.red.withOpacity(0.8),
-                                              colorText: Colors.white,
-                                              icon: Icon(Icons.error,
-                                                  color: Colors.white),
-                                            );
-                                            return;
-                                          }
-
                                           c.metodePembayaran.value = 1;
                                           try {
                                             await c.addTransaksiOut(
@@ -949,18 +1030,30 @@ class _KasirPState extends State<KasirP> {
                                               fromButton: true,
                                             );
                                             c.kategoriProduk('');
+
+                                            final produkDenganPembelian =
+                                                c.filteredProduk.where((p) =>
+                                                    p['listDibeli'] != null &&
+                                                    p['listDibeli'].isNotEmpty);
                                             for (var produk
-                                                in c.filteredProduk) {
-                                              print(
-                                                  'List Dibeli: ${produk['listDibeli']}');
+                                                in produkDenganPembelian) {
                                               await c.addAllDetailTransaksiOut(
                                                   produk['listDibeli']);
                                             }
 
                                             if (c.checkboxSaldo.value == true) {
+                                              int saldoInput = int.tryParse(c
+                                                      .saldoInput
+                                                      .toString()) ??
+                                                  0;
+                                              int saldoMember =
+                                                  int.tryParse(c.MemberSaldo) ??
+                                                      0;
+                                              int kurangSaldo =
+                                                  saldoMember - saldoInput;
                                               await c.kurangSaldo(
                                                   c.selectedMember.string,
-                                                  c.saldoUpdate.toString());
+                                                  kurangSaldo.toString());
                                             }
                                             await c.tambahPoin(
                                                 c.selectedMember.string,
@@ -1156,6 +1249,8 @@ class _KasirPState extends State<KasirP> {
                                                                             c.checkboxSaldo.value =
                                                                                 false;
                                                                           });
+                                                                          c.saldoInput.value =
+                                                                              0;
                                                                           setState(
                                                                               () {
                                                                             c.checkbox.value =
@@ -1225,6 +1320,8 @@ class _KasirPState extends State<KasirP> {
                                                                           c.checkboxSaldo.value =
                                                                               false;
                                                                         });
+                                                                        c.saldoInput
+                                                                            .value = 0;
                                                                         setState(
                                                                             () {
                                                                           c.checkbox.value =
@@ -1283,22 +1380,6 @@ class _KasirPState extends State<KasirP> {
                                           "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.totalHarga.toString()))}",
                                           "00020101021126660014ID.LINKAJA.WWW011893600911000000000802152103124400000080303UMI51440014ID.CO.QRIS.WWW0215ID20210652077750303UMI5204839853033605802ID5922YAY BAKTI KAMAJAYA IND6006SLEMAN61055528162070703A016304FA4D",
                                           () async {
-                                            if ((double.tryParse(
-                                                            c.MemberSaldo) ??
-                                                        0) <
-                                                    c.totalHarga.toInt() &&
-                                                c.checkboxSaldo.value == true) {
-                                              Get.snackbar(
-                                                'Error',
-                                                'Saldo Anda Kurang, Tidak bisa Menggunakan Saldo!',
-                                                backgroundColor:
-                                                    Colors.red.withOpacity(0.8),
-                                                colorText: Colors.white,
-                                                icon: Icon(Icons.error,
-                                                    color: Colors.white),
-                                              );
-                                              return;
-                                            }
                                             c.metodePembayaran.value = 2;
                                             c.statusTr.value = 1;
                                             try {
@@ -1315,19 +1396,35 @@ class _KasirPState extends State<KasirP> {
                                               );
 
                                               c.kategoriProduk('');
+
+                                              final produkDenganPembelian =
+                                                  c.filteredProduk.where((p) =>
+                                                      p['listDibeli'] != null &&
+                                                      p['listDibeli']
+                                                          .isNotEmpty);
+
                                               for (var produk
-                                                  in c.filteredProduk) {
-                                                print(
-                                                  'List Dibeli: ${produk['listDibeli']}');
+                                                  in produkDenganPembelian) {
                                                 await c
                                                     .addAllDetailTransaksiOut(
                                                         produk['listDibeli']);
                                               }
+
                                               if (c.checkboxSaldo.value ==
                                                   true) {
+                                                int saldoInput = int.tryParse(c
+                                                        .saldoInput
+                                                        .toString()) ??
+                                                    0;
+                                                int saldoMember = int.tryParse(
+                                                        c.MemberSaldo) ??
+                                                    0;
+                                                int kurangSaldo =
+                                                    saldoMember - saldoInput;
                                                 await c.kurangSaldo(
                                                     c.selectedMember.string,
-                                                    c.saldoUpdate.toString());
+                                                    kurangSaldo.toString());
+                                                ;
                                               }
                                               await c.tambahPoin(
                                                   c.selectedMember.string,
@@ -1505,6 +1602,8 @@ class _KasirPState extends State<KasirP> {
                                                                             setState(() {
                                                                               c.checkboxSaldo.value = false;
                                                                             });
+                                                                            c.saldoInput.value =
+                                                                                0;
                                                                             setState(() {
                                                                               c.checkbox.value = false;
                                                                             });
@@ -1562,6 +1661,8 @@ class _KasirPState extends State<KasirP> {
                                                                             c.checkboxSaldo.value =
                                                                                 false;
                                                                           });
+                                                                          c.saldoInput.value =
+                                                                              0;
                                                                           setState(
                                                                               () {
                                                                             c.checkbox.value =

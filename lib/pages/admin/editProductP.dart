@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:bluetooth_thermal_printer_example/controllers/admin/editPageC.dart';
 import 'package:bluetooth_thermal_printer_example/controllers/admin/productC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/pages/admin/addOnP.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,13 +50,8 @@ class _EditProductPState extends State<EditProductP> {
     editController.imageUrl.value =
         "http://10.10.20.50/POS_CI/uploads/${item['gambar_barang']}";
     editController.hasNewImage.value = false;
-
     fetchData();
-    editController.fetchAddon();
-    editController.fetchMitra();
-    editController.fetchTipe();
-    editController.fetchKategori();
-
+    editController.fetchAddOn();
     editController.editProduct(
       item['id']?.toString() ?? '',
       namaProdukController.text,
@@ -230,15 +228,276 @@ class _EditProductPState extends State<EditProductP> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         buildInputLabel('Add On', " *"),
-                        buildDropdown(
-                          selectedValue: editController.selectedAddOn,
-                          label: 'Pilih Add On',
-                          items: editController.addOn,
-                          onChanged: (newValue) {
-                            editController.selectedAddOn.value = newValue;
+                        ElevatedButton(
+                          onPressed: () async {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.5,
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Obx(() {
+                                      if (editController.isLoading.value) {
+                                        return Center(
+                                            child: CircularProgressIndicator());
+                                      }
+                                      return Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Tambah Add On',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Wrap(
+                                            spacing: 12,
+                                            runSpacing: 12,
+                                            children: editController
+                                                .filteredAddOnByProduk(
+                                                    item['id'].toString())
+                                                .map((item) {
+                                              final id = item['id'];
+                                              final name = item['add_on'] ?? '';
+                                              final isSelected = editController
+                                                  .selectedAddOn
+                                                  .any((e) => e['id'] == id);
+
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  final index = editController
+                                                      .selectedAddOn
+                                                      .indexWhere(
+                                                          (e) => e['id'] == id);
+                                                  if (index >= 0) {
+                                                    editController.selectedAddOn
+                                                        .removeAt(index);
+                                                  } else {
+                                                    editController.selectedAddOn
+                                                        .add(item);
+                                                  }
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 16),
+                                                  decoration: BoxDecoration(
+                                                    color: isSelected
+                                                        ? PrimaryColor().blue
+                                                        : Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    border: Border.all(
+                                                      color:
+                                                          PrimaryColor().blue,
+                                                      width: 1,
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        blurRadius: 4,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Text(
+                                                    name,
+                                                    style: TextStyle(
+                                                      color: isSelected
+                                                          ? Colors.white
+                                                          : PrimaryColor().blue,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Container(
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                final selectedIds =
+                                                    editController.selectedAddOn
+                                                        .map((e) => e['id'])
+                                                        .toList();
+                                                print(
+                                                    'Selected AddOn IDs: $selectedIds');
+                                                for (var data in editController
+                                                    .selectedAddOn) {
+                                                  await editController
+                                                      .addProdukAddOn(
+                                                          data['id'].toString(),
+                                                          item['id']
+                                                              .toString());
+                                                }
+                                                await editController.refresh();
+                                                await editController
+                                                    .selectedAddOn.clear;
+                                                Navigator.pop(context);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    PrimaryColor().blue,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 16),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Simpan',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    }),
+                                  ),
+                                );
+                              },
+                            );
                           },
-                          key: 'add_on',
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(Icons.add, color: Colors.black54),
+                              SizedBox(width: 8),
+                              Text(
+                                'Tambah Add On',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        Obx(() {
+                          final idProduk = item['id'] ?? 0;
+                          final filteredAddOn = editController.addOnPr
+                              .where((e) => e['id_produk'] == idProduk)
+                              .toList();
+                          return filteredAddOn.isNotEmpty
+                              ? Wrap(
+                                  spacing: 10,
+                                  runSpacing: 10,
+                                  children: filteredAddOn.map((item) {
+                                    return Stack(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(top: 20),
+                                          child: Card(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            color: Colors.white,
+                                            elevation: 2,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 10),
+                                              child: ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                    maxWidth: 120),
+                                                child: Text(
+                                                  editController.AddonName(
+                                                      item['id_add_on']
+                                                          .toString()),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: 0,
+                                          top: 0,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              AdminW().deleteDialog(
+                                                  context,
+                                                  'Hapus Add On',
+                                                  'Apakah anda yakin ingin menghapus add on ini',
+                                                  () async {
+                                                await editController
+                                                    .deleteProdukAddOn(
+                                                  item['id'].toString(),
+                                                  fromButton: true,
+                                                );
+                                                await editController.refresh();
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                            child: Container(
+                                              width: 20,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                color: Colors.red,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 1.5),
+                                              ),
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    );
+                                  }).toList(),
+                                )
+                              : const SizedBox(height: 1);
+                        }),
                       ],
                     ),
                     SizedBox(height: 10),
