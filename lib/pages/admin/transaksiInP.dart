@@ -13,8 +13,6 @@ class TransaksiInP extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final TransaksiInController c = Get.put(TransaksiInController());
   final TextEditingController stokController = TextEditingController();
-  final TextEditingController satuanController = TextEditingController();
-  final TextEditingController jualController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +54,10 @@ class TransaksiInP extends StatelessWidget {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
+                                    c.jumlahPcsController
+                                        .addListener(c.updateStokTotal);
+                                    c.hargaPackController
+                                        .addListener(c.updateStokTotal);
                                     return Dialog(
                                       elevation: 0,
                                       backgroundColor: Colors.transparent,
@@ -350,37 +352,63 @@ class TransaksiInP extends StatelessWidget {
                                                                           .size
                                                                           .width *
                                                                       1,
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
                                                                     children: [
-                                                                      Container(
-                                                                        width: MediaQuery.of(context).size.width *
-                                                                            0.38,
-                                                                        child:
-                                                                            Column(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.min,
-                                                                          children: [
-                                                                            buildInputLabel('Harga Satuan',
-                                                                                " "),
-                                                                            buildTextField(
-                                                                              inputFormat: LengthLimitingTextInputFormatter(50),
-                                                                              c: c.satuanController,
-                                                                              hintText: 'Rp 3.000 ',
-                                                                              prefixIcon: FontAwesomeIcons.moneyBillWave,
-                                                                              type: TextInputType.number,
+                                                                      Row(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          Container(
+                                                                            width: MediaQuery.of(context).orientation == Orientation.portrait
+                                                                                ? MediaQuery.of(context).size.width * 0.38
+                                                                                : MediaQuery.of(context).size.width * 0.44,
+                                                                            child:
+                                                                                Column(
+                                                                              mainAxisSize: MainAxisSize.min,
+                                                                              children: [
+                                                                                buildInputLabel('Harga Pack Produk', " "),
+                                                                                buildTextField(
+                                                                                  inputFormat: LengthLimitingTextInputFormatter(50),
+                                                                                  c: c.hargaPackController,
+                                                                                  hintText: 'Rp 60.000 ',
+                                                                                  prefixIcon: FontAwesomeIcons.moneyBillWave,
+                                                                                  type: TextInputType.number,
+                                                                                ),
+                                                                              ],
                                                                             ),
-                                                                          ],
-                                                                        ),
+                                                                          ),
+                                                                          Spacer(),
+                                                                          Container(
+                                                                            width: MediaQuery.of(context).orientation == Orientation.portrait
+                                                                                ? MediaQuery.of(context).size.width * 0.38
+                                                                                : MediaQuery.of(context).size.width * 0.44,
+                                                                            child:
+                                                                                Column(
+                                                                              mainAxisSize: MainAxisSize.min,
+                                                                              children: [
+                                                                                buildInputLabel('Jumlah Pcs Per-pack', " "),
+                                                                                buildTextField(
+                                                                                  inputFormat: LengthLimitingTextInputFormatter(50),
+                                                                                  c: c.jumlahPcsController,
+                                                                                  hintText: 'Qty : 42',
+                                                                                  prefixIcon: Icons.inventory_2_outlined,
+                                                                                  type: TextInputType.number,
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ],
                                                                       ),
+                                                                      SizedBox(
+                                                                          height:
+                                                                              10),
                                                                       Container(
-                                                                        width: MediaQuery.of(context).size.width *
-                                                                            0.38,
+                                                                        width:
+                                                                            MediaQuery.of(context).size.width *
+                                                                                1,
                                                                         child:
                                                                             Column(
                                                                           mainAxisSize:
@@ -391,13 +419,25 @@ class TransaksiInP extends StatelessWidget {
                                                                             buildTextField(
                                                                               inputFormat: LengthLimitingTextInputFormatter(50),
                                                                               c: c.jualController,
-                                                                              hintText: 'Rp 4000',
+                                                                              hintText: 'Rp 3.000 ',
                                                                               prefixIcon: FontAwesomeIcons.moneyBillWave,
                                                                               type: TextInputType.number,
                                                                             ),
                                                                           ],
                                                                         ),
                                                                       ),
+                                                                      SizedBox(
+                                                                          height:
+                                                                              10),
+                                                                      Obx(() =>
+                                                                          Text(
+                                                                            'Harga Satuan : Rp ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.hargaDasar.value.toString()))}',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: 14,
+                                                                              color: Colors.grey.shade700,
+                                                                            ),
+                                                                          )),
                                                                     ],
                                                                   ),
                                                                 )
@@ -472,11 +512,11 @@ class TransaksiInP extends StatelessWidget {
                                                             0;
                                                         int produkSatuan =
                                                             int.tryParse(c
-                                                                    .satuanController
+                                                                    .hargaController
                                                                     .text
                                                                     .toString()) ??
                                                                 0;
-                                                        int totalStok =
+                                                        int totalHarga =
                                                             stok * produkSatuan;
                                                         if (c.selectedProduct
                                                                 .value ==
@@ -498,20 +538,6 @@ class TransaksiInP extends StatelessWidget {
                                                           return;
                                                         }
                                                         Get.back();
-                                                        await c.addTransaksiIn(
-                                                            stokController.text,
-                                                            totalStok
-                                                                .toString());
-                                                        await c.addDetTransaksiIn(
-                                                            c.selectedProduct
-                                                                .value
-                                                                .toString(),
-                                                            stokController.text,
-                                                            c.satuanController
-                                                                .text,
-                                                            c.jualController
-                                                                .text
-                                                                .toString());
                                                         if (c.checkbox.value ==
                                                             false) {
                                                           await c.tambahStok(
@@ -523,17 +549,43 @@ class TransaksiInP extends StatelessWidget {
                                                         } else if (c.checkbox
                                                                 .value ==
                                                             true) {
-                                                          await c.duplikatProduk(
+                                                          print('hargaDasar : ' +
+                                                              c.hargaDasar
+                                                                  .toString());
+                                                          await c.editProduk(
+                                                            c.selectedProduct
+                                                                .value
+                                                                .toString(),
+                                                            c.hargaDasar.value
+                                                                .toString(),
+                                                            c.hargaPackController
+                                                                .text,
+                                                            c.jualController
+                                                                .text,
+                                                            c.jumlahPcsController
+                                                                .text,
+                                                          );
+                                                          await c.tambahStok(
                                                               c.selectedProduct
                                                                   .value
                                                                   .toString(),
                                                               stokController
-                                                                  .text,
-                                                              c.ProdukSatuan
-                                                                  .toString(),
-                                                              c.ProdukJual
-                                                                  .toString());
+                                                                  .text);
                                                         }
+                                                        await c.addTransaksiIn(
+                                                            stokController.text,
+                                                            totalHarga
+                                                                .toString());
+                                                        await c.addDetTransaksiIn(
+                                                            c.selectedProduct
+                                                                .value
+                                                                .toString(),
+                                                            stokController.text,
+                                                            c.hargaController
+                                                                .text,
+                                                            c.jualController
+                                                                .text
+                                                                .toString());
                                                         await c
                                                             .fetchTransaksiDet();
                                                         await c

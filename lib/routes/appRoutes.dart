@@ -26,6 +26,7 @@ abstract class Routes {
   static const OPNAMEP = _Paths.OPNAMEP;
   static const OPNAMEDET = _Paths.OPNAMEDET;
   static const REPORTINGP = _Paths.REPORTINGP;
+  static const TRANSAKSIOUTMITRAP = _Paths.TRANSAKSIOUTMITRAP;
 }
 
 abstract class _Paths {
@@ -53,4 +54,5 @@ abstract class _Paths {
   static const OPNAMEP = '/OpNameP';
   static const OPNAMEDET = '/OpNameDetail';
   static const REPORTINGP = '/ReportingP';
+  static const TRANSAKSIOUTMITRAP = '/TransaksiOutMitraP';
 }

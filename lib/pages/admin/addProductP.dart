@@ -32,6 +32,10 @@ class _AddProductPState extends State<AddProductP> {
   final TextEditingController namaMitraNewController = TextEditingController();
   final TextEditingController noMitraNewController = TextEditingController();
   final TextEditingController emailMitraNewController = TextEditingController();
+  final TextEditingController bankMitraNewController = TextEditingController();
+  final TextEditingController noRekMitraNewController = TextEditingController();
+  final TextEditingController namaRekMitraNewController =
+      TextEditingController();
 
   final TextEditingController newTipeController = TextEditingController();
   final TextEditingController newKategoriController = TextEditingController();
@@ -61,6 +65,9 @@ class _AddProductPState extends State<AddProductP> {
       namaMitraNewController.text,
       noMitraNewController.text,
       emailMitraNewController.text,
+      bankMitraNewController.text,
+      noRekMitraNewController.text,
+      namaRekMitraNewController.text,
     );
 
     addController.addProduct(
@@ -70,7 +77,7 @@ class _AddProductPState extends State<AddProductP> {
       addController.selectedTipe.string,
       addController.selectedMitra.string,
       addController.selectedAddOn.string,
-      hargaPackProdukController.text,
+      addController.hargaDasar.string,
       jumlahIsiProdukController.text,
       hargaSatuanProdukController.text,
       hargaJualProdukController.text,
@@ -405,13 +412,17 @@ class _AddProductPState extends State<AddProductP> {
                                       addController.showMitra.value = false;
                                       addController.jumlahPcsPack.value = false;
                                       addController.hargaPack.value = false;
+                                      addController.harga.value = true;
+
                                       addController.selectedMitra.value = null;
+                                      hargaSatuanProdukController.text = '';
                                       hargaPackProdukController.text = '';
                                       jumlahIsiProdukController.text = '';
                                     } else {
                                       addController.showMitra.value = true;
                                       addController.jumlahPcsPack.value = true;
                                       addController.hargaPack.value = true;
+                                      addController.harga.value = false;
                                     }
                                   },
                                   key: 'tipe',
@@ -677,6 +688,12 @@ class _AddProductPState extends State<AddProductP> {
                                                         noMitraNewController
                                                             .text,
                                                         emailMitraNewController
+                                                            .text,
+                                                        bankMitraNewController
+                                                            .text,
+                                                        noRekMitraNewController
+                                                            .text,
+                                                        namaRekMitraNewController
                                                             .text,
                                                         fromButton: true,
                                                       );
@@ -988,40 +1005,46 @@ class _AddProductPState extends State<AddProductP> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              buildInputLabel('Harga Dasar Per-pcs', " *"),
-                              buildTextField(
-                                inputFormat: RupiahFormaters(),
-                                controller: hargaSatuanProdukController,
-                                hintText: 'Rp 5.000',
-                                prefixIcon: FontAwesomeIcons.moneyBill1Wave,
-                                type: TextInputType.number,
-                              ),
-                            ],
+                    Obx(
+                      () => Row(
+                        children: [
+                          Expanded(
+                            flex: addController.harga.value ? 1 : 1,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                buildInputLabel('Harga Jual Per-pcs', " *"),
+                                buildTextField(
+                                  inputFormat: RupiahFormaters(),
+                                  controller: hargaJualProdukController,
+                                  hintText: 'Rp 5.500',
+                                  prefixIcon: FontAwesomeIcons.moneyBill1Wave,
+                                  type: TextInputType.number,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              buildInputLabel('Harga Jual Per-pcs', " *"),
-                              buildTextField(
-                                inputFormat: RupiahFormaters(),
-                                controller: hargaJualProdukController,
-                                hintText: 'Rp 5.500',
-                                prefixIcon: FontAwesomeIcons.moneyBill1Wave,
-                                type: TextInputType.number,
+                          if (!addController.harga.value) ...[
+                            SizedBox(width: 16),
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  buildInputLabel('Harga Dasar Per-pcs', " *"),
+                                  buildTextField(
+                                    inputFormat: RupiahFormaters(),
+                                    controller: hargaSatuanProdukController,
+                                    hintText: 'Rp 5.000',
+                                    prefixIcon: FontAwesomeIcons.moneyBill1Wave,
+                                    type: TextInputType.number,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                     SizedBox(height: 20),
                     buildInputLabel('Tambah Stok', " *"),
@@ -1049,6 +1072,12 @@ class _AddProductPState extends State<AddProductP> {
                                     hintText: 'Rp 0',
                                     prefixIcon: FontAwesomeIcons.moneyBill1Wave,
                                     type: TextInputType.number,
+                                    onChanged: (value) {
+                                      addController.hitungHargaDasar(
+                                        value,
+                                        jumlahIsiProdukController.text,
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
@@ -1066,12 +1095,17 @@ class _AddProductPState extends State<AddProductP> {
                                 children: [
                                   buildInputLabel('Jumlah Isi Per-pack', " *"),
                                   buildTextField(
-                                    inputFormat: RupiahFormaters(),
-                                    controller: jumlahIsiProdukController,
-                                    hintText: '0 pcs',
-                                    prefixIcon: Icons.inventory_2_outlined,
-                                    type: TextInputType.number,
-                                  ),
+                                      inputFormat: RupiahFormaters(),
+                                      controller: jumlahIsiProdukController,
+                                      hintText: '0 pcs',
+                                      prefixIcon: Icons.inventory_2_outlined,
+                                      type: TextInputType.number,
+                                      onChanged: (value) {
+                                        addController.hitungHargaDasar(
+                                          hargaPackProdukController.text,
+                                          value,
+                                        );
+                                      }),
                                 ],
                               ),
                             ),
@@ -1160,7 +1194,6 @@ class _AddProductPState extends State<AddProductP> {
                                         SizedBox(width: 20),
                                         GestureDetector(
                                           onTap: () {
-                                            // Action for Gallery
                                             addController.pickImage();
                                           },
                                           child: Container(
@@ -1264,6 +1297,17 @@ class _AddProductPState extends State<AddProductP> {
                         }
                       }),
                     ),
+                    SizedBox(height: 20),
+                    Obx(() => Text(
+                          'Harga Dasar: ' +
+                              addController
+                                  .formatRupiah(addController.hargaDasar.value),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade700,
+                          ),
+                        )),
                     SizedBox(height: 40),
                     Container(
                       width: double.infinity,
@@ -1286,6 +1330,25 @@ class _AddProductPState extends State<AddProductP> {
                                       return;
                                     }
                                     addController.isLoading.value = true;
+
+                                    if (addController.selectedTipe.value ==
+                                        '1') {
+                                      final int hargaPack = int.tryParse(
+                                              hargaPackProdukController.text
+                                                  .replaceAll('.', '')) ??
+                                          0;
+                                      final int jumlahIsi = int.tryParse(
+                                              jumlahIsiProdukController.text
+                                                  .replaceAll('.', '')) ??
+                                          1;
+                                      addController.hargaDasar.value =
+                                          (hargaPack ~/ jumlahIsi).toString();
+                                    } else {
+                                      addController.hargaDasar.value =
+                                          hargaSatuanProdukController.text
+                                              .replaceAll('.', '');
+                                    }
+
                                     try {
                                       await addController.addProduct(
                                         namaProdukController.text,
@@ -1298,8 +1361,7 @@ class _AddProductPState extends State<AddProductP> {
                                             .replaceAll('.', ''),
                                         jumlahIsiProdukController.text
                                             .replaceAll('.', ''),
-                                        hargaSatuanProdukController.text
-                                            .replaceAll('.', ''),
+                                        addController.hargaDasar.value,
                                         hargaJualProdukController.text
                                             .replaceAll('.', ''),
                                         stokProdukController.text
@@ -1451,6 +1513,7 @@ class _AddProductPState extends State<AddProductP> {
     required IconData prefixIcon,
     required TextInputType type,
     required inputFormat,
+    Function(String)? onChanged,
     // controller
   }) {
     return Container(
@@ -1479,6 +1542,7 @@ class _AddProductPState extends State<AddProductP> {
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
+        onChanged: onChanged,
       ),
     );
   }

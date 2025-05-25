@@ -26,6 +26,10 @@ class _MitraPState extends State<MitraP> {
   final TextEditingController newNoController = TextEditingController();
   final TextEditingController newEmailController = TextEditingController();
 
+  final TextEditingController newBankController = TextEditingController();
+  final TextEditingController newNoRekController = TextEditingController();
+  final TextEditingController newRekNamaController = TextEditingController();
+
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final gambarProdukController = FileImage(File(''));
 
@@ -218,13 +222,35 @@ class _MitraPState extends State<MitraP> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      Text(
-                        item['email'],
-                        style: GoogleFonts.nunito(
-                          fontSize: 12,
-                          color: Colors.white,
+                      Visibility(
+                        visible: item['email'] != null &&
+                            item['email'].toString().trim().isNotEmpty,
+                        child: Text(
+                          item['email'],
+                          style: GoogleFonts.nunito(
+                              fontSize: 12, color: Colors.white),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
+                      ),
+                      Visibility(
+                        visible: item['no_rek'] != null &&
+                            item['no_rek'].toString().trim().isNotEmpty,
+                        child: Text(
+                          item['no_rek'],
+                          style: GoogleFonts.nunito(
+                              fontSize: 12, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Visibility(
+                        visible: item['nama_rek'] != null &&
+                            item['nama_rek'].toString().trim().isNotEmpty,
+                        child: Text(
+                          '${item['nama_rek']} (${item['bank_rek'] ?? ' '})',
+                          style: GoogleFonts.nunito(
+                              fontSize: 12, color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       SizedBox(height: 10),
                       Row(
@@ -251,7 +277,10 @@ class _MitraPState extends State<MitraP> {
                                     item['id'],
                                     item['nama'],
                                     item['no_tlp'],
-                                    item['email']);
+                                    item['email'] ?? ' ',
+                                    item['bank_rek'] ?? ' ',
+                                    item['no_rek'] ?? ' ',
+                                    item['nama_rek'] ?? ' ');
                               },
                             ),
                           ),
@@ -499,6 +528,34 @@ class _MitraPState extends State<MitraP> {
                             prefixIcon: Icons.alternate_email,
                             type: TextInputType.emailAddress,
                           ),
+                          SizedBox(height: 10),
+                          buildInputLabel('Nama Bank (opsional)', " "),
+                          buildTextField(
+                            inputFormat: LengthLimitingTextInputFormatter(200),
+                            controller: newBankController,
+                            hintText: 'BCA, Dana',
+                            prefixIcon: Icons.account_balance_outlined,
+                            type: TextInputType.name,
+                          ),
+                          SizedBox(height: 10),
+                          buildInputLabel('No Rekening (opsional)', " "),
+                          buildTextField(
+                            inputFormat: LengthLimitingTextInputFormatter(200),
+                            controller: newNoRekController,
+                            hintText: 'contoh: 01982173019',
+                            prefixIcon: Icons.account_balance_wallet,
+                            type: TextInputType.number,
+                          ),
+                          SizedBox(height: 10),
+                          buildInputLabel(
+                              'Nama Pemilik Rekening (opsional)', " "),
+                          buildTextField(
+                            inputFormat: LengthLimitingTextInputFormatter(200),
+                            controller: newRekNamaController,
+                            hintText: 'contoh: ARTHA ABADI',
+                            prefixIcon: Icons.face,
+                            type: TextInputType.name,
+                          ),
                         ],
                       ),
                       SizedBox(height: 24),
@@ -526,6 +583,9 @@ class _MitraPState extends State<MitraP> {
                                             newNameController.text,
                                             newNoController.text,
                                             newEmailController.text,
+                                            newBankController.text,
+                                            newNoRekController.text,
+                                            newRekNamaController.text,
                                             fromButton: true,
                                           );
                                           await mitraController.refresh();
@@ -610,13 +670,19 @@ class _MitraPState extends State<MitraP> {
   }
 
   void showEditDialog(BuildContext context, String id, String mitraLama,
-      String no_tlp, String email) {
+      String no_tlp, String email, String bank, String noRek, String namaRek) {
     final TextEditingController namaMitraController =
         TextEditingController(text: mitraLama);
     final TextEditingController noMitraController =
         TextEditingController(text: no_tlp);
     final TextEditingController emailMitraController =
         TextEditingController(text: email);
+    final TextEditingController bankMitraController =
+        TextEditingController(text: bank);
+    final TextEditingController noRekMitraController =
+        TextEditingController(text: noRek);
+    final TextEditingController namaRekMitraController =
+        TextEditingController(text: namaRek);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -660,6 +726,33 @@ class _MitraPState extends State<MitraP> {
                     inputFormat:
                         FilteringTextInputFormatter.singleLineFormatter,
                   ),
+                  SizedBox(height: 10),
+                  buildInputLabel('Nama Bank (opsional)', " "),
+                  buildTextField(
+                    inputFormat: LengthLimitingTextInputFormatter(200),
+                    controller: bankMitraController,
+                    hintText: 'BCA, Dana',
+                    prefixIcon: Icons.account_balance_outlined,
+                    type: TextInputType.name,
+                  ),
+                  SizedBox(height: 10),
+                  buildInputLabel('No Rekening (opsional)', " "),
+                  buildTextField(
+                    inputFormat: LengthLimitingTextInputFormatter(200),
+                    controller: noRekMitraController,
+                    hintText: 'contoh: 01982173019',
+                    prefixIcon: Icons.account_balance_wallet,
+                    type: TextInputType.number,
+                  ),
+                  SizedBox(height: 10),
+                  buildInputLabel('Nama Pemilik Rekening (opsional)', " "),
+                  buildTextField(
+                    inputFormat: LengthLimitingTextInputFormatter(200),
+                    controller: namaRekMitraController,
+                    hintText: 'contoh: ARTHA ABADI',
+                    prefixIcon: Icons.face,
+                    type: TextInputType.name,
+                  ),
                   SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -679,6 +772,9 @@ class _MitraPState extends State<MitraP> {
                             namaMitraController.text,
                             noMitraController.text,
                             emailMitraController.text,
+                            bankMitraController.text,
+                            noRekMitraController.text,
+                            namaRekMitraController.text,
                             fromButton: true,
                           );
                           Navigator.pop(context);

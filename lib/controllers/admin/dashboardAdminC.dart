@@ -26,7 +26,7 @@ class DashboardController extends GetxController {
   var totalProduk = 0.obs;
   final totalQRIS = 0.obs;
   final totalCash = 0.obs;
-  var totalHarga = 0.obs;
+  var totalSaldo = 0.obs;
   var totalLaba = 0.obs;
   var totalTransaksiIn = 0.obs;
   var totalKasbon = 0.obs;
@@ -182,13 +182,13 @@ class DashboardController extends GetxController {
         if (jsonData['status'] == true) {
           transaksiOutDet.value =
               List<Map<String, dynamic>>.from(jsonData['data']);
-          int total = 0;
+          int saldo = 0;
           int laba = 0;
           for (var item in transaksiOutDet) {
-            total += int.tryParse(item['total_harga'].toString()) ?? 0;
+            saldo += int.tryParse(item['saldo'].toString()) ?? 0;
             laba += int.tryParse(item['laba'].toString()) ?? 0;
           }
-          totalHarga.value = total;
+          totalSaldo.value = saldo + laba;
           totalLaba.value = laba;
         } else {
           throw Exception('Failed to load products');
@@ -307,5 +307,14 @@ class DashboardController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<void> refreshPage() async {
+    await fetchTransaksiOut();
+    await fetchTransaksiOutDet();
+    await fetchProduk();
+    await fetchTransaksiInDet();
+    await fetchTransaksiIn();
+    updateChartData();
   }
 }

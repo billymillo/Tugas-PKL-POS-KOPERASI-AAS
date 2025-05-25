@@ -14,6 +14,7 @@ import 'package:bluetooth_thermal_printer_example/pages/admin/productP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/reportingP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/transaksiInMitra.dart';
 import 'package:bluetooth_thermal_printer_example/pages/admin/transaksiInP.dart';
+import 'package:bluetooth_thermal_printer_example/pages/admin/transaksiOutMitra.dart';
 import 'package:bluetooth_thermal_printer_example/pages/kasir/kasirP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/kasir/lockDeviceP.dart';
 import 'package:bluetooth_thermal_printer_example/pages/kasir/transaksiP.dart';
@@ -111,6 +112,10 @@ class AppPages {
     GetPage(
       name: _Paths.REPORTINGP,
       page: () => ReportingP(),
+    ),
+    GetPage(
+      name: _Paths.TRANSAKSIOUTMITRAP,
+      page: () => TransaksiOutMitraP(),
     ),
   ];
 }

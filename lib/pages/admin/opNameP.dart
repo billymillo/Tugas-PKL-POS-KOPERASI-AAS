@@ -98,6 +98,61 @@ class _OpNamePageState extends State<OpNamePage> {
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
+                                        Obx(() => Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                ChoiceChip(
+                                                  label: Text('Retail'),
+                                                  selected: controller
+                                                          .selectedJenis
+                                                          .value ==
+                                                      1,
+                                                  onSelected: (selected) {
+                                                    if (selected)
+                                                      controller.selectedJenis
+                                                          .value = 1;
+                                                  },
+                                                  selectedColor:
+                                                      PrimaryColor().blue,
+                                                  backgroundColor:
+                                                      Colors.grey.shade200,
+                                                  labelStyle: TextStyle(
+                                                    color: controller
+                                                                .selectedJenis
+                                                                .value ==
+                                                            1
+                                                        ? Colors.white
+                                                        : Colors.black87,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10),
+                                                ChoiceChip(
+                                                  label: Text('Non Retail'),
+                                                  selected: controller
+                                                          .selectedJenis
+                                                          .value ==
+                                                      2,
+                                                  onSelected: (selected) {
+                                                    if (selected)
+                                                      controller.selectedJenis
+                                                          .value = 2;
+                                                  },
+                                                  selectedColor:
+                                                      PrimaryColor().blue,
+                                                  backgroundColor:
+                                                      Colors.grey.shade200,
+                                                  labelStyle: TextStyle(
+                                                    color: controller
+                                                                .selectedJenis
+                                                                .value ==
+                                                            2
+                                                        ? Colors.white
+                                                        : Colors.black87,
+                                                  ),
+                                                ),
+                                              ],
+                                            )),
                                       ],
                                     ),
                                     SizedBox(height: 10),
@@ -108,8 +163,10 @@ class _OpNamePageState extends State<OpNamePage> {
                                         ElevatedButton(
                                           onPressed: () async {
                                             Get.back();
-                                            await controller
-                                                .addOpname(status.toString());
+                                            await controller.addOpname(
+                                                status.toString(),
+                                                controller.selectedJenis.value
+                                                    .toString());
                                             await controller.fetchOpName();
                                             controller.isLoading.value = false;
                                           },

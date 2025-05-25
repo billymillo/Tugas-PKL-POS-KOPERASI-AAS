@@ -79,6 +79,7 @@ class LibraryController extends GetxController {
   }
 
   Future<void> addNewMitra(String nama, String no_tlp, String email,
+      String bank, String noRek, String namaRek,
       {bool fromButton = false}) async {
     if (!fromButton) {
       return;
@@ -87,7 +88,8 @@ class LibraryController extends GetxController {
     try {
       final prefs = await SharedPreferences.getInstance();
       String? userInput = prefs.getString('name') ?? 'system';
-      final response = await apiService.mitra(nama, no_tlp, email, userInput);
+      final response = await apiService.mitra(
+          nama, no_tlp, email, bank, noRek, namaRek, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',
@@ -152,7 +154,7 @@ class LibraryController extends GetxController {
     }
   }
 
-  Future<void> editMitra(String id, String nama, String no_tlp, String email,
+  Future<void> editMitra(String id, String nama, String no_tlp, String email, String bank, String noRek, String namaRek,
       {bool fromButton = false}) async {
     if (!fromButton) {
       return;
@@ -166,6 +168,9 @@ class LibraryController extends GetxController {
         nama,
         no_tlp,
         email,
+        bank,
+        noRek,
+        namaRek,
         userUpdate,
       );
       if (response['status'] == true) {

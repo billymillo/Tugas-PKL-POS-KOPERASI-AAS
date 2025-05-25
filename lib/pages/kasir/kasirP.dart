@@ -150,7 +150,7 @@ class _KasirPState extends State<KasirP> {
                                                   return Container(
                                                     child: KasirW().kategori(
                                                       item['kategori'],
-                                                      "http://10.10.20.50/POS_CI/kategori/${item['gambar_kategori']}",
+                                                      "http://192.168.1.7/POS_CI/kategori/${item['gambar_kategori']}",
                                                       Icons.fastfood,
                                                       (kategori) {
                                                         print(
@@ -1378,7 +1378,7 @@ class _KasirPState extends State<KasirP> {
                                           context,
                                           c.isLoading,
                                           "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.totalHarga.toString()))}",
-                                          "00020101021126660014ID.LINKAJA.WWW011893600911000000000802152103124400000080303UMI51440014ID.CO.QRIS.WWW0215ID20210652077750303UMI5204839853033605802ID5922YAY BAKTI KAMAJAYA IND6006SLEMAN61055528162070703A016304FA4D",
+                                          "00020101021126570011ID.DANA.WWW011893600915335349417602093534941760303UMI51440014ID.CO.QRIS.WWW0215ID10222268651970303UMI5204541153033605802ID5925Koperasi Anugrah Artha Ab6010Kota Depok6105164126304A768",
                                           () async {
                                             c.metodePembayaran.value = 2;
                                             c.statusTr.value = 1;

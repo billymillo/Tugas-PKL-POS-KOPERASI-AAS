@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 // Fetch Api
 class ApiService {
-  static const String baseUrl = 'http://10.10.20.50/POS_CI/api/';
+  static const String   baseUrl = 'http://192.168.1.7/POS_CI/api/';
 
   Future<List<dynamic>> fetchUsers({String? id}) async {
     final url = id == null ? '$baseUrl/users' : '$baseUrl/users?id=$id';
@@ -174,8 +174,8 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> mitra(
-      String nama, String no_tlp, String email, String userInput) async {
+  Future<Map<String, dynamic>> mitra(String nama, String no_tlp, String email,
+      String bank, String noRek, String namaRek, String userInput) async {
     final url = '$baseUrl/product/mitra';
     final response = await http.post(
       Uri.parse(url),
@@ -183,6 +183,9 @@ class ApiService {
         'nama': nama,
         'no_tlp': no_tlp,
         'email': email,
+        'bank_rek': bank,
+        'no_rek': noRek,
+        'nama_rek': namaRek,
         'user_input': userInput,
       },
     );
@@ -210,8 +213,15 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> editMitra(String id, String nama, String no_tlp,
-      String email, String update) async {
+  Future<Map<String, dynamic>> editMitra(
+      String id,
+      String nama,
+      String no_tlp,
+      String email,
+      String bank,
+      String noRek,
+      String namaRek,
+      String update) async {
     final url = '$baseUrl/product/mitra/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -220,6 +230,9 @@ class ApiService {
         'nama': nama,
         'no_tlp': no_tlp,
         'email': email,
+        'bank_rek': bank,
+        'no_rek': noRek,
+        'nama_rek': namaRek,
         'user_update': update
       },
     );
@@ -348,12 +361,13 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> addOpname(
-      String status, String userInput) async {
+      String status, String tipeOpname, String userInput) async {
     final url = '$baseUrl/opname';
     final response = await http.post(
       Uri.parse(url),
       body: {
         'status_opname': status,
+        'tipe_opname': tipeOpname,
         'user_input': userInput,
       },
     );

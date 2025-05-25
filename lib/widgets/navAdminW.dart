@@ -118,6 +118,11 @@ Widget buildDrawer(BuildContext context) {
                 title: "Transaksi In Mitra",
                 routeName: Routes.TRANSAKSIINMITRAP,
               ),
+              drawerItem(
+                icon: Icons.fork_right_rounded,
+                title: "Transaksi Out Mitra",
+                routeName: Routes.TRANSAKSIOUTMITRAP,
+              ),
             ],
             collapsedShape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),

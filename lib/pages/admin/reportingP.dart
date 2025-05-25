@@ -108,7 +108,7 @@ class ReportingP extends StatelessWidget {
                                 controller.filterData();
                                 controller.filterTransaksiOutDet();
                                 controller.filterTransaksiInDet();
-                                controller.groupAndSortTransaksi(
+                                controller.groupAndSortTransaksi( 
                                     controller.transaksiOutDet);
                               },
                               icon: Icon(Icons.search, color: Colors.white),
@@ -678,7 +678,7 @@ class ReportingP extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Image.network(
-                                          "http://10.10.20.50/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
+                                          "http://192.168.1.7/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
                                           width: 50, // atur lebar
                                           height: 50, // atur tinggi
                                           fit: BoxFit

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiServiceTr {
-  static const String baseUrlTr = 'http://10.10.20.50/POS_CI/api';
+  static const String baseUrlTr = 'http://192.168.1.7/POS_CI/api';
 
   Future<String?> getUserInput() async {
     final prefs = await SharedPreferences.getInstance();
@@ -402,6 +402,23 @@ class ApiServiceTr {
     }
   }
 
+  Future<Map<String, dynamic>> updateSaldo(String id, String saldo, String userUpdate) async {
+    final url = '$baseUrlTr/transaksi_out/detail/$id';
+    final response = await http.put(
+      Uri.parse(url),
+      body: {
+        'id': id,
+        'saldo': saldo,
+        'user_update': userUpdate,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
   static Future<Map<String, dynamic>> addDetTransaksiIn(
     String idProduk,
     String jumlah,
@@ -532,40 +549,6 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> duplikatProduk(
-    String idProduk,
-    String stok,
-    String hargaSatuan,
-    String hargaJual,
-    String userUpdate,
-  ) async {
-    final url = '$baseUrlTr/product/duplicate';
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        body: {
-          'id': idProduk,
-          'stok': stok,
-          'harga_satuan': hargaSatuan,
-          'harga_jual': hargaJual,
-          'user_update': userUpdate,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        return {
-          'status': false,
-          'message': 'Error ${response.statusCode}: ${response.body}',
-        };
-      }
-    } catch (e) {
-      return {'status': false, 'message': 'Request failed: $e'};
-    }
-  }
-
   Future<Map<String, dynamic>> editProduk(String id, String stok,
       String hargaSatuan, String hargaJual, String userUpdate) async {
     final url = '$baseUrlTr/product/ubah/$id';
@@ -576,6 +559,27 @@ class ApiServiceTr {
         'stok': stok,
         'harga_satuan': hargaSatuan,
         'harga_jual': hargaJual,
+        'user_update': userUpdate,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return jsonDecode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> editProdukTrIn(String id,
+      String hargaSatuan, String hargaJual, String hargaPerPack, String jumlahPcs, String userUpdate) async {
+    final url = '$baseUrlTr/product/ubah/$id';
+    final response = await http.put(
+      Uri.parse(url),
+      body: {
+        'id': id,
+        'harga_satuan': hargaSatuan,
+        'harga_jual': hargaJual,
+        'harga_pack': hargaPerPack,
+        'jml_pcs_pack': jumlahPcs,
         'user_update': userUpdate,
       },
     );

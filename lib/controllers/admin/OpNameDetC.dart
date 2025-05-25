@@ -40,6 +40,7 @@ class OpNameDetController extends GetxController {
   RxInt currentPage = 0.obs;
   final int itemsPerPage = 10;
 
+  var tipeOpname = ''.obs;
   late String idOpname;
   late String statusOpname;
 
@@ -72,14 +73,14 @@ class OpNameDetController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchProduk();
     fetchOpName();
-    fetchDetOpName();
-    fetchStatus();
     final args = Get.arguments;
     idOpname = args['id_opname'].toString();
     statusOpname = args['status'].toString();
-    print("Cek Id dan Status" + '$idOpname $statusOpname');
+    print("Cek Id dan Status " + '$idOpname $statusOpname');
+    fetchDetOpName();
+    fetchStatus();
+    fetchProduk();
     WidgetsFlutterBinding.ensureInitialized();
     initializeDateFormatting('id_ID', null);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
@@ -110,6 +111,14 @@ class OpNameDetController extends GetxController {
     if (currentPage.value > 0) {
       currentPage.value--;
     }
+  }
+
+  String TipeOpname(String idopname) {
+    var selected = opname.firstWhere(
+      (m) => m['id'].toString() == idopname,
+      orElse: () => {'tipe_opname': '0'},
+    );
+    return selected['tipe_opname'] ?? "0";
   }
 
   bool isAllItemSaved(String idOpname) {
@@ -180,9 +189,11 @@ class OpNameDetController extends GetxController {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
           final filteredData = (jsonData['data'] as List)
-              .where((item) => item['id_tipe_barang'] == '1')
+              .where((item) =>
+                  item['id_tipe_barang'] == TipeOpname(idOpname.toString()))
               .toList();
-
+          print('Cek idOpname $idOpname');
+          print('Cek Tipe ${TipeOpname(idOpname.toString())}');
           produk.value = List<Map<String, dynamic>>.from(filteredData);
         } else {
           throw Exception('Failed to load products');
@@ -208,6 +219,7 @@ class OpNameDetController extends GetxController {
               List<Map<String, dynamic>>.from(jsonData['data'])
                 ..sort((a, b) => int.parse(b['id'].toString())
                     .compareTo(int.parse(a['id'].toString())));
+
           opname.value = sortedData;
         } else {
           throw Exception('Failed to load opname');

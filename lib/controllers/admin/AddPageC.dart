@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:bluetooth_thermal_printer_example/services/apiService.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddPageController extends GetxController {
@@ -29,6 +30,9 @@ class AddPageController extends GetxController {
   RxBool showMitra = true.obs;
   RxBool jumlahPcsPack = true.obs;
   RxBool hargaPack = true.obs;
+  RxBool harga = true.obs;
+  RxString hargaDasar = ''.obs;
+
   var isLoading = false.obs;
   var produk = <Map<String, dynamic>>[].obs;
   var tipe = <Map<String, dynamic>>[].obs;
@@ -49,6 +53,26 @@ class AddPageController extends GetxController {
     fetchMitra();
     fetchTipe();
     fetchKategori();
+  }
+
+  void hitungHargaDasar(String hargaPackText, String jumlahIsiText) {
+    final hargaPack = int.tryParse(hargaPackText.replaceAll('.', '')) ?? 0;
+    final jumlahIsi = int.tryParse(jumlahIsiText.replaceAll('.', '')) ?? 1;
+
+    if (jumlahIsi > 0) {
+      hargaDasar.value = (hargaPack ~/ jumlahIsi).toString();
+    } else {
+      hargaDasar.value = '0';
+    }
+  }
+
+  String formatRupiah(String value) {
+    final number = int.tryParse(value) ?? 0;
+    return NumberFormat.currency(
+      locale: 'id',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    ).format(number);
   }
 
   Future<void> fetchMitra() async {
@@ -325,6 +349,7 @@ class AddPageController extends GetxController {
   }
 
   Future<void> addNewMitra(String nama, String no_tlp, String email,
+      String bank, String noRek, String namaRek,
       {bool fromButton = false}) async {
     if (!fromButton) {
       return;
@@ -333,7 +358,8 @@ class AddPageController extends GetxController {
     try {
       final prefs = await SharedPreferences.getInstance();
       String? userInput = prefs.getString('name') ?? 'system';
-      final response = await apiService.mitra(nama, no_tlp, email, userInput);
+      final response = await apiService.mitra(
+          nama, no_tlp, email, bank, noRek, namaRek, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Success',

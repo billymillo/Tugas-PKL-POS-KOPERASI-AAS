@@ -10,9 +10,11 @@ import 'package:bluetooth_thermal_printer_example/services/apiService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TransaksiInController extends GetxController {
-  TextEditingController satuanController = TextEditingController();
+  TextEditingController hargaPackController = TextEditingController();
+  TextEditingController hargaController = TextEditingController();
   TextEditingController searchController = TextEditingController();
   TextEditingController jualController = TextEditingController();
+  TextEditingController jumlahPcsController = TextEditingController();
 
   final ApiServiceTr apiServiceTr = ApiServiceTr();
   var isLoading = false.obs;
@@ -24,6 +26,7 @@ class TransaksiInController extends GetxController {
   RxString searchQuery = ''.obs;
   var filteredProduct = <Map<String, dynamic>>[].obs;
   var selectedProduct = Rxn<String>();
+  var hargaDasar = 0.obs;
 
   @override
   void onInit() {
@@ -33,8 +36,11 @@ class TransaksiInController extends GetxController {
     fetchTransaksiDet();
     fetchTransaksiIn();
     ever(selectedProduct, (_) {
-      satuanController.text = ProdukSatuan;
+      hargaPackController.text = HargaPack;
+      hargaController.text = ProdukSatuan;
       jualController.text = ProdukJual;
+      jumlahPcsController.text = JumlahPcs;
+      hargaDasar.value = 0;
     });
   }
 
@@ -62,12 +68,12 @@ class TransaksiInController extends GetxController {
     return selected['no_transaksi_in'] ?? "";
   }
 
-  String get ProdukSatuan {
+  String get HargaPack {
     var selected = produk.firstWhere(
       (m) => m['id'] == selectedProduct.value,
-      orElse: () => {'harga_satuan': '  '},
+      orElse: () => {'harga_pack': '  '},
     );
-    return selected['harga_satuan'] ?? 0;
+    return selected['harga_pack'] ?? '0';
   }
 
   String get ProdukJual {
@@ -75,11 +81,43 @@ class TransaksiInController extends GetxController {
       (m) => m['id'] == selectedProduct.value,
       orElse: () => {'harga_jual': '  '},
     );
-    return selected['harga_jual'] ?? 0;
+    return selected['harga_jual'] ?? '0';
+  }
+
+  String get ProdukSatuan {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'harga_satuan': ' '},
+    );
+    return selected['harga_satuan'] ?? '0';
+  }
+
+  String get JumlahPcs {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'jml_pcs_pack': ' '},
+    );
+    return selected['jml_pcs_pack'] ?? '0';
   }
 
   void toggleCheckbox(bool? value) {
     checkbox.value = value ?? false;
+  }
+
+  void panggilHarga() {
+    hargaPackController.addListener(updateStokTotal);
+    jumlahPcsController.addListener(updateStokTotal);
+  }
+
+  void updateStokTotal() {
+    final hargaPack = int.tryParse(hargaPackController.text) ?? 0;
+    final jumlahPcs = int.tryParse(jumlahPcsController.text) ?? 1;
+
+    if (jumlahPcs != 0) {
+      hargaDasar.value = hargaPack ~/ jumlahPcs;
+    } else {
+      hargaDasar.value = 0;
+    }
   }
 
   Future<void> fetchProduk() async {
@@ -141,7 +179,6 @@ class TransaksiInController extends GetxController {
       isLoading(false);
     }
   }
-
 
   Future<void> fetchTransaksiIn() async {
     var url = ApiService.baseUrl + '/transaksi_in';
@@ -273,19 +310,20 @@ class TransaksiInController extends GetxController {
     }
   }
 
-  Future<void> duplikatProduk(
+  Future<void> editProduk(
     String id,
-    String stok,
     String hargaSatuan,
     String hargaJual,
+    String hargaPerPack,
+    String jumlahPcs,
   ) async {
     isLoading.value = true;
     final prefs = await SharedPreferences.getInstance();
     String? userInput = prefs.getString('name') ?? 'system';
 
     try {
-      final response = await apiServiceTr.duplikatProduk(
-          id, stok, hargaSatuan, hargaJual, userInput);
+      final response = await apiServiceTr.editProdukTrIn(
+          id, hargaSatuan, hargaJual, hargaPerPack, jumlahPcs, userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Berhasil',

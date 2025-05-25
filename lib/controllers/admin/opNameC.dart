@@ -22,6 +22,8 @@ class OpNameController extends GetxController {
   var opnameDet = <Map<String, dynamic>>[].obs;
   var status = <Map<String, dynamic>>[].obs;
 
+  var selectedJenis = 0.obs;
+
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
 
@@ -69,7 +71,6 @@ class OpNameController extends GetxController {
     }
   }
 
-  
   Future<void> fetchDetOpName() async {
     try {
       isLoading(true);
@@ -114,12 +115,14 @@ class OpNameController extends GetxController {
 
   Future<void> addOpname(
     String status,
+    String tipeOpname,
   ) async {
     isLoading.value = true;
     final prefs = await SharedPreferences.getInstance();
     String? userInput = prefs.getString('name') ?? 'system';
     final response = await ApiService.addOpname(
       status,
+      tipeOpname,
       userInput,
     );
     try {
