@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bluetooth_thermal_printer_example/controllers/admin/libraryC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/navAdminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -48,31 +49,44 @@ class _TipePState extends State<TipeP> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(left: 16),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(Icons.people,
-                                              size: 25,
-                                              color: PrimaryColor().blue),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            'Tipe Barang',
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20,
-                                                color: Colors.black),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              (MediaQuery.of(context)
+                                                          .orientation ==
+                                                      Orientation.landscape
+                                                  ? 0.75
+                                                  : 0.65),
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.people,
+                                                  size: 25,
+                                                  color: PrimaryColor().blue),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                'Tipe Barang',
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 16),
-                                        child: buildNewTipeDialog(),
-                                      ),
-                                    ],
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 16),
+                                          child: buildNewTipeDialog(),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -97,211 +111,19 @@ class _TipePState extends State<TipeP> {
                                               top: 0,
                                               child: GestureDetector(
                                                 onTap: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return Dialog(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child: Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.5,
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  20),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        16),
-                                                          ),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              Column(
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        horizontal:
-                                                                            20,
-                                                                        vertical:
-                                                                            10),
-                                                                    child:
-                                                                        Container(
-                                                                      padding:
-                                                                          EdgeInsets.all(
-                                                                              25),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: Color.fromARGB(
-                                                                            255,
-                                                                            255,
-                                                                            169,
-                                                                            163),
-                                                                        shape: BoxShape
-                                                                            .circle,
-                                                                      ),
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .delete_outline,
-                                                                        color: Colors
-                                                                            .red,
-                                                                        size:
-                                                                            50,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          25),
-                                                                  Text(
-                                                                    "Hapus Tipe",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .black87,
-                                                                      fontSize:
-                                                                          25,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          10),
-                                                                  Text(
-                                                                    "Apakah anda yakin untuk menghapus Tipe ini?",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade400,
-                                                                      fontSize:
-                                                                          15,
-                                                                    ),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                  height: 10),
-                                                              Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      await tipeController.deleteTipe(
-                                                                          tipe[
-                                                                              'id'],
-                                                                          fromButton:
-                                                                              true);
-                                                                      await tipeController
-                                                                          .refresh();
-                                                                      Get.to(
-                                                                          TipeP());
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    style: ElevatedButton
-                                                                        .styleFrom(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .red,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(12),
-                                                                      ),
-                                                                    ),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        SizedBox(
-                                                                            width:
-                                                                                8),
-                                                                        Text(
-                                                                          'Hapus',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Colors.white,
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          5),
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    style: ElevatedButton
-                                                                        .styleFrom(
-                                                                      backgroundColor: Colors
-                                                                          .grey
-                                                                          .shade200,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(12),
-                                                                      ),
-                                                                    ),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        SizedBox(
-                                                                            width:
-                                                                                8),
-                                                                        Text(
-                                                                          'Batal',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Colors.black,
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
+                                                  AdminW().deleteDialog(
+                                                    context,
+                                                    'Hapus Tipe',
+                                                    'Apakah anda yakin ingin menghapus tipe ${tipe['tipe']}?',
+                                                    () async {
+                                                      await tipeController
+                                                          .deleteTipe(
+                                                              tipe['id'],
+                                                              fromButton: true);
+                                                      await tipeController
+                                                          .refresh();
+                                                      Get.to(TipeP());
+                                                      Navigator.pop(context);
                                                     },
                                                   );
                                                 },
@@ -412,8 +234,8 @@ class _TipePState extends State<TipeP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Tipe', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Nama Tipe', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newtipeController,
                             hintText: 'Tipe',
@@ -568,8 +390,8 @@ class _TipePState extends State<TipeP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Tipe', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Nama Tipe', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: namatipeController,
                             hintText: 'Tipe',
@@ -669,68 +491,5 @@ class _TipePState extends State<TipeP> {
     final words = text.trim().split(RegExp(r'\s+'));
     if (words.length <= maxWords) return text;
     return words.take(maxWords).join(' ') + '...';
-  }
-
-  Widget buildInputLabel(String label, String label2) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          Text(label2,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: DarkColor().red,
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData prefixIcon,
-    required TextInputType type,
-    required inputFormat,
-    // controller
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: TextField(
-        inputFormatters: [inputFormat],
-        keyboardType: type,
-        controller: controller,
-        cursorColor: PrimaryColor().blue,
-        style: TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          prefixIcon: Icon(
-            prefixIcon,
-            color: Colors.grey.shade600,
-            size: 20,
-          ),
-          hintText: hintText,
-          hintStyle: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade400,
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      ),
-    );
   }
 }

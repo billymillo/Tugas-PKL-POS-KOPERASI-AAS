@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bluetooth_thermal_printer_example/controllers/admin/libraryC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/navAdminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -74,8 +75,12 @@ class _KategoriPState extends State<KategoriP> {
                           return SliverGrid(
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: getCrossAxisCount(context),
-                              childAspectRatio: 5,
+                              crossAxisCount: 1,
+                              childAspectRatio:
+                                  (MediaQuery.of(context).orientation ==
+                                          Orientation.landscape
+                                      ? 5
+                                      : 4),
                               crossAxisSpacing: 10,
                               mainAxisSpacing: 10,
                             ),
@@ -119,28 +124,38 @@ class _KategoriPState extends State<KategoriP> {
             NavbarDrawer(context, scaffoldKey),
             Padding(
               padding: EdgeInsets.only(top: 80, left: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.category,
-                          size: 25, color: PrimaryColor().blue),
-                      SizedBox(width: 10),
-                      Text(
-                        'Kategori Barang',
-                        style: GoogleFonts.roboto(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Colors.black),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width *
+                          (MediaQuery.of(context).orientation ==
+                                  Orientation.landscape
+                              ? 0.75
+                              : 0.65),
+                      child: Row(
+                        children: [
+                          Icon(Icons.category,
+                              size: 25, color: PrimaryColor().blue),
+                          SizedBox(width: 10),
+                          Text(
+                            'Kategori Barang',
+                            style: GoogleFonts.roboto(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.black),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: buildDialog(),
-                  ),
-                ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: buildDialog(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -159,7 +174,7 @@ class _KategoriPState extends State<KategoriP> {
             decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
-                    "http://192.168.1.7/POS_CI/kategori/${item['gambar_kategori']}",
+                    "http://10.10.20.109/POS_CI/kategori/${item['gambar_kategori']}",
                   ),
                   fit: BoxFit.cover,
                 ),
@@ -213,7 +228,7 @@ class _KategoriPState extends State<KategoriP> {
                         children: [
                           Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 13, vertical: 8),
+                                horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
@@ -223,7 +238,7 @@ class _KategoriPState extends State<KategoriP> {
                                 'Edit',
                                 style: GoogleFonts.nunito(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     color: Colors.blue),
                               ),
                               onTap: () {
@@ -231,7 +246,7 @@ class _KategoriPState extends State<KategoriP> {
                                   context,
                                   item['id'],
                                   item['kategori'],
-                                  "http://192.168.1.7/POS_CI/kategori/${item['gambar_kategori']}",
+                                  "http://10.10.20.109/POS_CI/kategori/${item['gambar_kategori']}",
                                 );
                               },
                             ),
@@ -239,7 +254,7 @@ class _KategoriPState extends State<KategoriP> {
                           SizedBox(width: 10),
                           Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 13, vertical: 8),
+                                horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
@@ -249,153 +264,20 @@ class _KategoriPState extends State<KategoriP> {
                                 'Hapus',
                                 style: GoogleFonts.nunito(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     color: Colors.red),
                               ),
                               onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Dialog(
-                                      elevation: 0,
-                                      backgroundColor: Colors.transparent,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.5,
-                                        padding: EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Column(
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10),
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(25),
-                                                    decoration: BoxDecoration(
-                                                      color: Color.fromARGB(
-                                                          255, 255, 169, 163),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.delete_outline,
-                                                      color: Colors.red,
-                                                      size: 50,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 25),
-                                                Text(
-                                                  "Hapus Kategori",
-                                                  style: TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 10),
-                                                Text(
-                                                  "Apakah anda yakin untuk menghapus Kategori ini?",
-                                                  style: TextStyle(
-                                                    color: Colors.grey.shade400,
-                                                    fontSize: 15,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 10),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    await kategoriController
-                                                        .deleteKategori(
-                                                            item['id'],
-                                                            fromButton: true);
-                                                    await kategoriController
-                                                        .refresh();
-                                                    Navigator.pop(context);
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor: Colors.red,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                        'Hapus',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 5),
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey.shade200,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                        'Batal',
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
+                                AdminW().deleteDialog(
+                                  context,
+                                  "Hapus Kategori",
+                                  "Apakah anda yakin ingin menghapus kategori ini?",
+                                  () async {
+                                    await kategoriController.deleteKategori(
+                                        item['id'],
+                                        fromButton: true);
+                                    await kategoriController.refresh();
+                                    Navigator.pop(context);
                                   },
                                 );
                               },
@@ -454,8 +336,8 @@ class _KategoriPState extends State<KategoriP> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            buildInputLabel('Nama Kategori', " *"),
-                            buildTextField(
+                            AdminW().buildInputLabel('Nama Kategori', " *"),
+                            AdminW().buildTextField(
                               inputFormat: LengthLimitingTextInputFormatter(30),
                               controller: newKategoriController,
                               hintText: 'Makanan',
@@ -463,7 +345,7 @@ class _KategoriPState extends State<KategoriP> {
                               type: TextInputType.name,
                             ),
                             SizedBox(height: 20),
-                            buildInputLabel('Gambar Kategori', " *"),
+                            AdminW().buildInputLabel('Gambar Kategori', " *"),
                             GestureDetector(
                               onTap: () {
                                 kategoriController.pickImageKategoriNew();
@@ -659,9 +541,9 @@ class _KategoriPState extends State<KategoriP> {
 
   int getCrossAxisCount(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    if (width > 900) return 2; // Tablet landscape
+    if (width > 900) return 1; // Tablet landscape
     if (width > 600) return 1; // Tablet portrait
-    return 2; // Phone
+    return 1; // Phone
   }
 
   void showEditDialog(
@@ -683,8 +565,8 @@ class _KategoriPState extends State<KategoriP> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  buildInputLabel('Nama Kategori', ' *'),
-                  buildTextField(
+                  AdminW().buildInputLabel('Nama Kategori', ' *'),
+                  AdminW().buildTextField(
                     controller: editKategoriController,
                     hintText: kategoriLama,
                     prefixIcon: CupertinoIcons.square_grid_2x2,
@@ -692,7 +574,7 @@ class _KategoriPState extends State<KategoriP> {
                     inputFormat: LengthLimitingTextInputFormatter(30),
                   ),
                   SizedBox(height: 20),
-                  buildInputLabel('Gambar Kategori', ' *'),
+                  AdminW().buildInputLabel('Gambar Kategori', ' *'),
                   Obx(() => GestureDetector(
                         onTap: () async {
                           await kategoriController.pickImageKategori();
@@ -779,69 +661,6 @@ class _KategoriPState extends State<KategoriP> {
           ),
         );
       },
-    );
-  }
-
-  Widget buildInputLabel(String label, String label2) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          Text(label2,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: DarkColor().red,
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData prefixIcon,
-    required TextInputType type,
-    required inputFormat,
-    // controller
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: TextField(
-        inputFormatters: [inputFormat],
-        keyboardType: type,
-        controller: controller,
-        cursorColor: PrimaryColor().blue,
-        style: TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          prefixIcon: Icon(
-            prefixIcon,
-            color: Colors.grey.shade600,
-            size: 20,
-          ),
-          hintText: hintText,
-          hintStyle: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade400,
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      ),
     );
   }
 }

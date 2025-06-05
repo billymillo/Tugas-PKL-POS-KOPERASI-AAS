@@ -34,6 +34,7 @@ class EditPageController extends GetxController {
   RxBool hargaPack = true.obs;
   RxBool harga = true.obs;
   RxString hargaDasar = ''.obs;
+  RxString totalLaba = ''.obs;
 
   var isLoading = false.obs;
   var produk = <Map<String, dynamic>>[].obs;
@@ -99,6 +100,17 @@ class EditPageController extends GetxController {
       hargaDasar.value = (hargaPack ~/ jumlahIsi).toString();
     } else {
       hargaDasar.value = '0';
+    }
+  }
+
+  void hitungLaba(String hargaDasarText, String hargaJualText) {
+    final hargaDasar = int.tryParse(hargaDasarText) ?? 0;
+    final hargaJual = int.tryParse(hargaJualText.replaceAll('.', '')) ?? 1;
+
+    if (hargaJual > 0) {
+      totalLaba.value = (hargaJual - hargaDasar).toString();
+    } else {
+      totalLaba.value = '0';
     }
   }
 
@@ -266,7 +278,7 @@ class EditPageController extends GetxController {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );
@@ -287,6 +299,7 @@ class EditPageController extends GetxController {
   Future<void> editProduct(
       String id,
       String nama_barang,
+      String barcode,
       dynamic gambar_barang,
       String id_kategori_barang,
       String id_tipe_barang,
@@ -316,6 +329,7 @@ class EditPageController extends GetxController {
       final response = await apiService.editProduk(
           id,
           nama_barang,
+          barcode,
           hasNewImage.value ? imagePath.value : null,
           id_kategori_barang,
           id_tipe_barang,

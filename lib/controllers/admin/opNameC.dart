@@ -41,9 +41,9 @@ class OpNameController extends GetxController {
   String statusName(String idStatus) {
     var selected = status.firstWhere(
       (m) => m['id'].toString() == idStatus,
-      orElse: () => {'status': 'Belum ada pendataan'},
+      orElse: () => {'status': ' '},
     );
-    return selected['status'] ?? "Belum ada pendataan";
+    return selected['status'] ?? " ";
   }
 
   Future<void> fetchOpName() async {

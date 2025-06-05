@@ -65,6 +65,8 @@ class TransaksiOutMitraP extends StatelessWidget {
                                       const SizedBox(height: 6),
                                       Obx(() {
                                         return DropdownButtonFormField<String>(
+                                          isExpanded:
+                                              true, // penting agar isi dropdown tidak overflow
                                           value: c.selectedMitra.value.isEmpty
                                               ? null
                                               : c.selectedMitra.value,
@@ -78,23 +80,31 @@ class TransaksiOutMitraP extends StatelessWidget {
                                             ),
                                             contentPadding:
                                                 const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 14),
+                                              horizontal: 12,
+                                              vertical: 14,
+                                            ),
                                           ),
-                                          hint: Text('Pilih Mitra',
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.black54)),
+                                          hint: Text(
+                                            'Pilih Mitra',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black54,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                           items: c.mitra.map((mitra) {
                                             return DropdownMenuItem<String>(
                                               value: mitra['id'].toString(),
-                                              child: Text(mitra['nama'],
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.black54)),
+                                              child: Text(
+                                                mitra['nama'],
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black54,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             );
                                           }).toList(),
                                           onChanged: (value) {
@@ -216,562 +226,598 @@ class TransaksiOutMitraP extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Obx(() {
-                                  final totalSaldo =
-                                      c.transaksiOutDet.fold<int>(
-                                    0,
-                                    (sum, item) =>
-                                        sum +
-                                        (int.tryParse((double.tryParse(
-                                                        item['saldo']
-                                                            .toString()) ??
-                                                    0)
-                                                .toStringAsFixed(0)) ??
-                                            0),
-                                  );
-
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${c.MitraName(c.selectedMitra.value.toString())}',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Total Penjualan : ' +
-                                            c.formatRupiah(totalSaldo),
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black87),
-                                      ),
-                                      SizedBox(height: 10),
-                                      Text(
-                                        '${c.formatTanggal(c.selectedStartDate.value.toString())} - ${c.formatTanggal(c.selectedEndDate.value.toString())}',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }),
-                                Row(
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width *
+                                    (MediaQuery.of(context).orientation ==
+                                            Orientation.landscape
+                                        ? 1.5
+                                        : 1.85),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Obx(() {
-                                      final data = c.transaksiOutDet;
-                                      if (data.isEmpty) {
-                                        return SizedBox();
-                                      }
-                                      return ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.blue,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          c.pdfTransaksiOutDet();
-                                        },
-                                        child: Text('Download PDF',
+                                      final totalSaldo = c.totalSaldo;
+                                      final totalJumlah = c.totalJumlah;
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${c.MitraName(c.selectedMitra.value.toString())}',
                                             style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white)),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Total Penjualan : ' +
+                                                c.formatRupiah(
+                                                    totalSaldo.toString()),
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black87),
+                                          ),
+                                          Text(
+                                            'Total Jumlah : ' +
+                                                totalJumlah.toString(),
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black87),
+                                          ),
+                                          SizedBox(height: 10),
+                                          Text(
+                                            '${c.formatTanggal(c.selectedStartDate.value.toString())} - ${c.formatTanggal(c.selectedEndDate.value.toString())}',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ],
                                       );
                                     }),
-                                    SizedBox(width: 10),
-                                    Obx(() {
-                                      final data = c.transaksiOutDet;
-                                      if (data.isEmpty) {
-                                        return SizedBox();
-                                      }
-                                      return ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: PrimaryColor().blue,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        onPressed: () async {
-                                          await showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Dialog(
-                                                elevation: 0,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.3,
-                                                  padding: EdgeInsets.all(20),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        20,
-                                                                    vertical:
-                                                                        10),
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(25),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        163,
-                                                                        171,
-                                                                        255),
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                              ),
-                                                              child: Icon(
-                                                                Icons
-                                                                    .people_alt_outlined,
-                                                                color:
-                                                                    PrimaryColor()
-                                                                        .blue,
-                                                                size: 50,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 25),
-                                                          Text(
-                                                            "Tarik Saldo Mitra",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 25,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 10),
-                                                          Text(
-                                                            'Anda akan menarik saldo mitra pada tanggal',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 15,
-                                                            ),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                          Text(
-                                                            '${c.formatTanggal(c.selectedStartDate.value.toString())} - ${c.formatTanggal(c.selectedEndDate.value.toString())}',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 15,
-                                                            ),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(height: 10),
-                                                      Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Obx(() =>
-                                                              ElevatedButton(
-                                                                onPressed: c
-                                                                        .isLoading
-                                                                        .value
-                                                                    ? null
-                                                                    : () async {
-                                                                        c.isLoading.value =
-                                                                            true;
-                                                                        await c
-                                                                            .tarikSaldoMitra();
-                                                                        c.selectedMitra.value =
-                                                                            '';
-                                                                        // c.selectedStartDate.value =
-                                                                        //     DateTime.now();
-                                                                        // c.selectedEndDate.value =
-                                                                        //     DateTime.now();
-                                                                        // c.dateLabel
-                                                                        //     .value = DateFormat('dd MMM', 'id_ID')
-                                                                        //         .format(c.selectedStartDate.value) +
-                                                                        //     ' - ' +
-                                                                        //     DateFormat('dd MMM yyyy', 'id_ID').format(c.selectedEndDate.value);
-                                                                        await c
-                                                                            .fetchTransaksiOutDet();
-                                                                        c.filterTransaksiOutDet();
-                                                                        c.filterAllTransaksiOutDet();
-                                                                        c.isLoading.value =
-                                                                            false;
-                                                                        Get.back();
-                                                                      },
-                                                                style: ElevatedButton
-                                                                    .styleFrom(
-                                                                  backgroundColor:
-                                                                      Colors
+                                    SizedBox(width: 20),
+                                    Row(
+                                      children: [
+                                        Obx(() {
+                                          final data = c.transaksiOutDet;
+                                          if (data.isEmpty) {
+                                            return SizedBox();
+                                          }
+                                          return ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20, vertical: 12),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            onPressed: () {
+                                              c.pdfTransaksiOutDet();
+                                            },
+                                            child: Text('Download PDF',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.white)),
+                                          );
+                                        }),
+                                        SizedBox(width: 10),
+                                        Obx(() {
+                                          final data = c.transaksiOutDet;
+                                          if (data.isEmpty) {
+                                            return SizedBox();
+                                          }
+                                          return ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  PrimaryColor().blue,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20, vertical: 12),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              await showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Dialog(
+                                                    elevation: 0,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.3,
+                                                        padding:
+                                                            EdgeInsets.all(20),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(16),
+                                                        ),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Column(
+                                                              children: [
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          20,
+                                                                      vertical:
+                                                                          10),
+                                                                  child:
+                                                                      Container(
+                                                                    padding:
+                                                                        EdgeInsets.all(
+                                                                            25),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      color: Color.fromARGB(
+                                                                          255,
+                                                                          163,
+                                                                          171,
+                                                                          255),
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                    ),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .people_alt_outlined,
+                                                                      color: PrimaryColor()
                                                                           .blue,
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12),
+                                                                      size: 50,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                                child: c.isLoading
-                                                                        .value
-                                                                    ? SizedBox(
-                                                                        width:
-                                                                            20,
-                                                                        height:
-                                                                            20,
-                                                                        child:
-                                                                            CircularProgressIndicator(
-                                                                          color:
-                                                                              Colors.white,
-                                                                          strokeWidth:
-                                                                              2,
-                                                                        ),
-                                                                      )
-                                                                    : Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          SizedBox(
-                                                                              width: 8),
-                                                                          Text(
-                                                                            'Tarik Saldo',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 14,
-                                                                              fontWeight: FontWeight.w600,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                              )),
-                                                          SizedBox(height: 5),
-                                                          ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              Get.back();
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade200,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                              ),
+                                                                SizedBox(
+                                                                    height: 25),
+                                                                Text(
+                                                                  "Tarik Saldo Mitra",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize:
+                                                                        25,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                    height: 10),
+                                                                Text(
+                                                                  'Anda akan menarik saldo mitra pada tanggal',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        15,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                                Text(
+                                                                  '${c.formatTanggal(c.selectedStartDate.value.toString())} - ${c.formatTanggal(c.selectedEndDate.value.toString())}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        15,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ],
                                                             ),
-                                                            child: Row(
+                                                            SizedBox(
+                                                                height: 10),
+                                                            Column(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .center,
                                                               children: [
+                                                                Obx(() =>
+                                                                    ElevatedButton(
+                                                                      onPressed: c
+                                                                              .isLoading
+                                                                              .value
+                                                                          ? null
+                                                                          : () async {
+                                                                              c.isLoading.value = true;
+                                                                              await c.addTransaksiOutMitra(c.selectedMitra.value, c.totalJumlah.toString(), c.totalSaldo.toString(), '1', c.selectedStartDate.value.toString(), c.selectedEndDate.value.toString());
+                                                                              await c.tarikSaldoMitra();
+                                                                              c.selectedMitra.value = '';
+                                                                              await c.fetchTransaksiOutDet();
+                                                                              c.filterTransaksiOutDet();
+                                                                              c.filterAllTransaksiOutDet();
+                                                                              c.isLoading.value = false;
+                                                                              Navigator.pop(context);
+                                                                              Get.snackbar(
+                                                                                'Berhasil',
+                                                                                'Tarik Saldo Mitra Berhasil',
+                                                                                backgroundColor: Colors.green.withOpacity(0.8),
+                                                                                colorText: Colors.white,
+                                                                                icon: Icon(Icons.check_circle_outline, color: Colors.white),
+                                                                              );
+                                                                            },
+                                                                      style: ElevatedButton
+                                                                          .styleFrom(
+                                                                        backgroundColor:
+                                                                            Colors.blue,
+                                                                        shape:
+                                                                            RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(12),
+                                                                        ),
+                                                                      ),
+                                                                      child: c.isLoading
+                                                                              .value
+                                                                          ? SizedBox(
+                                                                              width: 20,
+                                                                              height: 20,
+                                                                              child: CircularProgressIndicator(
+                                                                                color: Colors.white,
+                                                                                strokeWidth: 2,
+                                                                              ),
+                                                                            )
+                                                                          : Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                SizedBox(width: 8),
+                                                                                Text(
+                                                                                  'Tarik Saldo',
+                                                                                  style: TextStyle(
+                                                                                    color: Colors.white,
+                                                                                    fontSize: 14,
+                                                                                    fontWeight: FontWeight.w600,
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                    )),
                                                                 SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Batal',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black54,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
+                                                                    height: 5),
+                                                                ElevatedButton(
+                                                                  onPressed:
+                                                                      () async {
+                                                                    Get.back();
+                                                                  },
+                                                                  style: ElevatedButton
+                                                                      .styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .grey
+                                                                            .shade200,
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              12),
+                                                                    ),
+                                                                  ),
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      SizedBox(
+                                                                          width:
+                                                                              8),
+                                                                      Text(
+                                                                        'Batal',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.black54,
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ),
                                                               ],
                                                             ),
-                                                          ),
-                                                        ],
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ],
-                                                  ),
-                                                ),
+                                                    ),
+                                                  );
+                                                },
                                               );
                                             },
+                                            child: Text('Tarik Saldo',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.white)),
                                           );
-                                        },
-                                        child: Text('Tarik Saldo',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white)),
-                                      );
-                                    }),
-                                    SizedBox(width: 10),
-                                    Obx(() {
-                                      final data = c.transaksiOutDet;
-                                      if (data.isEmpty) {
-                                        return SizedBox();
-                                      }
-                                      return ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: PrimaryColor().red,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        onPressed: () async {
-                                          await showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Dialog(
-                                                elevation: 0,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.3,
-                                                  padding: EdgeInsets.all(20),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        20,
-                                                                    vertical:
-                                                                        10),
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(25),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        255,
-                                                                        163,
-                                                                        163),
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                              ),
-                                                              child: Icon(
-                                                                Icons
-                                                                    .people_alt_outlined,
-                                                                color:
-                                                                    PrimaryColor()
-                                                                        .red,
-                                                                size: 50,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 25),
-                                                          Text(
-                                                            "Pembatalan Penarikan Saldo",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 25,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 10),
-                                                          Text(
-                                                            'Anda akan mengembalikan saldo seperti sebelumnya. Lanjutkan?',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 15,
-                                                            ),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(height: 10),
-                                                      Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Obx(() =>
-                                                              ElevatedButton(
-                                                                onPressed: c
-                                                                        .isLoading
-                                                                        .value
-                                                                    ? null
-                                                                    : () async {
-                                                                        c.isLoading.value =
-                                                                            true;
-                                                                        await c
-                                                                            .undoTarikSaldo();
-                                                                        c.selectedMitra.value =
-                                                                            '';
-                                                                        await c
-                                                                            .fetchTransaksiOutDet();
-                                                                        c.filterTransaksiOutDet();
-                                                                        c.filterAllTransaksiOutDet();
-                                                                        c.isLoading.value =
-                                                                            false;
-                                                                        Get.back();
-                                                                      },
-                                                                style: ElevatedButton
-                                                                    .styleFrom(
-                                                                  backgroundColor:
-                                                                      Colors
+                                        }),
+                                        SizedBox(width: 10),
+                                        Obx(() {
+                                          final data = c.transaksiOutDet;
+                                          if (data.isEmpty) {
+                                            return SizedBox();
+                                          }
+                                          return ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  PrimaryColor().red,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20, vertical: 12),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              if (c.totalSaldo != 0) {
+                                                Get.snackbar(
+                                                  'Gagal',
+                                                  'Transaksi ini belum pernah mengalami penarikan',
+                                                  backgroundColor: Colors.red
+                                                      .withOpacity(0.8),
+                                                  colorText: Colors.white,
+                                                  icon: Icon(Icons.error,
+                                                      color: Colors.white),
+                                                );
+                                                return;
+                                              }
+                                              await showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Dialog(
+                                                    elevation: 0,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.3,
+                                                        padding:
+                                                            EdgeInsets.all(20),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(16),
+                                                        ),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          20,
+                                                                      vertical:
+                                                                          10),
+                                                                  child:
+                                                                      Container(
+                                                                    padding:
+                                                                        EdgeInsets.all(
+                                                                            25),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      color: Color.fromARGB(
+                                                                          255,
+                                                                          255,
+                                                                          163,
+                                                                          163),
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                    ),
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .people_alt_outlined,
+                                                                      color: PrimaryColor()
                                                                           .red,
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            12),
+                                                                      size: 50,
+                                                                    ),
                                                                   ),
                                                                 ),
-                                                                child: c.isLoading
-                                                                        .value
-                                                                    ? SizedBox(
-                                                                        width:
-                                                                            20,
-                                                                        height:
-                                                                            20,
-                                                                        child:
-                                                                            CircularProgressIndicator(
-                                                                          color:
-                                                                              Colors.white,
-                                                                          strokeWidth:
-                                                                              2,
-                                                                        ),
-                                                                      )
-                                                                    : Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          SizedBox(
-                                                                              width: 8),
-                                                                          Text(
-                                                                            'Ya, Lanjutkan',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 14,
-                                                                              fontWeight: FontWeight.w600,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                              )),
-                                                          SizedBox(height: 5),
-                                                          ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              Get.back();
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade200,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                              ),
+                                                                SizedBox(
+                                                                    height: 25),
+                                                                Text(
+                                                                  "Pembatalan Penarikan Saldo",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize:
+                                                                        25,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                                SizedBox(
+                                                                    height: 10),
+                                                                Text(
+                                                                  'Anda akan mengembalikan saldo seperti sebelumnya. Lanjutkan?',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        15,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ],
                                                             ),
-                                                            child: Row(
+                                                            SizedBox(
+                                                                height: 10),
+                                                            Column(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .center,
                                                               children: [
+                                                                Obx(() =>
+                                                                    ElevatedButton(
+                                                                      onPressed: c
+                                                                              .isLoading
+                                                                              .value
+                                                                          ? null
+                                                                          : () async {
+                                                                              c.isLoading.value = true;
+                                                                              await c.addTransaksiOutMitra(c.selectedMitra.value, c.totalJumlah.toString(), c.totalSaldo.toString(), '6', c.selectedStartDate.value.toString(), c.selectedEndDate.value.toString());
+                                                                              await c.undoTarikSaldo();
+                                                                              c.selectedMitra.value = '';
+                                                                              await c.fetchTransaksiOutDet();
+                                                                              c.filterTransaksiOutDet();
+                                                                              c.filterAllTransaksiOutDet();
+                                                                              c.isLoading.value = false;
+                                                                              Navigator.pop(context);
+                                                                              Get.snackbar(
+                                                                                'Berhasil',
+                                                                                'Saldo berhasil dikembalikan seperti semula',
+                                                                                backgroundColor: Colors.green.withOpacity(0.8),
+                                                                                colorText: Colors.white,
+                                                                                icon: Icon(Icons.check_circle_outline, color: Colors.white),
+                                                                              );
+                                                                            },
+                                                                      style: ElevatedButton
+                                                                          .styleFrom(
+                                                                        backgroundColor:
+                                                                            Colors.red,
+                                                                        shape:
+                                                                            RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(12),
+                                                                        ),
+                                                                      ),
+                                                                      child: c.isLoading
+                                                                              .value
+                                                                          ? SizedBox(
+                                                                              width: 20,
+                                                                              height: 20,
+                                                                              child: CircularProgressIndicator(
+                                                                                color: Colors.white,
+                                                                                strokeWidth: 2,
+                                                                              ),
+                                                                            )
+                                                                          : Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                SizedBox(width: 8),
+                                                                                Text(
+                                                                                  'Ya, Lanjutkan',
+                                                                                  style: TextStyle(
+                                                                                    color: Colors.white,
+                                                                                    fontSize: 14,
+                                                                                    fontWeight: FontWeight.w600,
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                    )),
                                                                 SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Batal',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black54,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
+                                                                    height: 5),
+                                                                ElevatedButton(
+                                                                  onPressed:
+                                                                      () async {
+                                                                    Get.back();
+                                                                  },
+                                                                  style: ElevatedButton
+                                                                      .styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .grey
+                                                                            .shade200,
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              12),
+                                                                    ),
+                                                                  ),
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      SizedBox(
+                                                                          width:
+                                                                              8),
+                                                                      Text(
+                                                                        'Batal',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.black54,
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ),
                                                               ],
                                                             ),
-                                                          ),
-                                                        ],
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ],
-                                                  ),
-                                                ),
+                                                    ),
+                                                  );
+                                                },
                                               );
                                             },
+                                            child: Text('Batalkan Penarikan',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.white)),
                                           );
-                                        },
-                                        child: Text('Batalkan Penarikan',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.white)),
-                                      );
-                                    }),
+                                        }),
+                                      ],
+                                    ),
                                   ],
                                 ),
-                              ],
+                              ),
                             ),
                             SizedBox(height: 20),
                             Container(
@@ -779,11 +825,10 @@ class TransaksiOutMitraP extends StatelessWidget {
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Container(
-                                  width: MediaQuery.of(context).size.width *
-                                      (MediaQuery.of(context).orientation ==
-                                              Orientation.landscape
-                                          ? 1
-                                          : 1.3),
+                                  width: MediaQuery.of(context).orientation ==
+                                          Orientation.landscape
+                                      ? MediaQuery.of(context).size.width
+                                      : null,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(16),

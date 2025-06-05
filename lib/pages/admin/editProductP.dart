@@ -25,6 +25,7 @@ class _EditProductPState extends State<EditProductP> {
   final ProductController productController = Get.put(ProductController());
 
   final TextEditingController namaProdukController = TextEditingController();
+  final TextEditingController barcodeProdukController = TextEditingController();
   final gambarProdukController = FileImage(File(''));
   final TextEditingController hargaSatuanProdukController =
       TextEditingController();
@@ -42,19 +43,21 @@ class _EditProductPState extends State<EditProductP> {
     super.initState();
     item = Get.arguments;
     namaProdukController.text = item['nama_barang'] ?? '';
+    barcodeProdukController.text = item['barcode_barang']?.toString() ?? '';
     hargaSatuanProdukController.text = item['harga_satuan']?.toString() ?? '';
     hargaJualProdukController.text = item['harga_jual']?.toString() ?? '';
     stokProdukController.text = item['stok']?.toString() ?? '';
     hargaPackProdukController.text = item['harga_pack']?.toString() ?? '';
     jumlahIsiProdukController.text = item['jml_pcs_pack']?.toString() ?? '';
     editController.imageUrl.value =
-        "http://192.168.1.7/POS_CI/uploads/${item['gambar_barang']}";
+        "http://10.10.20.109/POS_CI/uploads/${item['gambar_barang']}";
     editController.hasNewImage.value = false;
     fetchData();
     editController.fetchAddOn();
     editController.editProduct(
       item['id']?.toString() ?? '',
       namaProdukController.text,
+      barcodeProdukController.text,
       gambarProdukController.file,
       editController.selectedKategori.string,
       editController.selectedTipe.string,
@@ -114,7 +117,7 @@ class _EditProductPState extends State<EditProductP> {
             children: [
               Container(
                 padding:
-                    EdgeInsets.only(bottom: 50, left: 50, right: 50, top: 100),
+                    EdgeInsets.only(bottom: 50, left: 50, right: 50, top: 50),
                 decoration: BoxDecoration(color: Colors.white),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,12 +141,21 @@ class _EditProductPState extends State<EditProductP> {
                       ],
                     ),
                     SizedBox(height: 30),
-                    buildInputLabel('Nama Produk', ' *'),
-                    buildTextField(
+                    AdminW().buildInputLabel('Nama Produk', ' *'),
+                    AdminW().buildTextField(
                       inputFormat: LengthLimitingTextInputFormatter(200),
                       controller: namaProdukController,
                       hintText: 'Masukkan nama produk',
                       prefixIcon: Icons.fastfood_outlined,
+                      type: TextInputType.name,
+                    ),
+                    SizedBox(height: 20),
+                    AdminW().buildInputLabel('Barcode Produk', ' '),
+                    AdminW().buildTextField(
+                      inputFormat: LengthLimitingTextInputFormatter(200),
+                      controller: barcodeProdukController,
+                      hintText: 'Masukkan barcode produk',
+                      prefixIcon: Icons.barcode_reader,
                       type: TextInputType.name,
                     ),
                     SizedBox(height: 20),
@@ -153,9 +165,9 @@ class _EditProductPState extends State<EditProductP> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              buildInputLabel("Kategori", " *"),
+                              AdminW().buildInputLabel("Kategori", " *"),
                               Obx(() {
-                                return buildDropdown(
+                                return AdminW().buildDropdown(
                                   selectedValue:
                                       editController.selectedKategori,
                                   label: 'Pilih Kategori',
@@ -163,7 +175,7 @@ class _EditProductPState extends State<EditProductP> {
                                   onChanged: (newValue) {
                                     setState(() {
                                       editController.selectedKategori.value =
-                                          newValue;
+                                          newValue ?? '';
                                     });
                                   },
                                   key: 'kategori',
@@ -177,9 +189,9 @@ class _EditProductPState extends State<EditProductP> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              buildInputLabel("Tipe", " *"),
+                              AdminW().buildInputLabel("Tipe", " *"),
                               Obx(() {
-                                return buildDropdown(
+                                return AdminW().buildDropdown(
                                   selectedValue: editController.selectedTipe,
                                   label: 'Pilih Tipe',
                                   items: editController.tipe,
@@ -216,13 +228,15 @@ class _EditProductPState extends State<EditProductP> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            buildInputLabel('Mitra Produk (Opsional)', ""),
-                            buildDropdown(
+                            AdminW()
+                                .buildInputLabel('Mitra Produk (Opsional)', ""),
+                            AdminW().buildDropdown(
                               selectedValue: editController.selectedMitra,
                               label: 'Pilih Mitra',
                               items: editController.mitra,
                               onChanged: (newValue) {
-                                editController.selectedMitra.value = newValue;
+                                editController.selectedMitra.value =
+                                    newValue ?? '';
                               },
                               key: 'nama',
                             ),
@@ -234,7 +248,7 @@ class _EditProductPState extends State<EditProductP> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildInputLabel('Add On', " *"),
+                        AdminW().buildInputLabel('Add On', " *"),
                         ElevatedButton(
                           onPressed: () async {
                             showDialog(
@@ -515,13 +529,20 @@ class _EditProductPState extends State<EditProductP> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                buildInputLabel('Harga Jual Per-pcs', " *"),
-                                buildTextField(
+                                AdminW().buildInputLabel(
+                                    'Harga Jual Per-pcs', " *"),
+                                AdminW().buildTextField(
                                   inputFormat: RupiahFormaters(),
                                   controller: hargaJualProdukController,
                                   hintText: 'Rp 5.500',
                                   prefixIcon: FontAwesomeIcons.moneyBill1Wave,
                                   type: TextInputType.number,
+                                  onChanged: (value) {
+                                    editController.hitungLaba(
+                                      editController.hargaDasar.value,
+                                      value,
+                                    );
+                                  },
                                 ),
                               ],
                             ),
@@ -533,8 +554,9 @@ class _EditProductPState extends State<EditProductP> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  buildInputLabel('Harga Dasar Per-pcs', " *"),
-                                  buildTextField(
+                                  AdminW().buildInputLabel(
+                                      'Harga Dasar Per-pcs', " *"),
+                                  AdminW().buildTextField(
                                     inputFormat: RupiahFormaters(),
                                     controller: hargaSatuanProdukController,
                                     hintText: 'Rp 5.000',
@@ -549,8 +571,8 @@ class _EditProductPState extends State<EditProductP> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    buildInputLabel('Tambah Stok', " *"),
-                    buildTextField(
+                    AdminW().buildInputLabel('Tambah Stok', " *"),
+                    AdminW().buildTextField(
                       inputFormat: RupiahFormaters(),
                       controller: stokProdukController,
                       hintText: 'Jumlah yang ditambahkan',
@@ -567,8 +589,8 @@ class _EditProductPState extends State<EditProductP> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  buildInputLabel('Harga Pack', " *"),
-                                  buildTextField(
+                                  AdminW().buildInputLabel('Harga Pack', " *"),
+                                  AdminW().buildTextField(
                                       inputFormat: RupiahFormaters(),
                                       controller: hargaPackProdukController,
                                       hintText: 'Rp 0',
@@ -595,8 +617,9 @@ class _EditProductPState extends State<EditProductP> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  buildInputLabel('Jumlah Isi Per-pack', " *"),
-                                  buildTextField(
+                                  AdminW().buildInputLabel(
+                                      'Jumlah Isi Per-pack', " *"),
+                                  AdminW().buildTextField(
                                       inputFormat: RupiahFormaters(),
                                       controller: jumlahIsiProdukController,
                                       hintText: '0 pcs',
@@ -619,7 +642,7 @@ class _EditProductPState extends State<EditProductP> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        buildInputLabel('Gambar', " *"),
+                        AdminW().buildInputLabel('Gambar', " *"),
                       ],
                     ),
                     GestureDetector(
@@ -627,62 +650,67 @@ class _EditProductPState extends State<EditProductP> {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
+                            final isLandscape =
+                                MediaQuery.of(context).orientation ==
+                                    Orientation.landscape;
+
                             return Dialog(
-                              elevation: 0,
+                              elevation: 2,
                               backgroundColor: Colors.transparent,
-                              child: Container(
-                                padding: EdgeInsets.all(40),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(height: 20),
-                                    Row(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  double dialogWidth =
+                                      constraints.maxWidth * 0.5;
+                                  double dialogHeight = isLandscape
+                                      ? constraints.maxHeight * 0.6
+                                      : constraints.maxHeight * 0.25;
+
+                                  return Container(
+                                    width: dialogWidth,
+                                    height: dialogHeight,
+                                    padding: EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            // Action for Camera
-                                            editController.pickImageCam();
-                                          },
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.25,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.3,
-                                            padding: EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: PrimaryColor().green,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black26,
-                                                  blurRadius: 6,
-                                                  offset: Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Center(
+                                        // Kamera Button
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              editController.pickImageCam();
+                                            },
+                                            child: Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 8),
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: PrimaryColor().green,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black26,
+                                                    blurRadius: 6,
+                                                    offset: Offset(0, 4),
+                                                  ),
+                                                ],
+                                              ),
                                               child: Column(
-                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Icon(Icons.camera_alt,
                                                       color: Colors.white,
-                                                      size: 60),
+                                                      size: 40),
                                                   SizedBox(height: 10),
                                                   Text(
                                                     'Kamera',
                                                     style: TextStyle(
-                                                      fontSize: 25,
+                                                      fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Colors.white,
@@ -693,46 +721,41 @@ class _EditProductPState extends State<EditProductP> {
                                             ),
                                           ),
                                         ),
-                                        SizedBox(width: 20),
-                                        GestureDetector(
-                                          onTap: () {
-                                            // Action for Gallery
-                                            editController.pickImage();
-                                          },
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.25,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.3,
-                                            padding: EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: PrimaryColor().blue,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black26,
-                                                  blurRadius: 6,
-                                                  offset: Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Center(
+
+                                        // Galeri Button
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              editController.pickImage();
+                                            },
+                                            child: Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 8),
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: PrimaryColor().blue,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black26,
+                                                    blurRadius: 6,
+                                                    offset: Offset(0, 4),
+                                                  ),
+                                                ],
+                                              ),
                                               child: Column(
-                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Icon(Icons.photo_library,
                                                       color: Colors.white,
-                                                      size: 60),
+                                                      size: 40),
                                                   SizedBox(height: 10),
                                                   Text(
                                                     'Galeri',
                                                     style: TextStyle(
-                                                      fontSize: 25,
+                                                      fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Colors.white,
@@ -745,8 +768,8 @@ class _EditProductPState extends State<EditProductP> {
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  );
+                                },
                               ),
                             );
                           },
@@ -824,16 +847,34 @@ class _EditProductPState extends State<EditProductP> {
                       }),
                     ),
                     SizedBox(height: 40),
-                    Obx(() => Text(
-                          'Harga Dasar: ' +
-                              editController.formatRupiah(
-                                  editController.hargaDasar.value),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade700,
+                    Obx(() => Visibility(
+                          visible: editController.hargaPack.value == false,
+                          child: Text(
+                            'Harga Dasar Per-pcs: ' +
+                                editController.formatRupiah(
+                                    editController.hargaDasar.value),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
                           ),
                         )),
+                    SizedBox(width: 20),
+                    Obx(() => Visibility(
+                          visible: editController.hargaPack.value == false,
+                          child: Text(
+                            'Laba Per-pcs: ' +
+                                editController.formatRupiah(
+                                    editController.totalLaba.value),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        )),
+                    SizedBox(height: 20),
                     Container(
                       width: double.infinity,
                       height: 50,
@@ -843,6 +884,19 @@ class _EditProductPState extends State<EditProductP> {
                                 : () async {
                                     File? imageFile =
                                         editController.imagePath.value;
+                                    if (int.parse(
+                                            editController.totalLaba.value) <
+                                        0) {
+                                      Get.snackbar(
+                                        'Gagal',
+                                        'Laba tidak boleh minus, Silahkan cek kembali data produk anda!',
+                                        backgroundColor:
+                                            Colors.red.withOpacity(0.5),
+                                        icon: Icon(Icons.crisis_alert,
+                                            color: Colors.black),
+                                      );
+                                      return;
+                                    }
                                     if (editController.selectedTipe.value ==
                                         '1') {
                                       final int hargaPack = int.tryParse(
@@ -863,6 +917,7 @@ class _EditProductPState extends State<EditProductP> {
                                     await editController.editProduct(
                                       item['id'],
                                       namaProdukController.text,
+                                      barcodeProdukController.text,
                                       imageFile,
                                       editController.selectedKategori.string,
                                       editController.selectedTipe.string,
@@ -880,7 +935,7 @@ class _EditProductPState extends State<EditProductP> {
                                       fromButton: true,
                                     );
 
-                                    await productController.fetchProduk();
+                                    await productController.refresh();
                                   },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: PrimaryColor().blue,
@@ -926,137 +981,6 @@ class _EditProductPState extends State<EditProductP> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget buildInputLabel(String label, String label2) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          Text(label2,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: DarkColor().red,
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData prefixIcon,
-    required TextInputType type,
-    required inputFormat,
-    Function(String)? onChanged,
-    // controller
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: TextField(
-        inputFormatters: [inputFormat],
-        keyboardType: type,
-        controller: controller,
-        cursorColor: PrimaryColor().blue,
-        style: TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          prefixIcon: Icon(
-            prefixIcon,
-            color: Colors.grey.shade600,
-            size: 20,
-          ),
-          hintText: hintText,
-          hintStyle: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade400,
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-        onChanged: onChanged,
-      ),
-    );
-  }
-
-  Widget buildDropdown({
-    required Rxn<String> selectedValue,
-    required String label,
-    required List<Map<String, dynamic>> items,
-    required ValueChanged<String?> onChanged,
-    required String key,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: label,
-                border: InputBorder.none,
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              ),
-              value: items.any(
-                      (item) => item['id'].toString() == selectedValue.value)
-                  ? selectedValue.value
-                  : null,
-              icon: SizedBox.shrink(),
-              style: TextStyle(fontSize: 14, color: Colors.black87),
-              onChanged: (newValue) {
-                selectedValue.value = newValue;
-                onChanged(newValue);
-              },
-              items: [
-                DropdownMenuItem<String>(
-                  value: null,
-                  child: Text('${label}'),
-                ),
-                ...items.map<DropdownMenuItem<String>>((item) {
-                  return DropdownMenuItem<String>(
-                    value: item['id'].toString(),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        item[key] ?? 'No Name',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Icon(Icons.keyboard_arrow_down,
-                color: Colors.grey.shade600, size: 20),
-          ),
-        ],
       ),
     );
   }

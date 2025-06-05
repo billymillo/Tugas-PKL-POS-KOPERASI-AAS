@@ -17,10 +17,13 @@ class AddPageController extends GetxController {
   final ApiService apiService = ApiService();
   var url = ApiService.baseUrl + '/product';
   var urlRaw = ApiService.baseUrl;
+  TextEditingController searchController = TextEditingController();
 
   var selectedTipe = Rxn<String>();
   var selectedKategori = Rxn<String>();
   var selectedMitra = Rxn<String>();
+  var selectedBank = Rxn<String>();
+
   var selectedAddOn = <Map<String, dynamic>>[].obs;
   var imagePath = Rxn<File>();
   var imagePathK = Rxn<File>();
@@ -32,13 +35,18 @@ class AddPageController extends GetxController {
   RxBool hargaPack = true.obs;
   RxBool harga = true.obs;
   RxString hargaDasar = ''.obs;
+  RxString totalLaba = ''.obs;
 
   var isLoading = false.obs;
   var produk = <Map<String, dynamic>>[].obs;
   var tipe = <Map<String, dynamic>>[].obs;
   var kategori = <Map<String, dynamic>>[].obs;
   var mitra = <Map<String, dynamic>>[].obs;
+  var banks = <Map<String, dynamic>>[].obs;
   var addOn = <Map<String, dynamic>>[].obs;
+
+  var filteredBank = <Map<String, dynamic>>[].obs;
+  RxString searchQuery = ''.obs;
 
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
@@ -53,6 +61,15 @@ class AddPageController extends GetxController {
     fetchMitra();
     fetchTipe();
     fetchKategori();
+    fetchBank();
+  }
+
+  String get KodeBank {
+    var selected = banks.firstWhere(
+      (m) => m['nama'] == selectedBank.value,
+      orElse: () => {'kode': 'Non Member'},
+    );
+    return selected['kode'] ?? 0;
   }
 
   void hitungHargaDasar(String hargaPackText, String jumlahIsiText) {
@@ -63,6 +80,17 @@ class AddPageController extends GetxController {
       hargaDasar.value = (hargaPack ~/ jumlahIsi).toString();
     } else {
       hargaDasar.value = '0';
+    }
+  }
+
+  void hitungLaba(String hargaDasarText, String hargaJualText) {
+    final hargaDasar = int.tryParse(hargaDasarText) ?? 0;
+    final hargaJual = int.tryParse(hargaJualText.replaceAll('.', '')) ?? 1;
+
+    if (hargaJual > 0) {
+      totalLaba.value = (hargaJual - hargaDasar).toString();
+    } else {
+      totalLaba.value = '0';
     }
   }
 
@@ -95,6 +123,50 @@ class AddPageController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<void> fetchBank() async {
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(urlRaw + "/bank"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          var bankData = List<Map<String, dynamic>>.from(jsonData['data']);
+          banks.value = bankData;
+        } else {
+          banks.value = [];
+        }
+      } else {
+        banks.value = [];
+      }
+    } catch (e) {
+      print('Error fetching bank: $e');
+      banks.value = [];
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void searchBank(String query, List<Map<String, dynamic>> bankList) {
+    searchQuery.value = query;
+    if (query.isEmpty) {
+      filteredBank.assignAll(bankList);
+    } else {
+      filteredBank.assignAll(bankList.where((banks) {
+        final nama = banks['nama'].toString().toLowerCase();
+        final kode = banks['kode'].toString().toLowerCase();
+
+        return nama.contains(query.toLowerCase()) ||
+            kode.contains(query.toLowerCase());
+      }).toList());
+    }
+  }
+
+  void clearSearch() {
+    searchController.clear();
+    searchQuery.value = '';
+    filteredBank.assignAll([]);
   }
 
   Future<void> fetchAddOn() async {
@@ -179,11 +251,11 @@ class AddPageController extends GetxController {
 
   Future<void> addProduct(
     String nama_barang,
+    String barcode,
     File gambar_barang,
     String id_kategori_barang,
     String id_tipe_barang,
     String id_mitra_barang,
-    String id_add_on,
     String harga_pack,
     String jml_pcs_pack,
     String harga_satuan,
@@ -191,19 +263,22 @@ class AddPageController extends GetxController {
     String stok,
   ) async {
     isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    String? userInput = prefs.getString('name') ?? 'system';
     try {
       final response = await apiService.addProduk(
         nama_barang,
+        barcode,
         gambar_barang,
         id_kategori_barang,
         id_tipe_barang,
         id_mitra_barang,
-        id_add_on,
         harga_pack,
         jml_pcs_pack,
         harga_satuan,
         harga_jual,
         stok,
+        userInput,
       );
       if (response['status'] == true) {
         Get.snackbar(

@@ -51,185 +51,191 @@ class _OpNamePageState extends State<OpNamePage> {
                             return Dialog(
                               elevation: 0,
                               backgroundColor: Colors.transparent,
-                              child: Container(
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                padding: EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 10),
-                                          child: Container(
-                                            padding: EdgeInsets.all(25),
-                                            decoration: BoxDecoration(
-                                              color: Color.fromARGB(
-                                                  255, 163, 171, 255),
-                                              shape: BoxShape.circle,
+                              child: SingleChildScrollView(
+                                child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
+                                  padding: EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20, vertical: 10),
+                                            child: Container(
+                                              padding: EdgeInsets.all(25),
+                                              decoration: BoxDecoration(
+                                                color: Color.fromARGB(
+                                                    255, 163, 171, 255),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.all_inbox_rounded,
+                                                color: PrimaryColor().blue,
+                                                size: 50,
+                                              ),
                                             ),
-                                            child: Icon(
-                                              Icons.all_inbox_rounded,
-                                              color: PrimaryColor().blue,
-                                              size: 50,
+                                          ),
+                                          SizedBox(height: 25),
+                                          Text(
+                                            "Tambah Opname",
+                                            style: TextStyle(
+                                              color: Colors.black87,
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(height: 25),
-                                        Text(
-                                          "Tambah Opname",
-                                          style: TextStyle(
-                                            color: Colors.black87,
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold,
+                                          SizedBox(height: 10),
+                                          Text(
+                                            'Anda akan membuat data baru Opname. Lanjutkan?',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 15,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
-                                        ),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          'Anda akan membuat data baru Opname. Lanjutkan?',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 15,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        Obx(() => Row(
+                                          Obx(() => Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  ChoiceChip(
+                                                    label: Text('Retail'),
+                                                    selected: controller
+                                                            .selectedJenis
+                                                            .value ==
+                                                        1,
+                                                    onSelected: (selected) {
+                                                      if (selected)
+                                                        controller.selectedJenis
+                                                            .value = 1;
+                                                    },
+                                                    selectedColor:
+                                                        PrimaryColor().blue,
+                                                    backgroundColor:
+                                                        Colors.grey.shade200,
+                                                    labelStyle: TextStyle(
+                                                      color: controller
+                                                                  .selectedJenis
+                                                                  .value ==
+                                                              1
+                                                          ? Colors.white
+                                                          : Colors.black87,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 10),
+                                                  ChoiceChip(
+                                                    label: Text('Non Retail'),
+                                                    selected: controller
+                                                            .selectedJenis
+                                                            .value ==
+                                                        2,
+                                                    onSelected: (selected) {
+                                                      if (selected)
+                                                        controller.selectedJenis
+                                                            .value = 2;
+                                                    },
+                                                    selectedColor:
+                                                        PrimaryColor().blue,
+                                                    backgroundColor:
+                                                        Colors.grey.shade200,
+                                                    labelStyle: TextStyle(
+                                                      color: controller
+                                                                  .selectedJenis
+                                                                  .value ==
+                                                              2
+                                                          ? Colors.white
+                                                          : Colors.black87,
+                                                    ),
+                                                  ),
+                                                ],
+                                              )),
+                                        ],
+                                      ),
+                                      SizedBox(height: 10),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              Get.back();
+                                              await controller.addOpname(
+                                                  status.toString(),
+                                                  controller.selectedJenis.value
+                                                      .toString());
+                                              await controller.fetchOpName();
+                                              controller.isLoading.value =
+                                                  false;
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                ChoiceChip(
-                                                  label: Text('Retail'),
-                                                  selected: controller
-                                                          .selectedJenis
-                                                          .value ==
-                                                      1,
-                                                  onSelected: (selected) {
-                                                    if (selected)
-                                                      controller.selectedJenis
-                                                          .value = 1;
-                                                  },
-                                                  selectedColor:
-                                                      PrimaryColor().blue,
-                                                  backgroundColor:
-                                                      Colors.grey.shade200,
-                                                  labelStyle: TextStyle(
-                                                    color: controller
-                                                                .selectedJenis
-                                                                .value ==
-                                                            1
-                                                        ? Colors.white
-                                                        : Colors.black87,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 10),
-                                                ChoiceChip(
-                                                  label: Text('Non Retail'),
-                                                  selected: controller
-                                                          .selectedJenis
-                                                          .value ==
-                                                      2,
-                                                  onSelected: (selected) {
-                                                    if (selected)
-                                                      controller.selectedJenis
-                                                          .value = 2;
-                                                  },
-                                                  selectedColor:
-                                                      PrimaryColor().blue,
-                                                  backgroundColor:
-                                                      Colors.grey.shade200,
-                                                  labelStyle: TextStyle(
-                                                    color: controller
-                                                                .selectedJenis
-                                                                .value ==
-                                                            2
-                                                        ? Colors.white
-                                                        : Colors.black87,
+                                                SizedBox(width: 8),
+                                                Text(
+                                                  'Buat Opname',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
                                               ],
-                                            )),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () async {
-                                            Get.back();
-                                            await controller.addOpname(
-                                                status.toString(),
-                                                controller.selectedJenis.value
-                                                    .toString());
-                                            await controller.fetchOpName();
-                                            controller.isLoading.value = false;
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.blue,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
                                             ),
                                           ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SizedBox(width: 8),
-                                              Text(
-                                                'Buat Opname',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                          SizedBox(height: 5),
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              Get.back();
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: 5),
-                                        ElevatedButton(
-                                          onPressed: () async {
-                                            Get.back();
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                Colors.grey.shade200,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                SizedBox(width: 8),
+                                                Text(
+                                                  'Batal',
+                                                  style: TextStyle(
+                                                    color: Colors.black54,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              SizedBox(width: 8),
-                                              Text(
-                                                'Batal',
-                                                style: TextStyle(
-                                                  color: Colors.black54,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
                           },
-                        );
+                        ).then((_) {
+                          controller.selectedJenis.value = 0;
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
@@ -256,11 +262,12 @@ class _OpNamePageState extends State<OpNamePage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Obx(() {
                       return Expanded(
                         child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 10),
                             itemCount: controller.opname.length,
                             itemBuilder: (context, index) {
                               final item = controller.opname[index];
@@ -351,7 +358,8 @@ class _OpNamePageState extends State<OpNamePage> {
                               );
                             }),
                       );
-                    })
+                    }),
+                    SizedBox(height: 40),
                   ],
                 ),
               ),

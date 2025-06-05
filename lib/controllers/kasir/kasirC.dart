@@ -20,7 +20,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class KasirC extends GetxController {
   TextEditingController searchController = TextEditingController();
   final LibraryController poinController = Get.put(LibraryController());
+  final FocusNode barcodeFocusNode = FocusNode();
   var saldoController = TextEditingController();
+  var topUpController = TextEditingController();
 
   var listProduk = <Map<String, dynamic>>[].obs;
   RxList<dynamic> selectedVarian = [].obs;
@@ -38,6 +40,8 @@ class KasirC extends GetxController {
   var metodePembayaran = 0.obs;
   var statusTr = 0.obs;
   var statusId = 0.obs;
+  String qrData =
+      '00020101021126570011ID.DANA.WWW011893600915335349417602093534941760303UMI51440014ID.CO.QRIS.WWW0215ID10222268651970303UMI5204541153033605802ID5925Koperasi Anugrah Artha Ab6010Kota Depok6105164126304A768';
 
   final ApiServiceTr apiServiceTr = ApiServiceTr();
   var url = ApiService.baseUrl + '/product';
@@ -58,6 +62,8 @@ class KasirC extends GetxController {
   var transaksiId = ''.obs;
 
   var isLoading = true.obs;
+  var isPrinting = false.obs;
+
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
   BluetoothDevice? device;
   RxBool isConnected = false.obs;
@@ -65,19 +71,21 @@ class KasirC extends GetxController {
   var jumlahPesanan = 0.obs;
 
   var saldoInput = 0.obs;
+  var topUpInput = 0.obs;
 
   double get totalHarga {
     double total = 0;
+
     for (var produk in listProduk) {
       if (produk['listDibeli'] != null) {
         for (var item in produk['listDibeli']) {
           total += double.tryParse(item['harga'].toString()) ?? 0;
+
           var addOns = item['addOn'];
           if (addOns is List && addOns.isNotEmpty && addOns.first != '1') {
             for (var id in addOns) {
-              double hargaAddOn =
+              total +=
                   double.tryParse(addOnHarga(id.toString()).toString()) ?? 0;
-              total += hargaAddOn;
             }
           }
         }
@@ -85,15 +93,25 @@ class KasirC extends GetxController {
     }
 
     double diskon = 0;
-    double saldo = 0;
     if (checkbox.value && double.tryParse(MemberPoin.toString())! < total) {
-      diskon = (double.tryParse(MemberPoin.toString()) ?? 0) * 1;
-    }
-    if (checkboxSaldo.value && saldoController.text.isNotEmpty) {
-      saldo = double.tryParse(saldoInput.toString()) ?? 0;
+      diskon = double.tryParse(MemberPoin.toString()) ?? 0;
     }
 
-    return total - diskon - saldo;
+    double saldoDigunakan = 0;
+    double saldo = double.tryParse(MemberSaldo.toString()) ?? 0;
+    double totalHargaDiskon = total - diskon;
+
+    if (checkboxSaldo.value) {
+      if (totalHargaDiskon > saldo) {
+        return totalHargaDiskon;
+      } else if (totalHargaDiskon == saldo) {
+        return 0;
+      } else {
+        return 0;
+      }
+    }
+
+    return total - diskon - saldoDigunakan;
   }
 
   double get totalHargaSebelum {
@@ -115,9 +133,8 @@ class KasirC extends GetxController {
     } else {
       if (checkbox.value == false) {
         return (totalHarga ~/ 100) + currentMemberPoin;
-      } else if (checkbox.value &&
-          double.tryParse(MemberPoin.toString())! < totalHarga) {
-        return currentMemberPoin;
+      } else if (checkbox.value == true) {
+        return 0;
       } else {
         return 0;
       }
@@ -140,8 +157,42 @@ class KasirC extends GetxController {
     }
   }
 
-  double get potonganHarga {
-    return poinDapat * 100.0;
+  int get saldoUpdate {
+    if (selectedMember.value == null) return 0;
+
+    int currentMemberSaldo = int.tryParse(MemberSaldo) ?? 0;
+    int poin = int.tryParse(MemberPoin) ?? 0;
+
+    double total = 0;
+    for (var produk in listProduk) {
+      if (produk['listDibeli'] != null) {
+        for (var item in produk['listDibeli']) {
+          total += double.tryParse(item['harga'].toString()) ?? 0;
+
+          var addOns = item['addOn'];
+          if (addOns is List && addOns.isNotEmpty && addOns.first != '1') {
+            for (var id in addOns) {
+              total +=
+                  double.tryParse(addOnHarga(id.toString()).toString()) ?? 0;
+            }
+          }
+        }
+      }
+    }
+    int diskon = checkbox.value ? poin : 0;
+    int totalHargaDiskon = (total - diskon).round();
+
+    if (checkboxSaldo.value) {
+      if (totalHargaDiskon > currentMemberSaldo) {
+        return 0;
+      } else if (totalHargaDiskon == currentMemberSaldo) {
+        return currentMemberSaldo;
+      } else {
+        return totalHargaDiskon;
+      }
+    } else {
+      return 0;
+    }
   }
 
   String get MemberName {
@@ -264,6 +315,7 @@ class KasirC extends GetxController {
     }
     print("Jumlah Dibeli: ${filteredProduk[i]['jumlahDibeli']}");
     print("List Dibeli: ${filteredProduk[i]['listDibeli']}");
+    print('banyak dibeli ${banyakDibeli.value}');
   }
 
   void simpanJumlahDibeli(
@@ -279,8 +331,8 @@ class KasirC extends GetxController {
     required String nama,
     required List<String> addOn,
   }) {
-    for (var i = 0; i < filteredProduk.length; i++) {
-      var produk = filteredProduk[i];
+    for (var i = 0; i < listProduk.length; i++) {
+      var produk = listProduk[i];
       if (produk['nama'] == nama) {
         for (var j = 0; j < produk['listDibeli'].length; j++) {
           var item = produk['listDibeli'][j];
@@ -301,7 +353,7 @@ class KasirC extends GetxController {
             produk['listDibeli'].removeAt(j);
             produk['jumlahDibeli'] -= 1;
             banyakDibeli.value -= 1;
-            filteredProduk.refresh();
+            filteredProduk.refresh(); // tetap refresh tampilan
             return;
           }
         }
@@ -313,15 +365,19 @@ class KasirC extends GetxController {
     searchQuery.value = query;
     filteredProduk.assignAll(listProduk.where((produk) {
       return produk['nama'].toLowerCase().contains(query.toLowerCase()) ||
-          produk['kategori_name']
+          produk['barcode']
               .toString()
               .toLowerCase()
               .contains(query.toLowerCase()) ||
-          produk['tipe_name']
+          produk['kategori']
               .toString()
               .toLowerCase()
               .contains(query.toLowerCase()) ||
-          produk['mitra_name']
+          produk['tipe']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()) ||
+          produk['mitra']
               .toString()
               .toLowerCase()
               .contains(query.toLowerCase());
@@ -329,10 +385,10 @@ class KasirC extends GetxController {
   }
 
   Future<void> fetchProduk() async {
-    var url = ApiService.baseUrl + '/product';
+    var url = ApiService.baseUrl;
     try {
       isLoading(true);
-      var response = await http.get(Uri.parse(url + "/produk"));
+      var response = await http.get(Uri.parse(url + "/product"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
@@ -342,7 +398,7 @@ class KasirC extends GetxController {
           throw Exception('Gagal mengambil data produk');
         }
       } else {
-        throw Exception('Gagal load data');
+        throw Exception('Gagal load data api');
       }
     } catch (e) {
       print('Error: $e');
@@ -403,6 +459,7 @@ class KasirC extends GetxController {
     listProduk.value = List<Map<String, dynamic>>.from(data.map((item) => {
           "id": item['id'],
           "nama": item['nama_barang'],
+          "barcode": item['barcode_barang'].toString(),
           "harga": item['harga_jual'].toString(),
           "harga_satuan": item['harga_satuan'].toString(),
           "tipe": item['id_tipe_barang'].toString(),
@@ -412,7 +469,7 @@ class KasirC extends GetxController {
           "jumlah": item['stok'].toString(),
           "jumlahDibeli": 0,
           "listDibeli": [],
-          "foto": "http://192.168.1.7/POS_CI/uploads/${item['gambar_barang']}",
+          "foto": "http://10.10.20.109/POS_CI/uploads/${item['gambar_barang']}",
         }));
   }
 
@@ -560,6 +617,7 @@ class KasirC extends GetxController {
     await fetchKategori();
     await fetchMember();
     await fetchStatus();
+    banyakDibeli.value = 0;
   }
 
   void searchMember(
@@ -578,63 +636,24 @@ class KasirC extends GetxController {
     }
   }
 
-  void simpanSaldo() {
-    int inputSaldo = int.tryParse(saldoController.text) ?? 0;
-    int memberSaldo = int.tryParse(MemberSaldo) ?? 0;
-
-    if (inputSaldo > memberSaldo) {
-      Get.snackbar(
-        "Saldo Melebihi",
-        "Jumlah saldo yang dimasukkan melebihi saldo member",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    if (inputSaldo > totalHarga.toInt()) {
-      Get.snackbar(
-        "Melebihi Total",
-        "Saldo yang dimasukkan melebihi total harga",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-    saldoInput.value = inputSaldo;
-  }
-
   void clearSearch() {
     searchController.clear();
     searchQuery.value = '';
     filteredMembers.assignAll([]);
   }
 
-  Future<void> tambahPoin(
+  Future<void> ubahPoin(
     String id,
     String poin,
   ) async {
     isLoading.value = true;
     try {
-      final response = await apiServiceTr.tambahPoin(
+      final response = await apiServiceTr.ubahPoin(
         id,
         poin,
       );
       if (response['status'] == true) {
-        Get.snackbar(
-          'Berhasil',
-          'Poin Member berhasil ditambahkan ke Member',
-          colorText: Colors.white,
-          backgroundColor: Colors.green,
-          icon: Icon(Icons.check_circle, color: Colors.white),
-        );
-      } else {
-        Get.snackbar(
-          'Non Member',
-          'Pembelian Berjenis Non Member',
-          backgroundColor: Colors.blue.withOpacity(0.5),
-          icon: Icon(Icons.error, color: Colors.white),
-        );
+        print('Berhasil' + response['message']);
       }
     } catch (e) {
       print(e);
@@ -649,7 +668,7 @@ class KasirC extends GetxController {
     }
   }
 
-  Future<void> kurangSaldo(
+  Future<void> ubahSaldo(
     String id,
     String saldo,
   ) async {
@@ -660,20 +679,7 @@ class KasirC extends GetxController {
         saldo,
       );
       if (response['status'] == true) {
-        Get.snackbar(
-          'Berhasil',
-          'Berhasil Saldo Member telah dipakai',
-          colorText: Colors.white,
-          backgroundColor: Colors.green,
-          icon: Icon(Icons.check_circle, color: Colors.white),
-        );
-      } else {
-        Get.snackbar(
-          'Non Member',
-          'Pembelian Berjenis Non Member',
-          backgroundColor: Colors.blue.withOpacity(0.5),
-          icon: Icon(Icons.error, color: Colors.white),
-        );
+        print(response['message']);
       }
     } catch (e) {
       print(e);
@@ -747,7 +753,7 @@ class KasirC extends GetxController {
 
   Future<void> addTransaksiOut(
     String? idMember,
-    String produk,
+    String jumlah,
     String metodePem,
     String totalTr,
     String? diskon,
@@ -764,7 +770,7 @@ class KasirC extends GetxController {
     try {
       final response = await ApiServiceTr.TransaksiOut(
         idMember ?? '',
-        produk,
+        jumlah,
         metodePem,
         totalTr,
         diskon ?? '',
@@ -839,12 +845,49 @@ class KasirC extends GetxController {
     );
     try {
       if (response['status'] == true) {
+        print(response['message']);
+      } else if (response['status'] == false) {
+        Get.snackbar(
+          'Gagal',
+          response['message'],
+          backgroundColor: Colors.red.withOpacity(0.8),
+          colorText: Colors.white,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar(
+        'Gagal',
+        e.toString(),
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> topupSaldo(
+      String idMember, String totalKasbon, String idMetode) async {
+    isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    String? userInput = prefs.getString('name') ?? 'system';
+    final response = await ApiServiceTr.addTopup(
+      idMember,
+      totalKasbon,
+      idMetode,
+      userInput,
+    );
+    try {
+      if (response['status'] == true) {
         Get.snackbar(
           'Berhasil',
           response['message'],
-          backgroundColor: Colors.blue.withOpacity(0.8),
+          backgroundColor: Colors.green.withOpacity(0.8),
           colorText: Colors.white,
-          icon: Icon(Icons.check_circle, color: Colors.white),
+          icon: Icon(Icons.check_circle_outline, color: Colors.white),
         );
       } else if (response['status'] == false) {
         Get.snackbar(
@@ -1103,64 +1146,66 @@ class KasirC extends GetxController {
       // Loop here
       Map<String, Map<String, dynamic>> groupedProducts = {};
 
-      for (var i = 0; i < listProduk.length; i++) {
-        var produk = listProduk[i];
-        var namaProduk = produk['nama'];
-        var idProduk = produk['id_produk'].toString();
-
-        if (produk['listDibeli'].isNotEmpty) {
+      for (var produk in listProduk) {
+        if (produk['listDibeli'] != null && produk['listDibeli'].isNotEmpty) {
           for (var item in produk['listDibeli']) {
-            var harga = double.parse(item['harga'].toString());
-            List<dynamic> addonList = item['addOn'] ?? [];
-
-            // Sort dan gabungkan ID addOn agar konsisten
-            List<String> addonIds = addonList.map((a) => a.toString()).toList();
-            addonIds.sort();
+            String idProduk = item['id'].toString();
+            String namaProduk = produk['nama'];
+            int jumlah = int.tryParse(item['Jumlah'].toString()) ?? 1;
+            int hargaJual = int.tryParse(item['harga_jual'].toString()) ?? 0;
+            List<dynamic> addOnList = item['addOn'] ?? [];
+            List<String> addonIds = addOnList.map((a) => a.toString()).toList()
+              ..sort();
             String addonKey = addonIds.join(',');
-
-            // Kombinasi key unik berdasarkan produk dan addon
             String key = '$idProduk|$addonKey';
+
+            int totalAddOnHarga = 0;
+            for (var addOnId in addonIds) {
+              totalAddOnHarga += addOnHarga(addOnId);
+            }
 
             if (!groupedProducts.containsKey(key)) {
               groupedProducts[key] = {
                 'nama': namaProduk,
-                'harga': harga,
-                'jumlah': 1,
+                'jumlah': jumlah,
+                'harga_jual': hargaJual,
+                'totalAddOn': totalAddOnHarga,
                 'addOn': addonIds,
               };
             } else {
-              groupedProducts[key]!['jumlah'] += 1;
+              groupedProducts[key]!['jumlah'] += jumlah;
+              groupedProducts[key]!['totalAddOn'] += totalAddOnHarga;
             }
           }
         }
       }
+
       groupedProducts.forEach((key, value) {
         String nama = value['nama'];
-        double harga = value['harga'];
+        int hargaSatuan = value['harga_satuan'];
         int jumlah = value['jumlah'];
-        double totalHarga = harga;
-        double totalHargaAddOn = 0;
+        int totalAddOnHarga = value['totalAddOn'];
+        List<String> addonIds = value['addOn'];
 
-        String formattedTotal =
+        int hargaPerItem =
+            hargaSatuan + (addonIds.isEmpty ? 0 : totalAddOnHarga ~/ jumlah);
+        int totalHarga = hargaPerItem * jumlah;
+
+        String formattedHargaPerItem =
+            NumberFormat('#,##0', 'id_ID').format(hargaPerItem);
+        String formattedTotalHarga =
             NumberFormat('#,##0', 'id_ID').format(totalHarga);
 
-        // Cetak add-on jika ada
-        List<String> addonIds = value['addOn'];
-        for (var addOnId in addonIds) {
-          totalHargaAddOn += addOnHarga(addOnId);
-        }
-        double hargaSatuanDenganAddOn = harga + totalHargaAddOn;
-        String formattedTotalHarga = NumberFormat('#,##0', 'id_ID')
-            .format(hargaSatuanDenganAddOn * jumlah);
         printer.printLeftRight("$nama", "$formattedTotalHarga", 0);
-        printer.printLeftRight("Qty: $jumlah x $formattedTotal", "", 0);
+        printer.printLeftRight("Qty: $jumlah x $formattedHargaPerItem", "", 0);
+
         if (addonIds.isNotEmpty) {
           for (var addOnId in addonIds) {
             String namaAddOn = addOnName(addOnId);
             int hargaAddOn = addOnHarga(addOnId);
             String hargaAddOnFormat =
                 NumberFormat('#,##0', 'id_ID').format(hargaAddOn);
-            printer.printCustom(" + $namaAddOn ($hargaAddOnFormat) x 2", 0, 0);
+            printer.printCustom(" + $namaAddOn ($hargaAddOnFormat)", 0, 0);
           }
         }
       });

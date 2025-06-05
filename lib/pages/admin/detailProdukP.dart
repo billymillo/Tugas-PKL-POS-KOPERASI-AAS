@@ -1,5 +1,6 @@
 import 'package:bluetooth_thermal_printer_example/controllers/admin/productC.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -42,7 +43,7 @@ class DetailProdukP extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
                       image: NetworkImage(
-                        "http://192.168.1.7/POS_CI/uploads/${item['gambar_barang']}",
+                        "http://10.10.20.109/POS_CI/uploads/${item['gambar_barang']}",
                       ),
                       fit: BoxFit.cover,
                     ),
@@ -88,8 +89,6 @@ class DetailProdukP extends StatelessWidget {
                             buildInfoRow("Tipe", item['tipe_name']),
                             buildInfoRow("Mitra",
                                 item['mitra_name'] ?? "Tidak Memiliki Mitra"),
-                            buildInfoRow("Add On",
-                                item['add_on_name'] ?? "Tidak Memiliki Add On"),
                             buildInfoRow("Harga Satuan",
                                 "Rp${NumberFormat('#,##0', 'id_ID').format(double.parse(item['harga_satuan'].toString()))}"),
                             buildInfoRow("Harga Jual",
@@ -108,179 +107,20 @@ class DetailProdukP extends StatelessWidget {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Dialog(
-                                    elevation: 0,
-                                    backgroundColor: Colors.transparent,
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.5,
-                                      padding: EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 10),
-                                                child: Container(
-                                                  padding: EdgeInsets.all(25),
-                                                  decoration: BoxDecoration(
-                                                    color: Color.fromARGB(
-                                                        255, 255, 169, 163),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.delete_outline,
-                                                    color: Colors.red,
-                                                    size: 50,
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(height: 25),
-                                              Text(
-                                                "Hapus Produk",
-                                                style: TextStyle(
-                                                  color: Colors.black87,
-                                                  fontSize: 25,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text(
-                                                "Apakah anda yakin untuk menghapus produk ini?",
-                                                style: TextStyle(
-                                                  color: Colors.grey.shade400,
-                                                  fontSize: 15,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 10),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Obx(() => ElevatedButton(
-                                                    onPressed:
-                                                        productController
-                                                                .isLoading.value
-                                                            ? null
-                                                            : () async {
-                                                                productController
-                                                                    .isLoading
-                                                                    .value = true;
-                                                                try {
-                                                                  await productController.delete(
-                                                                      item[
-                                                                          'id'],
-                                                                      fromButton:
-                                                                          true);
-                                                                  await productController
-                                                                      .fetchProduk();
-                                                                  await productController
-                                                                      .refresh();
-                                                                } catch (e) {
-                                                                } finally {
-                                                                  productController
-                                                                      .isLoading
-                                                                      .value = false;
-                                                                }
-                                                              },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                      ),
-                                                    ),
-                                                    child: productController
-                                                            .isLoading.value
-                                                        ? SizedBox(
-                                                            height: 16,
-                                                            width: 16,
-                                                            child:
-                                                                CircularProgressIndicator(
-                                                              color:
-                                                                  Colors.white,
-                                                              strokeWidth: 2,
-                                                            ),
-                                                          )
-                                                        : Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              SizedBox(
-                                                                  width: 8),
-                                                              Text(
-                                                                'Hapus',
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                  )),
-                                              SizedBox(height: 5),
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  Navigator.pop(context);
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Colors.grey.shade200,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(width: 8),
-                                                    Text(
-                                                      'Batal',
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
+                              AdminW().deleteDialog(context, "Hapus Produk",
+                                  "Apakah anda yakin untuk menghapus produk ini?",
+                                  () async {
+                                productController.isLoading.value = true;
+                                try {
+                                  await productController.delete(item['id'],
+                                      fromButton: true);
+                                  await productController.fetchProduk();
+                                  await productController.refresh();
+                                } catch (e) {
+                                } finally {
+                                  productController.isLoading.value = false;
+                                }
+                              });
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.redAccent,

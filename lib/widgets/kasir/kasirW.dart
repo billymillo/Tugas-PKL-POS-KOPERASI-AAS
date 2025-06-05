@@ -793,26 +793,35 @@ class KasirW {
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: onTap,
-                  child: Icon(Icons.close, size: 20, color: Colors.red),
-                ),
-                SizedBox(width: 6),
-                Text(
-                  produk,
-                  style: GoogleFonts.nunito(
-                      fontWeight: FontWeight.bold, fontSize: 11),
-                ),
-              ],
+            Flexible(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: onTap,
+                    child: Icon(Icons.close, size: 20, color: Colors.red),
+                  ),
+                  SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      produk,
+                      style: GoogleFonts.nunito(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            SizedBox(width: 8),
             Text(
               harga,
               style: GoogleFonts.nunito(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
-                  color: PrimaryColor().blue),
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+                color: PrimaryColor().blue,
+              ),
             ),
           ],
         ),
@@ -925,6 +934,17 @@ class KasirW {
           );
           return;
         }
+        if (c.checkboxSaldo.value == true &&
+            (double.tryParse(c.MemberSaldo.toString()) ?? 0) < c.totalHarga) {
+          Get.snackbar(
+            'Saldo Tidak Mencukupi',
+            'Nonaktifkan Checkbox, untuk melanjutkan transaksi!',
+            backgroundColor: Colors.red.withOpacity(0.8),
+            colorText: Colors.white,
+            icon: Icon(Icons.error, color: Colors.white),
+          );
+          return;
+        }
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -952,7 +972,6 @@ class KasirW {
                         style: GoogleFonts.nunito(
                             fontSize: 13, color: Colors.grey.shade600)),
                     SizedBox(height: 10),
-
                     // Generate QR Code QRIS yang bisa dipindai
                     QrImageView(
                       data: qrisData,
@@ -1073,6 +1092,18 @@ class KasirW {
           Get.snackbar(
             'Error',
             'Produk Tidak Boleh Kosong!',
+            backgroundColor: Colors.red.withOpacity(0.8),
+            colorText: Colors.white,
+            icon: Icon(Icons.error, color: Colors.white),
+          );
+          return;
+        }
+
+        if (c.checkboxSaldo.value == true &&
+            (double.tryParse(c.MemberSaldo.toString()) ?? 0) < c.totalHarga) {
+          Get.snackbar(
+            'Saldo Tidak Mencukupi',
+            'Nonaktifkan Checkbox, untuk melanjutkan transaksi!',
             backgroundColor: Colors.red.withOpacity(0.8),
             colorText: Colors.white,
             icon: Icon(Icons.error, color: Colors.white),
@@ -1269,6 +1300,140 @@ class KasirW {
               ),
             );
           },
+        );
+      },
+    );
+  }
+
+  void showMemberDialog(BuildContext context, dynamic controller) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: SingleChildScrollView(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.5,
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: controller.searchController,
+                    onChanged: (value) =>
+                        controller.searchMember(value, controller.member),
+                    style: TextStyle(fontSize: 13),
+                    cursorColor: Colors.black12,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(
+                        FontAwesomeIcons.magnifyingGlass,
+                        size: 15,
+                        color: DarkColor().grey,
+                      ),
+                      suffixIcon:
+                          Obx(() => controller.searchQuery.value.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(Icons.close, color: Colors.grey),
+                                  onPressed: () {
+                                    controller.clearSearch();
+                                  },
+                                )
+                              : SizedBox()),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide: BorderSide(color: ShadowColor().blue),
+                      ),
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide:
+                            BorderSide(color: ShadowColor().blue, width: 0.2),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        borderSide:
+                            BorderSide(color: ShadowColor().blue, width: 0.2),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: PrimaryColor().blue, width: 0.5),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      fillColor: PrimaryColor().grey,
+                      filled: true,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Obx(() {
+                    if (controller.isLoading.value) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (controller.filteredMembers.isEmpty) {
+                      return Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text("Tidak ada member ditemukan"),
+                      );
+                    }
+                    return Container(
+                      height:
+                          300, // Batas tinggi list agar tidak terlalu panjang
+                      child: ListView.builder(
+                        itemCount: controller.filteredMembers.length,
+                        itemBuilder: (context, index) {
+                          final member = controller.filteredMembers[index];
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 12, horizontal: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  side: BorderSide(color: Colors.blueAccent),
+                                ),
+                                elevation: 1, // Efek bayangan
+                              ),
+                              onPressed: () {
+                                controller.selectedMember.value =
+                                    member['id'].toString();
+                                Get.back();
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    member['nama'],
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  Text(
+                                    "${member['no_tlp']}",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );

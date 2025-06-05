@@ -123,12 +123,17 @@ class ReportingController extends GetxController {
             (grouped[idProduk]!['total_harga'] ?? 0) + totalHarga;
         grouped[idProduk]!['total_harga_dasar'] =
             (grouped[idProduk]!['total_harga_dasar'] ?? 0) + totalHargaDasar;
+
+        // Hitung ulang laba
+        grouped[idProduk]!['laba'] = (grouped[idProduk]!['total_harga'] ?? 0) -
+            (grouped[idProduk]!['total_harga_dasar'] ?? 0);
       } else {
         grouped[idProduk] = {
           ...item,
           'jumlah': jumlah,
           'total_harga': totalHarga,
           'total_harga_dasar': totalHargaDasar,
+          'laba': totalHarga - totalHargaDasar,
         };
       }
     }
@@ -616,8 +621,8 @@ class ReportingController extends GetxController {
                   'No',
                   'Nama Produk',
                   'Jumlah',
-                  'Harga Dasar',
-                  'Total Harga',
+                  'Total Harga Dasar',
+                  'Total Harga Jual',
                   'Laba'
                 ],
                 ...List.generate(groupedProduk.length, (index) {

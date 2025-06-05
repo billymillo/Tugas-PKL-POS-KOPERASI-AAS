@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bluetooth_thermal_printer_example/controllers/admin/libraryC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/navAdminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,33 +48,42 @@ class _MetodePState extends State<MetodeP> {
                             padding: const EdgeInsets.only(top: 16),
                             child: Column(
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 16),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(Icons.people,
-                                              size: 25,
-                                              color: PrimaryColor().blue),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            'Metode Pembayaran',
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20,
-                                                color: Colors.black),
-                                          ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 16),
-                                        child: buildNewMetodeDialog(),
-                                      ),
-                                    ],
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        (MediaQuery.of(context).orientation ==
+                                                Orientation.landscape
+                                            ? 1
+                                            : 1.25),
+                                    padding: const EdgeInsets.only(left: 16),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(Icons.people,
+                                                size: 25,
+                                                color: PrimaryColor().blue),
+                                            SizedBox(width: 10),
+                                            Text(
+                                              'Metode Pembayaran',
+                                              style: GoogleFonts.roboto(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(width: 20),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 16),
+                                          child: buildNewMetodeDialog(),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -99,211 +109,19 @@ class _MetodePState extends State<MetodeP> {
                                               top: 0,
                                               child: GestureDetector(
                                                 onTap: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return Dialog(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child: Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.5,
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  20),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        16),
-                                                          ),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              Column(
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        horizontal:
-                                                                            20,
-                                                                        vertical:
-                                                                            10),
-                                                                    child:
-                                                                        Container(
-                                                                      padding:
-                                                                          EdgeInsets.all(
-                                                                              25),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: Color.fromARGB(
-                                                                            255,
-                                                                            255,
-                                                                            169,
-                                                                            163),
-                                                                        shape: BoxShape
-                                                                            .circle,
-                                                                      ),
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .delete_outline,
-                                                                        color: Colors
-                                                                            .red,
-                                                                        size:
-                                                                            50,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          25),
-                                                                  Text(
-                                                                    "Hapus Metode",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .black87,
-                                                                      fontSize:
-                                                                          25,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          10),
-                                                                  Text(
-                                                                    "Apakah anda yakin untuk menghapus Metode ini?",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade400,
-                                                                      fontSize:
-                                                                          15,
-                                                                    ),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                  height: 10),
-                                                              Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      await metodeController.deleteMetode(
-                                                                          metode[
-                                                                              'id'],
-                                                                          fromButton:
-                                                                              true);
-                                                                      await metodeController
-                                                                          .refresh();
-                                                                      Get.to(
-                                                                          MetodeP());
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    style: ElevatedButton
-                                                                        .styleFrom(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .red,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(12),
-                                                                      ),
-                                                                    ),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        SizedBox(
-                                                                            width:
-                                                                                8),
-                                                                        Text(
-                                                                          'Hapus',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Colors.white,
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          5),
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    style: ElevatedButton
-                                                                        .styleFrom(
-                                                                      backgroundColor: Colors
-                                                                          .grey
-                                                                          .shade200,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(12),
-                                                                      ),
-                                                                    ),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        SizedBox(
-                                                                            width:
-                                                                                8),
-                                                                        Text(
-                                                                          'Batal',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Colors.black,
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
+                                                  AdminW().deleteDialog(
+                                                    context,
+                                                    'Hapus Metode',
+                                                    'Apakah anda yakin untuk menghapus Metode ini',
+                                                    () async {
+                                                      await metodeController
+                                                          .deleteMetode(
+                                                              metode['id'],
+                                                              fromButton: true);
+                                                      await metodeController
+                                                          .refresh();
+                                                      Get.to(MetodeP());
+                                                      Navigator.pop(context);
                                                     },
                                                   );
                                                 },
@@ -359,48 +177,59 @@ class _MetodePState extends State<MetodeP> {
                                 ],
                               ),
                             ),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(left: 32, top: 20),
-                                  width: 300,
-                                  child: buildTextField(
-                                      controller: poinController,
-                                      hintText: '1 Poin = "..." Rupiah',
-                                      prefixIcon: Icons.star,
-                                      type: TextInputType.number,
-                                      inputFormat:
-                                          LengthLimitingTextInputFormatter(20)),
-                                ),
-                                SizedBox(width: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    int newValue =
-                                        int.tryParse(poinController.text) ??
-                                            100;
-                                    metodeController.simpanPoin(newValue);
-                                    poinController.clear();
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(top: 20),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: PrimaryColor().blue,
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Container(
+                                padding: EdgeInsets.only(left: 32, top: 16),
+                                width: MediaQuery.of(context).size.width *
+                                    (MediaQuery.of(context).orientation ==
+                                            Orientation.landscape
+                                        ? 1
+                                        : 1.2),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 300,
+                                      child: AdminW().buildTextField(
+                                          controller: poinController,
+                                          hintText: '1 Poin = "..." Rupiah',
+                                          prefixIcon: Icons.star,
+                                          type: TextInputType.number,
+                                          inputFormat:
+                                              LengthLimitingTextInputFormatter(
+                                                  20)),
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 10),
-                                      child: Text(
-                                        'Simpan',
-                                        style: GoogleFonts.nunito(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: Colors.white),
+                                    SizedBox(width: 10),
+                                    GestureDetector(
+                                      onTap: () {
+                                        int newValue =
+                                            int.tryParse(poinController.text) ??
+                                                100;
+                                        metodeController.simpanPoin(newValue);
+                                        poinController.clear();
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: PrimaryColor().blue,
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 10),
+                                          child: Text(
+                                            'Simpan',
+                                            style: GoogleFonts.nunito(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: Colors.white),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           ],
                         ),
@@ -467,11 +296,14 @@ class _MetodePState extends State<MetodeP> {
                             size: 24,
                           ),
                           SizedBox(width: 12),
-                          Text(
-                            "Tambahkan Metode Pembayaran ",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 18,
+                          Flexible(
+                            flex: 1,
+                            child: Text(
+                              "Tambahkan Metode Pembayaran ",
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
                         ],
@@ -480,8 +312,9 @@ class _MetodePState extends State<MetodeP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Metode Pembayaran', " *"),
-                          buildTextField(
+                          AdminW()
+                              .buildInputLabel('Nama Metode Pembayaran', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newMetodeController,
                             hintText: 'Metode Pembayaran',
@@ -636,8 +469,9 @@ class _MetodePState extends State<MetodeP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Metode Pembayaran', " *"),
-                          buildTextField(
+                          AdminW()
+                              .buildInputLabel('Nama Metode Pembayaran', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: namaMetodeController,
                             hintText: 'Metode Pembayaran',
@@ -749,68 +583,5 @@ class _MetodePState extends State<MetodeP> {
     final words = text.trim().split(RegExp(r'\s+'));
     if (words.length <= maxWords) return text;
     return words.take(maxWords).join(' ') + '...';
-  }
-
-  Widget buildInputLabel(String label, String label2) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          Text(label2,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: DarkColor().red,
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData prefixIcon,
-    required TextInputType type,
-    required inputFormat,
-    // controller
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: TextField(
-        inputFormatters: [inputFormat],
-        keyboardType: type,
-        controller: controller,
-        cursorColor: PrimaryColor().blue,
-        style: TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          prefixIcon: Icon(
-            prefixIcon,
-            color: Colors.grey.shade600,
-            size: 20,
-          ),
-          hintText: hintText,
-          hintStyle: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade400,
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      ),
-    );
   }
 }

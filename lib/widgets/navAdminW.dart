@@ -194,120 +194,126 @@ Widget NavbarDrawer(
                     return Dialog(
                       elevation: 0,
                       backgroundColor: Colors.transparent,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
-                                  child: Container(
-                                    padding: EdgeInsets.all(25),
-                                    decoration: BoxDecoration(
-                                      color: Color.fromARGB(255, 255, 169, 163),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.logout_outlined,
-                                      color: Colors.red,
-                                      size: 50,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 25),
-                                Text(
-                                  "Logout",
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  "Apakah anda yakin untuk melakukan Logout?",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade400,
-                                    fontSize: 15,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    showDialog(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (BuildContext context) {
-                                        return Center(
-                                            child: CircularProgressIndicator());
-                                      },
-                                    );
-                                    await logoutController.logout();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Logout',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                      child: SingleChildScrollView(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    child: Container(
+                                      padding: EdgeInsets.all(25),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Color.fromARGB(255, 255, 169, 163),
+                                        shape: BoxShape.circle,
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 5),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.grey.shade200,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      child: Icon(
+                                        Icons.logout_outlined,
+                                        color: Colors.red,
+                                        size: 50,
+                                      ),
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Batal',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
+                                  SizedBox(height: 25),
+                                  Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  SizedBox(height: 10),
+                                  Text(
+                                    "Apakah anda yakin untuk melakukan Logout?",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade400,
+                                      fontSize: 15,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        },
+                                      );
+                                      await logoutController.logout();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Logout',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      Navigator.pop(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey.shade200,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Batal',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );

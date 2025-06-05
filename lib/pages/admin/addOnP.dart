@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bluetooth_thermal_printer_example/controllers/admin/libraryC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/navAdminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -49,31 +50,44 @@ class _AddOnPState extends State<AddOnP> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.only(left: 16),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(Icons.add_to_photos_outlined,
-                                              size: 25,
-                                              color: PrimaryColor().blue),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            'Add On Barang',
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20,
-                                                color: Colors.black),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              (MediaQuery.of(context)
+                                                          .orientation ==
+                                                      Orientation.landscape
+                                                  ? 0.75
+                                                  : 0.55),
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.add_to_photos_outlined,
+                                                  size: 25,
+                                                  color: PrimaryColor().blue),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                'Add On Barang',
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 16),
-                                        child: buildNewAddOnDialog(),
-                                      ),
-                                    ],
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(right: 16),
+                                          child: buildNewAddOnDialog(),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -100,211 +114,17 @@ class _AddOnPState extends State<AddOnP> {
                                               top: 0,
                                               child: GestureDetector(
                                                 onTap: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return Dialog(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child: Container(
-                                                          width: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.5,
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  20),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        16),
-                                                          ),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              Column(
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        horizontal:
-                                                                            20,
-                                                                        vertical:
-                                                                            10),
-                                                                    child:
-                                                                        Container(
-                                                                      padding:
-                                                                          EdgeInsets.all(
-                                                                              25),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: Color.fromARGB(
-                                                                            255,
-                                                                            255,
-                                                                            169,
-                                                                            163),
-                                                                        shape: BoxShape
-                                                                            .circle,
-                                                                      ),
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .delete_outline,
-                                                                        color: Colors
-                                                                            .red,
-                                                                        size:
-                                                                            50,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          25),
-                                                                  Text(
-                                                                    "Hapus Add On",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .black87,
-                                                                      fontSize:
-                                                                          25,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          10),
-                                                                  Text(
-                                                                    "Apakah anda yakin untuk menghapus Add On ini?",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .grey
-                                                                          .shade400,
-                                                                      fontSize:
-                                                                          15,
-                                                                    ),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                  height: 10),
-                                                              Column(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .center,
-                                                                children: [
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      await addOnC.deleteAddOn(
-                                                                          addOn[
-                                                                              'id'],
-                                                                          fromButton:
-                                                                              true);
-                                                                      await addOnC
-                                                                          .refresh();
-                                                                      Get.to(
-                                                                          AddOnP());
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    style: ElevatedButton
-                                                                        .styleFrom(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .red,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(12),
-                                                                      ),
-                                                                    ),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        SizedBox(
-                                                                            width:
-                                                                                8),
-                                                                        Text(
-                                                                          'Hapus',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Colors.white,
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          5),
-                                                                  ElevatedButton(
-                                                                    onPressed:
-                                                                        () async {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    style: ElevatedButton
-                                                                        .styleFrom(
-                                                                      backgroundColor: Colors
-                                                                          .grey
-                                                                          .shade200,
-                                                                      shape:
-                                                                          RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(12),
-                                                                      ),
-                                                                    ),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        SizedBox(
-                                                                            width:
-                                                                                8),
-                                                                        Text(
-                                                                          'Batal',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Colors.black,
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
+                                                  AdminW().deleteDialog(
+                                                    context,
+                                                    'Hapus Add On',
+                                                    'Apakah anda yakin ingin menghapus Add On ini ?',
+                                                    () async {
+                                                      await addOnC.deleteAddOn(
+                                                          addOn['id'],
+                                                          fromButton: true);
+                                                      await addOnC.refresh();
+                                                      Get.to(AddOnP());
+                                                      Navigator.pop(context);
                                                     },
                                                   );
                                                 },
@@ -415,8 +235,8 @@ class _AddOnPState extends State<AddOnP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Add On', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Nama Add On', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: namaAddOnNewController,
                             hintText: 'Rebus',
@@ -424,8 +244,8 @@ class _AddOnPState extends State<AddOnP> {
                             type: TextInputType.name,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('Harga Add On', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Harga Add On', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: hargaAddOnNewController,
                             hintText: 'Rp. ',
@@ -461,9 +281,9 @@ class _AddOnPState extends State<AddOnP> {
                                             hargaAddOnNewController.text,
                                           );
                                           await addOnC.refresh();
-                                          Navigator.pop(context);
                                           namaAddOnNewController.clear();
                                           hargaAddOnNewController.clear();
+                                          Navigator.pop(context);
                                         } catch (e) {
                                           Get.snackbar("Error", e.toString());
                                         } finally {
@@ -583,8 +403,8 @@ class _AddOnPState extends State<AddOnP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Add On', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Nama Add On', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newAddOnText,
                             hintText: 'Rebus',
@@ -592,8 +412,8 @@ class _AddOnPState extends State<AddOnP> {
                             type: TextInputType.name,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('Harga Add On', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Harga Add On', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newAddOnHargaText,
                             hintText: 'Rp. ',
@@ -627,9 +447,9 @@ class _AddOnPState extends State<AddOnP> {
                                 fromButton: true,
                               );
                               await addOnC.refresh();
-                              Navigator.pop(context);
                               newAddOnText.clear();
                               newAddOnHargaText.clear();
+                              Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: PrimaryColor().blue,
@@ -700,68 +520,5 @@ class _AddOnPState extends State<AddOnP> {
     final words = text.trim().split(RegExp(r'\s+'));
     if (words.length <= maxWords) return text;
     return words.take(maxWords).join(' ') + '...';
-  }
-
-  Widget buildInputLabel(String label, String label2) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          Text(label2,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: DarkColor().red,
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData prefixIcon,
-    required TextInputType type,
-    required inputFormat,
-    // controller
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: TextField(
-        inputFormatters: [inputFormat],
-        keyboardType: type,
-        controller: controller,
-        cursorColor: PrimaryColor().blue,
-        style: TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          prefixIcon: Icon(
-            prefixIcon,
-            color: Colors.grey.shade600,
-            size: 20,
-          ),
-          hintText: hintText,
-          hintStyle: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade400,
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      ),
-    );
   }
 }

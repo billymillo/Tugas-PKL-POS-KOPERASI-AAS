@@ -38,593 +38,621 @@ class TransaksiInMitraP extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 4),
-                            Text(
-                              'Transaksi Masuk Mitra',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            ElevatedButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Dialog(
-                                      elevation: 0,
-                                      backgroundColor: Colors.transparent,
-                                      child: Container(
-                                        padding: EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    CupertinoIcons.add_circled,
-                                                    color: PrimaryColor().blue,
-                                                    size: 24,
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  Text(
-                                                    "Tambah Transaksi",
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 18,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 15),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  buildInputLabel(
-                                                      'Produk', " *"),
-                                                  GestureDetector(
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                          border: Border.all(
-                                                              width: 1,
-                                                              color:
-                                                                  PrimaryColor()
-                                                                      .blue),
-                                                          color: Colors.white,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 16,
-                                                              horizontal: 20),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Obx(() =>
-                                                              cM.selectedProductM
-                                                                          .value ==
-                                                                      null
-                                                                  ? Text(
-                                                                      'Pilih Produk',
-                                                                      style: GoogleFonts.nunito(
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontSize:
-                                                                              14,
-                                                                          color:
-                                                                              PrimaryColor().blue),
-                                                                    )
-                                                                  : Text(
-                                                                      '${cM.ProdukNameM(cM.selectedProductM.value.toString())}' +
-                                                                          ' (${cM.NamaMitra(cM.selectedProductM.value.toString())}) : ' +
-                                                                          '${cM.ProdukStokM(cM.selectedProductM.value.toString())} pcs',
-                                                                      style: GoogleFonts.nunito(
-                                                                          fontWeight: FontWeight
-                                                                              .bold,
-                                                                          fontSize:
-                                                                              14,
-                                                                          color:
-                                                                              PrimaryColor().blue),
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      maxLines:
-                                                                          1,
-                                                                    )),
-                                                          Icon(
-                                                            Icons.handshake,
-                                                            size: 25,
-                                                            color:
-                                                                PrimaryColor()
-                                                                    .blue,
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    onTap: () {
-                                                      showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return Dialog(
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .transparent,
-                                                              child:
-                                                                  SingleChildScrollView(
-                                                                child:
-                                                                    Container(
-                                                                  width: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width *
-                                                                      0.5,
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(
-                                                                          16),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            16),
-                                                                  ),
-                                                                  child: Column(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    children: [
-                                                                      TextField(
-                                                                        controller:
-                                                                            cM.searchMController,
-                                                                        onChanged: (value) => cM.searchProduct(
-                                                                            value,
-                                                                            cM.produkM),
-                                                                        style: const TextStyle(
-                                                                            fontSize:
-                                                                                13),
-                                                                        cursorColor:
-                                                                            Colors.black12,
-                                                                        decoration:
-                                                                            InputDecoration(
-                                                                          prefixIcon:
-                                                                              Icon(
-                                                                            FontAwesomeIcons.magnifyingGlass,
-                                                                            size:
-                                                                                15,
-                                                                            color:
-                                                                                DarkColor().grey,
-                                                                          ),
-                                                                          suffixIcon: Obx(() => cM.searchQueryM.value.isNotEmpty
-                                                                              ? IconButton(
-                                                                                  icon: Icon(Icons.close, color: Colors.grey),
-                                                                                  onPressed: () {
-                                                                                    cM.clearSearch();
-                                                                                  },
-                                                                                )
-                                                                              : SizedBox()),
-                                                                          contentPadding: const EdgeInsets
-                                                                              .symmetric(
-                                                                              vertical: 5,
-                                                                              horizontal: 20),
-                                                                          border:
-                                                                              OutlineInputBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.all(Radius.circular(10.0)),
-                                                                            borderSide:
-                                                                                BorderSide(color: ShadowColor().blue),
-                                                                          ),
-                                                                          disabledBorder:
-                                                                              OutlineInputBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.all(Radius.circular(10.0)),
-                                                                            borderSide:
-                                                                                BorderSide(color: ShadowColor().blue, width: 0.2),
-                                                                          ),
-                                                                          enabledBorder:
-                                                                              OutlineInputBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.all(Radius.circular(10.0)),
-                                                                            borderSide:
-                                                                                BorderSide(color: ShadowColor().blue, width: 0.2),
-                                                                          ),
-                                                                          focusedBorder:
-                                                                              OutlineInputBorder(
-                                                                            borderSide:
-                                                                                BorderSide(color: PrimaryColor().blue, width: 0.5),
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(10.0),
-                                                                          ),
-                                                                          fillColor:
-                                                                              PrimaryColor().grey,
-                                                                          filled:
-                                                                              true,
-                                                                        ),
-                                                                      ),
-                                                                      SizedBox(
-                                                                          height:
-                                                                              10),
-                                                                      Obx(() {
-                                                                        if (cM
-                                                                            .isLoadingM
-                                                                            .value) {
-                                                                          return Center(
-                                                                              child: CircularProgressIndicator());
-                                                                        }
-                                                                        if (cM
-                                                                            .filteredProductM
-                                                                            .isEmpty) {
-                                                                          return Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.all(20),
-                                                                            child:
-                                                                                Text("Tidak ada produk ditemukan"),
-                                                                          );
-                                                                        }
-                                                                        return Container(
-                                                                          height:
-                                                                              300,
-                                                                          child:
-                                                                              ListView.builder(
-                                                                            itemCount:
-                                                                                cM.filteredProductM.length,
-                                                                            itemBuilder:
-                                                                                (context, index) {
-                                                                              final produk = cM.filteredProductM[index];
-                                                                              return Padding(
-                                                                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                                                                child: ElevatedButton(
-                                                                                  style: ElevatedButton.styleFrom(
-                                                                                    backgroundColor: Colors.white,
-                                                                                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                                                                                    shape: RoundedRectangleBorder(
-                                                                                      borderRadius: BorderRadius.circular(8),
-                                                                                      side: BorderSide(color: Colors.blueAccent),
-                                                                                    ),
-                                                                                    elevation: 1, // Efek bayangan
-                                                                                  ),
-                                                                                  onPressed: () {
-                                                                                    cM.selectedProductM.value = produk['id'].toString();
-                                                                                    Get.back();
-                                                                                  },
-                                                                                  child: Row(
-                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                    children: [
-                                                                                      Text(
-                                                                                        produk['nama_barang'].toString(),
-                                                                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
-                                                                                        overflow: TextOverflow.ellipsis,
-                                                                                        maxLines: 1,
-                                                                                      ),
-                                                                                      Text(
-                                                                                        "${produk['stok']} pcs",
-                                                                                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                                                                                        overflow: TextOverflow.ellipsis,
-                                                                                        maxLines: 1,
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        );
-                                                                      }),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            );
-                                                          });
-                                                    },
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  buildInputLabel(
-                                                      'Tambah Stok', " *"),
-                                                  buildTextField(
-                                                    inputFormat:
-                                                        LengthLimitingTextInputFormatter(
-                                                            50),
-                                                    cM: stokControllerM,
-                                                    hintText: 'Qty: ',
-                                                    prefixIcon:
-                                                        CupertinoIcons.cube_box,
-                                                    type: TextInputType.number,
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  Container(
-                                                    child: Obx(
-                                                      () =>
-                                                          cM.checkboxM.value ==
-                                                                  true
-                                                              ? Container(
-                                                                  width: MediaQuery.of(
-                                                                              context)
-                                                                          .size
-                                                                          .width *
-                                                                      1,
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      Container(
-                                                                        width: MediaQuery.of(context).size.width *
-                                                                            0.38,
-                                                                        child:
-                                                                            Column(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.min,
-                                                                          children: [
-                                                                            buildInputLabel('Harga Satuan',
-                                                                                " "),
-                                                                            buildTextField(
-                                                                              inputFormat: LengthLimitingTextInputFormatter(50),
-                                                                              cM: cM.satuanMController,
-                                                                              hintText: 'Rp 3.000 ',
-                                                                              prefixIcon: FontAwesomeIcons.moneyBillWave,
-                                                                              type: TextInputType.number,
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                      Container(
-                                                                        width: MediaQuery.of(context).size.width *
-                                                                            0.38,
-                                                                        child:
-                                                                            Column(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.min,
-                                                                          children: [
-                                                                            buildInputLabel('Harga Jual',
-                                                                                " "),
-                                                                            buildTextField(
-                                                                              inputFormat: LengthLimitingTextInputFormatter(50),
-                                                                              cM: cM.jualMController,
-                                                                              hintText: 'Rp 4000',
-                                                                              prefixIcon: FontAwesomeIcons.moneyBillWave,
-                                                                              type: TextInputType.number,
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                )
-                                                              : Text(''),
-                                                    ),
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Obx(() => Transform.scale(
-                                                            scale: 0.9,
-                                                            child: SizedBox(
-                                                              height: 50,
-                                                              child: Checkbox(
-                                                                activeColor:
-                                                                    PrimaryColor()
-                                                                        .blue,
-                                                                visualDensity:
-                                                                    VisualDensity
-                                                                        .compact,
-                                                                materialTapTargetSize:
-                                                                    MaterialTapTargetSize
-                                                                        .shrinkWrap,
-                                                                value: cM
-                                                                    .checkboxM
-                                                                    .value,
-                                                                onChanged:
-                                                                    (bool?
-                                                                        value) {
-                                                                  cM.toggleCheckbox(
-                                                                      value);
-                                                                },
-                                                              ),
-                                                            ),
-                                                          )),
-                                                      Text(
-                                                        'Harga produk mengalami perubahan?',
-                                                        style:
-                                                            GoogleFonts.nunito(
-                                                                fontSize: 14,
-                                                                color: Colors
-                                                                    .black),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                      cM.selectedProductM
-                                                          .value = null;
-                                                    },
-                                                    child: Text(
-                                                      'Batal',
-                                                      style: TextStyle(
-                                                        color: Colors.black45,
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  Obx(
-                                                    () => ElevatedButton(
-                                                      onPressed: () async {
-                                                        int stok = int.tryParse(
-                                                                stokControllerM
-                                                                    .text) ??
-                                                            0;
-                                                        int produkSatuan =
-                                                            int.tryParse(cM
-                                                                    .satuanMController
-                                                                    .text
-                                                                    .toString()) ??
-                                                                0;
-                                                        int totalStok =
-                                                            stok * produkSatuan;
-                                                        if (cM.selectedProductM
-                                                                .value ==
-                                                            null) {
-                                                          Get.snackbar(
-                                                            'Error',
-                                                            'Produk Tidak Boleh Kosong, Pilih Produk Terlebih Dahulu!',
-                                                            backgroundColor:
-                                                                Colors.red
-                                                                    .withOpacity(
-                                                                        0.8),
-                                                            colorText:
-                                                                Colors.white,
-                                                            icon: Icon(
-                                                                Icons.error,
-                                                                color: Colors
-                                                                    .white),
-                                                          );
-                                                          return;
-                                                        }
-                                                        Get.back();
-                                                        await cM
-                                                            .addTransaksiInMitra(
-                                                          cM.ProdukMitra
-                                                              .toString(),
-                                                          stokControllerM.text,
-                                                          totalStok.toString(),
-                                                          '1',
-                                                        );
-                                                        await cM.addDetTransaksiMitra(
-                                                            cM.selectedProductM
-                                                                .value
-                                                                .toString(),
-                                                            stokControllerM
-                                                                .text,
-                                                            cM.satuanMController
-                                                                .text,
-                                                            cM.jualMController
-                                                                .text
-                                                                .toString());
-                                                        cM.editProduk(
-                                                            cM.selectedProductM
-                                                                .value
-                                                                .toString(),
-                                                            stokControllerM
-                                                                .text,
-                                                            cM.satuanMController
-                                                                .text,
-                                                            cM.jualMController
-                                                                .text
-                                                                .toString());
-                                                        await cM
-                                                            .fetchTransaksiDetMitra();
-                                                        stokControllerM.clear();
-                                                        await cM
-                                                            .fetchTransaksiInMitra();
-                                                        await cM.fetchProduk();
-                                                        stokControllerM.clear();
-                                                        cM.selectedProductM
-                                                            .value = null;
-                                                        cM.toggleCheckbox(
-                                                            false);
-                                                        cM.clearSearch();
-                                                        cM.selectedProductM
-                                                            .value = null;
-                                                        cM.toggleCheckbox(
-                                                            false);
-                                                      },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            PrimaryColor().blue,
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(12),
-                                                        ),
-                                                      ),
-                                                      child: cM.isLoadingM.value
-                                                          ? SizedBox(
-                                                              width: 15,
-                                                              height: 15,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                color: Colors
-                                                                    .white,
-                                                                strokeWidth: 2,
-                                                              ),
-                                                            )
-                                                          : Row(
-                                                              children: [
-                                                                Icon(
-                                                                  CupertinoIcons
-                                                                      .add,
-                                                                  size: 18,
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                                SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Tambah',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 4),
+                              Text(
+                                'Transaksi Masuk Mitra',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              child: Text('Tambahkan Stok Mitra Baru'),
-                            ),
-                          ],
+                              SizedBox(height: 5),
+                              ElevatedButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Dialog(
+                                        elevation: 0,
+                                        backgroundColor: Colors.transparent,
+                                        child: Container(
+                                          padding: EdgeInsets.all(20),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      CupertinoIcons
+                                                          .add_circled,
+                                                      color:
+                                                          PrimaryColor().blue,
+                                                      size: 24,
+                                                    ),
+                                                    SizedBox(width: 12),
+                                                    Text(
+                                                      "Tambah Transaksi",
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 15),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    buildInputLabel(
+                                                        'Produk', " *"),
+                                                    GestureDetector(
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                            border: Border.all(
+                                                                width: 1,
+                                                                color:
+                                                                    PrimaryColor()
+                                                                        .blue),
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5)),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 16,
+                                                                horizontal: 20),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Obx(
+                                                              () => cM.selectedProductM
+                                                                          .value ==
+                                                                      null
+                                                                  ? Flexible(
+                                                                      child:
+                                                                          Text(
+                                                                        'Pilih Produk',
+                                                                        style: GoogleFonts
+                                                                            .nunito(
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          fontSize:
+                                                                              14,
+                                                                          color:
+                                                                              PrimaryColor().blue,
+                                                                        ),
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        maxLines:
+                                                                            1,
+                                                                      ),
+                                                                    )
+                                                                  : Flexible(
+                                                                      child:
+                                                                          Text(
+                                                                        '${cM.ProdukNameM(cM.selectedProductM.value.toString())}'
+                                                                        ' (${cM.NamaMitra(cM.selectedProductM.value.toString())}) : '
+                                                                        '${cM.ProdukStokM(cM.selectedProductM.value.toString())} pcs',
+                                                                        style: GoogleFonts
+                                                                            .nunito(
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          fontSize:
+                                                                              14,
+                                                                          color:
+                                                                              PrimaryColor().blue,
+                                                                        ),
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                        maxLines:
+                                                                            1,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                            Icon(
+                                                              Icons.handshake,
+                                                              size: 25,
+                                                              color:
+                                                                  PrimaryColor()
+                                                                      .blue,
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      onTap: () {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return Dialog(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .transparent,
+                                                                child:
+                                                                    SingleChildScrollView(
+                                                                  child:
+                                                                      Container(
+                                                                    width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width *
+                                                                        0.5,
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(
+                                                                            16),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              16),
+                                                                    ),
+                                                                    child:
+                                                                        Column(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      children: [
+                                                                        TextField(
+                                                                          controller:
+                                                                              cM.searchMController,
+                                                                          onChanged: (value) => cM.searchProduct(
+                                                                              value,
+                                                                              cM.produkM),
+                                                                          style:
+                                                                              const TextStyle(fontSize: 13),
+                                                                          cursorColor:
+                                                                              Colors.black12,
+                                                                          decoration:
+                                                                              InputDecoration(
+                                                                            prefixIcon:
+                                                                                Icon(
+                                                                              FontAwesomeIcons.magnifyingGlass,
+                                                                              size: 15,
+                                                                              color: DarkColor().grey,
+                                                                            ),
+                                                                            suffixIcon: Obx(() => cM.searchQueryM.value.isNotEmpty
+                                                                                ? IconButton(
+                                                                                    icon: Icon(Icons.close, color: Colors.grey),
+                                                                                    onPressed: () {
+                                                                                      cM.clearSearch();
+                                                                                    },
+                                                                                  )
+                                                                                : SizedBox()),
+                                                                            contentPadding:
+                                                                                const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                                                                            border:
+                                                                                OutlineInputBorder(
+                                                                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                                                              borderSide: BorderSide(color: ShadowColor().blue),
+                                                                            ),
+                                                                            disabledBorder:
+                                                                                OutlineInputBorder(
+                                                                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                                                              borderSide: BorderSide(color: ShadowColor().blue, width: 0.2),
+                                                                            ),
+                                                                            enabledBorder:
+                                                                                OutlineInputBorder(
+                                                                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                                                              borderSide: BorderSide(color: ShadowColor().blue, width: 0.2),
+                                                                            ),
+                                                                            focusedBorder:
+                                                                                OutlineInputBorder(
+                                                                              borderSide: BorderSide(color: PrimaryColor().blue, width: 0.5),
+                                                                              borderRadius: BorderRadius.circular(10.0),
+                                                                            ),
+                                                                            fillColor:
+                                                                                PrimaryColor().grey,
+                                                                            filled:
+                                                                                true,
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(
+                                                                            height:
+                                                                                10),
+                                                                        Obx(() {
+                                                                          if (cM
+                                                                              .isLoadingM
+                                                                              .value) {
+                                                                            return Center(child: CircularProgressIndicator());
+                                                                          }
+                                                                          if (cM
+                                                                              .filteredProductM
+                                                                              .isEmpty) {
+                                                                            return Padding(
+                                                                              padding: const EdgeInsets.all(20),
+                                                                              child: Text("Tidak ada produk ditemukan"),
+                                                                            );
+                                                                          }
+                                                                          return Container(
+                                                                            height:
+                                                                                300,
+                                                                            child:
+                                                                                ListView.builder(
+                                                                              itemCount: cM.filteredProductM.length,
+                                                                              itemBuilder: (context, index) {
+                                                                                final produk = cM.filteredProductM[index];
+                                                                                return Padding(
+                                                                                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                                                                  child: ElevatedButton(
+                                                                                    style: ElevatedButton.styleFrom(
+                                                                                      backgroundColor: Colors.white,
+                                                                                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                                                                      shape: RoundedRectangleBorder(
+                                                                                        borderRadius: BorderRadius.circular(8),
+                                                                                        side: BorderSide(color: Colors.blueAccent),
+                                                                                      ),
+                                                                                      elevation: 1, // Efek bayangan
+                                                                                    ),
+                                                                                    onPressed: () {
+                                                                                      cM.selectedProductM.value = produk['id'].toString();
+                                                                                      Get.back();
+                                                                                    },
+                                                                                    child: Row(
+                                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                      children: [
+                                                                                        Expanded(
+                                                                                          child: Text(
+                                                                                            produk['nama_barang'].toString(),
+                                                                                            style: TextStyle(
+                                                                                              fontSize: 14,
+                                                                                              fontWeight: FontWeight.bold,
+                                                                                              color: Colors.black,
+                                                                                            ),
+                                                                                            overflow: TextOverflow.ellipsis,
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(width: 8), // beri jarak agar tidak terlalu mepet
+                                                                                        Text(
+                                                                                          "${produk['stok']} pcs",
+                                                                                          style: TextStyle(
+                                                                                            fontSize: 12,
+                                                                                            color: Colors.grey.shade600,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                );
+                                                                              },
+                                                                            ),
+                                                                          );
+                                                                        }),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            });
+                                                      },
+                                                    ),
+                                                    SizedBox(height: 10),
+                                                    buildInputLabel(
+                                                        'Tambah Stok', " *"),
+                                                    buildTextField(
+                                                      inputFormat:
+                                                          LengthLimitingTextInputFormatter(
+                                                              50),
+                                                      cM: stokControllerM,
+                                                      hintText: 'Qty: ',
+                                                      prefixIcon: CupertinoIcons
+                                                          .cube_box,
+                                                      type:
+                                                          TextInputType.number,
+                                                    ),
+                                                    SizedBox(height: 10),
+                                                    Container(
+                                                      child: Obx(
+                                                        () => cM.checkboxM
+                                                                    .value ==
+                                                                true
+                                                            ? Container(
+                                                                width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width *
+                                                                    1,
+                                                                child: Wrap(
+                                                                  spacing: 16,
+                                                                  runSpacing:
+                                                                      16,
+                                                                  children: [
+                                                                    Container(
+                                                                      child:
+                                                                          Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          buildInputLabel(
+                                                                              'Harga Satuan',
+                                                                              " "),
+                                                                          buildTextField(
+                                                                            inputFormat:
+                                                                                LengthLimitingTextInputFormatter(50),
+                                                                            cM: cM.satuanMController,
+                                                                            hintText:
+                                                                                'Rp 3.000 ',
+                                                                            prefixIcon:
+                                                                                FontAwesomeIcons.moneyBillWave,
+                                                                            type:
+                                                                                TextInputType.number,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                    Container(
+                                                                      child:
+                                                                          Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          buildInputLabel(
+                                                                              'Harga Jual',
+                                                                              " "),
+                                                                          buildTextField(
+                                                                            inputFormat:
+                                                                                LengthLimitingTextInputFormatter(50),
+                                                                            cM: cM.jualMController,
+                                                                            hintText:
+                                                                                'Rp 4000',
+                                                                            prefixIcon:
+                                                                                FontAwesomeIcons.moneyBillWave,
+                                                                            type:
+                                                                                TextInputType.number,
+                                                                          ),
+                                                                          SizedBox(
+                                                                              height: 10),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              )
+                                                            : Text(''),
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Obx(() =>
+                                                            Transform.scale(
+                                                              scale: 0.9,
+                                                              child: SizedBox(
+                                                                height: 50,
+                                                                child: Checkbox(
+                                                                  activeColor:
+                                                                      PrimaryColor()
+                                                                          .blue,
+                                                                  visualDensity:
+                                                                      VisualDensity
+                                                                          .compact,
+                                                                  materialTapTargetSize:
+                                                                      MaterialTapTargetSize
+                                                                          .shrinkWrap,
+                                                                  value: cM
+                                                                      .checkboxM
+                                                                      .value,
+                                                                  onChanged:
+                                                                      (bool?
+                                                                          value) {
+                                                                    cM.toggleCheckbox(
+                                                                        value);
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            )),
+                                                        Flexible(
+                                                          child: Text(
+                                                            'Harga produk mengalami perubahan?',
+                                                            style: GoogleFonts
+                                                                .nunito(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .black),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                        cM.selectedProductM
+                                                            .value = null;
+                                                      },
+                                                      child: Text(
+                                                        'Batal',
+                                                        style: TextStyle(
+                                                          color: Colors.black45,
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 12),
+                                                    Obx(
+                                                      () => ElevatedButton(
+                                                        onPressed: () async {
+                                                          int stok = int.tryParse(
+                                                                  stokControllerM
+                                                                      .text) ??
+                                                              0;
+                                                          int produkSatuan =
+                                                              int.tryParse(cM
+                                                                      .satuanMController
+                                                                      .text
+                                                                      .toString()) ??
+                                                                  0;
+                                                          int totalStok = stok *
+                                                              produkSatuan;
+                                                          if (cM.selectedProductM
+                                                                  .value ==
+                                                              null) {
+                                                            Get.snackbar(
+                                                              'Error',
+                                                              'Produk Tidak Boleh Kosong, Pilih Produk Terlebih Dahulu!',
+                                                              backgroundColor:
+                                                                  Colors.red
+                                                                      .withOpacity(
+                                                                          0.8),
+                                                              colorText:
+                                                                  Colors.white,
+                                                              icon: Icon(
+                                                                  Icons.error,
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                            return;
+                                                          }
+                                                          Get.back();
+                                                          await cM
+                                                              .addTransaksiInMitra(
+                                                            cM.ProdukMitra
+                                                                .toString(),
+                                                            stokControllerM
+                                                                .text,
+                                                            totalStok
+                                                                .toString(),
+                                                            '1',
+                                                          );
+                                                          await cM.addDetTransaksiMitra(
+                                                              cM.selectedProductM
+                                                                  .value
+                                                                  .toString(),
+                                                              stokControllerM
+                                                                  .text,
+                                                              cM.satuanMController
+                                                                  .text,
+                                                              cM.jualMController
+                                                                  .text
+                                                                  .toString());
+                                                          cM.editProduk(
+                                                              cM.selectedProductM
+                                                                  .value
+                                                                  .toString(),
+                                                              stokControllerM
+                                                                  .text,
+                                                              cM.satuanMController
+                                                                  .text,
+                                                              cM.jualMController
+                                                                  .text
+                                                                  .toString());
+                                                          await cM
+                                                              .fetchTransaksiDetMitra();
+                                                          stokControllerM
+                                                              .clear();
+                                                          await cM
+                                                              .fetchTransaksiInMitra();
+                                                          await cM
+                                                              .fetchProduk();
+                                                          stokControllerM
+                                                              .clear();
+                                                          cM.selectedProductM
+                                                              .value = null;
+                                                          cM.toggleCheckbox(
+                                                              false);
+                                                          cM.clearSearch();
+                                                          cM.selectedProductM
+                                                              .value = null;
+                                                          cM.toggleCheckbox(
+                                                              false);
+                                                        },
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              PrimaryColor()
+                                                                  .blue,
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                          ),
+                                                        ),
+                                                        child: cM.isLoadingM
+                                                                .value
+                                                            ? SizedBox(
+                                                                width: 15,
+                                                                height: 15,
+                                                                child:
+                                                                    CircularProgressIndicator(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  strokeWidth:
+                                                                      2,
+                                                                ),
+                                                              )
+                                                            : Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    CupertinoIcons
+                                                                        .add,
+                                                                    size: 18,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                  SizedBox(
+                                                                      width: 8),
+                                                                  Text(
+                                                                    'Tambah',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: Text('Tambahkan Stok Mitra Baru'),
+                              ),
+                            ],
+                          ),
                         ),
                         Container(
                           padding: EdgeInsets.all(10),
@@ -661,22 +689,41 @@ class TransaksiInMitraP extends StatelessWidget {
                       if (cM.transaksiDetM.isEmpty) {
                         return Center(child: Text("Tidak ada transaksi"));
                       }
-                      return ListView.separated(
-                        itemCount: cM.transaksiDetM.length,
-                        separatorBuilder: (_, __) => SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          var transaksiMitra = cM.transaksiDetM[index];
-                          return buildCardTransaksi(
-                              cM.ProdukNameM(transaksiMitra['id_produk']),
-                              cM.NoTransaksiM(
-                                  transaksiMitra['id_transaksi_in_mitra']),
-                              formatDate(transaksiMitra['input_date']),
-                              transaksiMitra['jumlah'].toString(),
-                              'Rp ${NumberFormat.currency(locale: 'id_ID', symbol: '', decimalDigits: 0).format(int.parse(transaksiMitra['total_harga']))}',
-                              'Rp ${NumberFormat.currency(locale: 'id_ID', symbol: '', decimalDigits: 0).format(int.parse(transaksiMitra['harga_satuan']))}',
-                              'Rp ${NumberFormat.currency(locale: 'id_ID', symbol: '', decimalDigits: 0).format(int.parse(transaksiMitra['harga_jual']))}',
-                              cM.ProdukNameMitra(transaksiMitra['id_produk']));
-                        },
+
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal, // scroll ke samping
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: MediaQuery.of(context)
+                                .size
+                                .width, // pastikan full width
+                          ),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical, // scroll ke bawah
+                            child: Column(
+                              children: List.generate(cM.transaksiDetM.length,
+                                  (index) {
+                                var transaksiMitra = cM.transaksiDetM[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12.0),
+                                  child: buildCardTransaksi(
+                                      cM.ProdukNameM(
+                                          transaksiMitra['id_produk']),
+                                      cM.NoTransaksiM(transaksiMitra[
+                                          'id_transaksi_in_mitra']),
+                                      formatDate(transaksiMitra['input_date']),
+                                      transaksiMitra['jumlah'].toString(),
+                                      'Rp ${NumberFormat.currency(locale: 'id_ID', symbol: '', decimalDigits: 0).format(int.parse(transaksiMitra['total_harga']))}',
+                                      'Rp ${NumberFormat.currency(locale: 'id_ID', symbol: '', decimalDigits: 0).format(int.parse(transaksiMitra['harga_satuan']))}',
+                                      'Rp ${NumberFormat.currency(locale: 'id_ID', symbol: '', decimalDigits: 0).format(int.parse(transaksiMitra['harga_jual']))}',
+                                      cM.ProdukNameMitra(
+                                          transaksiMitra['id_produk']),
+                                      context),
+                                );
+                              }),
+                            ),
+                          ),
+                        ),
                       );
                     }),
                   ),
@@ -693,22 +740,23 @@ class TransaksiInMitraP extends StatelessWidget {
 }
 
 Widget buildCardTransaksi(
-  String name,
-  String noTransaksi,
-  String tanggal,
-  String jumlah,
-  String total,
-  String satuan,
-  String jual,
-  String mitra,
-) {
+    String name,
+    String noTransaksi,
+    String tanggal,
+    String jumlah,
+    String total,
+    String satuan,
+    String jual,
+    String mitra,
+    context) {
   return Card(
     elevation: 2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
     ),
-    child: Padding(
+    child: Container(
       padding: EdgeInsets.all(16.0),
+      width: MediaQuery.of(context).size.width * 1.2,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -732,20 +780,24 @@ Widget buildCardTransaksi(
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        name + ' ($mitra)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Text(
+                          name + ' ($mitra)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
                       ),
-                      Text(
-                        noTransaksi,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 14,
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: Text(
+                          noTransaksi,
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ],

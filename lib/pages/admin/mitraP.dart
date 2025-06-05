@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bluetooth_thermal_printer_example/controllers/admin/libraryC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/navAdminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,6 @@ class _MitraPState extends State<MitraP> {
   final TextEditingController newNoController = TextEditingController();
   final TextEditingController newEmailController = TextEditingController();
 
-  final TextEditingController newBankController = TextEditingController();
   final TextEditingController newNoRekController = TextEditingController();
   final TextEditingController newRekNamaController = TextEditingController();
 
@@ -84,7 +84,7 @@ class _MitraPState extends State<MitraP> {
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: getCrossAxisCount(context),
-                              childAspectRatio: 0.7,
+                              childAspectRatio: 0.5,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
                             ),
@@ -127,29 +127,39 @@ class _MitraPState extends State<MitraP> {
             ),
             NavbarDrawer(context, scaffoldKey),
             Padding(
-              padding: EdgeInsets.only(top: 90, left: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(FontAwesomeIcons.peopleArrows,
-                          size: 25, color: PrimaryColor().blue),
-                      SizedBox(width: 10),
-                      Text(
-                        'Mitra Barang',
-                        style: GoogleFonts.roboto(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Colors.black),
+              padding: EdgeInsets.only(top: 80, left: 16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width *
+                          (MediaQuery.of(context).orientation ==
+                                  Orientation.landscape
+                              ? 0.75
+                              : 0.65),
+                      child: Row(
+                        children: [
+                          Icon(FontAwesomeIcons.peopleArrows,
+                              size: 25, color: PrimaryColor().blue),
+                          SizedBox(width: 10),
+                          Text(
+                            'Mitra Barang',
+                            style: GoogleFonts.roboto(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.black),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: buildDialog(),
-                  ),
-                ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: buildDialog(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -301,149 +311,17 @@ class _MitraPState extends State<MitraP> {
                                     color: Colors.white),
                               ),
                               onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Dialog(
-                                      elevation: 0,
-                                      backgroundColor: Colors.transparent,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.5,
-                                        padding: EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Column(
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10),
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(25),
-                                                    decoration: BoxDecoration(
-                                                      color: Color.fromARGB(
-                                                          255, 255, 169, 163),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.delete_outline,
-                                                      color: Colors.red,
-                                                      size: 50,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 25),
-                                                Text(
-                                                  "Hapus Mitra",
-                                                  style: TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 10),
-                                                Text(
-                                                  "Apakah anda yakin untuk menghapus Mitra ini?",
-                                                  style: TextStyle(
-                                                    color: Colors.grey.shade400,
-                                                    fontSize: 15,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 10),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    await mitraController
-                                                        .deleteMitra(item['id'],
-                                                            fromButton: true);
-                                                    await mitraController
-                                                        .refresh();
-                                                    Get.to(MitraP());
-                                                    Navigator.pop(context);
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor: Colors.red,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                        'Hapus',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 5),
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey.shade200,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                        'Batal',
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
+                                AdminW().deleteDialog(
+                                  context,
+                                  'Hapus Mitra',
+                                  'Apakah anda yakin ingin menghapus mitra ${item['nama']} ?',
+                                  () async {
+                                    await mitraController.deleteMitra(
+                                        item['id'],
+                                        fromButton: true);
+                                    await mitraController.refresh();
+                                    Get.to(MitraP());
+                                    Navigator.pop(context);
                                   },
                                 );
                               },
@@ -502,8 +380,8 @@ class _MitraPState extends State<MitraP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Mitra', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Nama Mitra', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newNameController,
                             hintText: 'Toko Kue XXXX',
@@ -511,8 +389,8 @@ class _MitraPState extends State<MitraP> {
                             type: TextInputType.name,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('No. Whatsapp', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('No. Whatsapp', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(12),
                             controller: newNoController,
                             hintText: '0861-XXXX-XXXX',
@@ -520,8 +398,9 @@ class _MitraPState extends State<MitraP> {
                             type: TextInputType.phone,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('Email Mitra (opsional)', " "),
-                          buildTextField(
+                          AdminW()
+                              .buildInputLabel('Email Mitra (opsional)', " "),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newEmailController,
                             hintText: 'contoh: 3yL6A@example.com',
@@ -529,17 +408,58 @@ class _MitraPState extends State<MitraP> {
                             type: TextInputType.emailAddress,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('Nama Bank (opsional)', " "),
-                          buildTextField(
-                            inputFormat: LengthLimitingTextInputFormatter(200),
-                            controller: newBankController,
-                            hintText: 'BCA, Dana',
-                            prefixIcon: Icons.account_balance_outlined,
-                            type: TextInputType.name,
+                          AdminW().buildInputLabel('Nama Bank (opsional)', " "),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                AdminW()
+                                    .showBankDialog(context, mitraController);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                elevation: 1,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(color: Colors.grey.shade300),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 14),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.start, // rata kiri
+                                children: [
+                                  Icon(Icons.add, color: Colors.black54),
+                                  SizedBox(width: 8),
+                                  Obx(() =>
+                                      mitraController.selectedBank.value == null
+                                          ? Text(
+                                              'Pilih Bank',
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            )
+                                          : Text(
+                                              mitraController.selectedBank.value
+                                                      .toString() +
+                                                  " (${mitraController.KodeBank})",
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            )),
+                                ],
+                              ),
+                            ),
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('No Rekening (opsional)', " "),
-                          buildTextField(
+                          AdminW()
+                              .buildInputLabel('No Rekening (opsional)', " "),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newNoRekController,
                             hintText: 'contoh: 01982173019',
@@ -547,9 +467,9 @@ class _MitraPState extends State<MitraP> {
                             type: TextInputType.number,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel(
+                          AdminW().buildInputLabel(
                               'Nama Pemilik Rekening (opsional)', " "),
-                          buildTextField(
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newRekNamaController,
                             hintText: 'contoh: ARTHA ABADI',
@@ -583,16 +503,21 @@ class _MitraPState extends State<MitraP> {
                                             newNameController.text,
                                             newNoController.text,
                                             newEmailController.text,
-                                            newBankController.text,
+                                            mitraController.selectedBank.value
+                                                .toString(),
                                             newNoRekController.text,
                                             newRekNamaController.text,
                                             fromButton: true,
                                           );
-                                          await mitraController.refresh();
                                           Navigator.pop(context);
                                           newNameController.clear();
                                           newNoController.clear();
                                           newEmailController.clear();
+                                          newNoRekController.clear();
+                                          newRekNamaController.clear();
+                                          mitraController.selectedBank.value =
+                                              null;
+                                          await mitraController.refresh();
                                         } catch (e) {
                                           Get.snackbar("Error", e.toString());
                                         } finally {
@@ -642,7 +567,9 @@ class _MitraPState extends State<MitraP> {
               ),
             );
           },
-        );
+        ).then((value) {
+          mitraController.selectedBank.value = null;
+        });
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueAccent,
@@ -675,10 +602,9 @@ class _MitraPState extends State<MitraP> {
         TextEditingController(text: mitraLama);
     final TextEditingController noMitraController =
         TextEditingController(text: no_tlp);
+    String selectedBankEdit = bank;
     final TextEditingController emailMitraController =
         TextEditingController(text: email);
-    final TextEditingController bankMitraController =
-        TextEditingController(text: bank);
     final TextEditingController noRekMitraController =
         TextEditingController(text: noRek);
     final TextEditingController namaRekMitraController =
@@ -686,6 +612,7 @@ class _MitraPState extends State<MitraP> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        print("Cek isi nya $bank");
         return Dialog(
           elevation: 0,
           backgroundColor: Colors.white,
@@ -697,61 +624,125 @@ class _MitraPState extends State<MitraP> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  buildInputLabel('Nama Mitra', ' *'),
-                  buildTextField(
-                    controller: namaMitraController,
-                    hintText: 'Toko Kue XXXX',
-                    prefixIcon: CupertinoIcons.person_2_alt,
-                    type: TextInputType.name,
-                    inputFormat:
-                        FilteringTextInputFormatter.singleLineFormatter,
+                  Row(
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.peopleArrows,
+                        color: PrimaryColor().blue,
+                        size: 24,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        "Edit Member ",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 15),
-                  buildInputLabel('No. Whatsapp', ' *'),
-                  buildTextField(
-                    controller: noMitraController,
-                    hintText: '0891-XXXX-XXXX',
-                    prefixIcon: CupertinoIcons.phone_circle,
-                    type: TextInputType.number,
-                    inputFormat:
-                        FilteringTextInputFormatter.singleLineFormatter,
-                  ),
-                  SizedBox(height: 15),
-                  buildInputLabel('Email Mitra(opsional)', ' *'),
-                  buildTextField(
-                    controller: emailMitraController,
-                    hintText: 'contoh: 3yL6A@example.com',
-                    prefixIcon: Icons.alternate_email,
-                    type: TextInputType.emailAddress,
-                    inputFormat:
-                        FilteringTextInputFormatter.singleLineFormatter,
-                  ),
-                  SizedBox(height: 10),
-                  buildInputLabel('Nama Bank (opsional)', " "),
-                  buildTextField(
-                    inputFormat: LengthLimitingTextInputFormatter(200),
-                    controller: bankMitraController,
-                    hintText: 'BCA, Dana',
-                    prefixIcon: Icons.account_balance_outlined,
-                    type: TextInputType.name,
-                  ),
-                  SizedBox(height: 10),
-                  buildInputLabel('No Rekening (opsional)', " "),
-                  buildTextField(
-                    inputFormat: LengthLimitingTextInputFormatter(200),
-                    controller: noRekMitraController,
-                    hintText: 'contoh: 01982173019',
-                    prefixIcon: Icons.account_balance_wallet,
-                    type: TextInputType.number,
-                  ),
-                  SizedBox(height: 10),
-                  buildInputLabel('Nama Pemilik Rekening (opsional)', " "),
-                  buildTextField(
-                    inputFormat: LengthLimitingTextInputFormatter(200),
-                    controller: namaRekMitraController,
-                    hintText: 'contoh: ARTHA ABADI',
-                    prefixIcon: Icons.face,
-                    type: TextInputType.name,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 15),
+                      AdminW().buildInputLabel('Nama Mitra', ' *'),
+                      AdminW().buildTextField(
+                        controller: namaMitraController,
+                        hintText: 'Toko Kue XXXX',
+                        prefixIcon: CupertinoIcons.person_2_alt,
+                        type: TextInputType.name,
+                        inputFormat:
+                            FilteringTextInputFormatter.singleLineFormatter,
+                      ),
+                      SizedBox(height: 15),
+                      AdminW().buildInputLabel('No. Whatsapp', ' *'),
+                      AdminW().buildTextField(
+                        controller: noMitraController,
+                        hintText: '0891-XXXX-XXXX',
+                        prefixIcon: CupertinoIcons.phone_circle,
+                        type: TextInputType.number,
+                        inputFormat:
+                            FilteringTextInputFormatter.singleLineFormatter,
+                      ),
+                      SizedBox(height: 15),
+                      AdminW().buildInputLabel('Email Mitra(opsional)', ' *'),
+                      AdminW().buildTextField(
+                        controller: emailMitraController,
+                        hintText: 'contoh: 3yL6A@example.com',
+                        prefixIcon: Icons.alternate_email,
+                        type: TextInputType.emailAddress,
+                        inputFormat:
+                            FilteringTextInputFormatter.singleLineFormatter,
+                      ),
+                      SizedBox(height: 10),
+                      AdminW().buildInputLabel('Nama Bank (opsional)', " "),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            AdminW().showBankDialog(context, mitraController,
+                                namaBank: selectedBankEdit);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.start, // rata kiri
+                            children: [
+                              Icon(Icons.add, color: Colors.black54),
+                              SizedBox(width: 8),
+                              Obx(() =>
+                                  mitraController.selectedBank.value == null
+                                      ? Text(
+                                          selectedBankEdit,
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        )
+                                      : Text(
+                                          mitraController.selectedBank.value
+                                                  .toString() +
+                                              " (${mitraController.KodeBank})",
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        )),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      AdminW().buildInputLabel('No Rekening (opsional)', " "),
+                      AdminW().buildTextField(
+                        inputFormat: LengthLimitingTextInputFormatter(200),
+                        controller: noRekMitraController,
+                        hintText: 'contoh: 01982173019',
+                        prefixIcon: Icons.account_balance_wallet,
+                        type: TextInputType.number,
+                      ),
+                      SizedBox(height: 10),
+                      AdminW().buildInputLabel(
+                          'Nama Pemilik Rekening (opsional)', " "),
+                      AdminW().buildTextField(
+                        inputFormat: LengthLimitingTextInputFormatter(200),
+                        controller: namaRekMitraController,
+                        hintText: 'contoh: ARTHA ABADI',
+                        prefixIcon: Icons.face,
+                        type: TextInputType.name,
+                      ),
+                    ],
                   ),
                   SizedBox(height: 24),
                   Row(
@@ -767,12 +758,15 @@ class _MitraPState extends State<MitraP> {
                       SizedBox(width: 12),
                       ElevatedButton(
                         onPressed: () async {
+                          var selectedBank =
+                              mitraController.selectedBank.value ??
+                                  selectedBankEdit;
                           await mitraController.editMitra(
                             id,
                             namaMitraController.text,
                             noMitraController.text,
                             emailMitraController.text,
-                            bankMitraController.text,
+                            selectedBank.toString(),
                             noRekMitraController.text,
                             namaRekMitraController.text,
                             fromButton: true,
@@ -811,71 +805,10 @@ class _MitraPState extends State<MitraP> {
           ),
         );
       },
-    );
+    ).then((value) {
+      mitraController.selectedBank.value = null;
+    });
   }
-}
-
-Widget buildInputLabel(String label, String label2) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey.shade700,
-          ),
-        ),
-        Text(label2,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: DarkColor().red,
-            )),
-      ],
-    ),
-  );
-}
-
-Widget buildTextField({
-  required TextEditingController controller,
-  required String hintText,
-  required IconData prefixIcon,
-  required TextInputType type,
-  required inputFormat,
-  // controller
-}) {
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(12),
-      color: Colors.grey.shade50,
-      border: Border.all(color: Colors.grey.shade200),
-    ),
-    child: TextField(
-      inputFormatters: [inputFormat],
-      keyboardType: type,
-      controller: controller,
-      cursorColor: PrimaryColor().blue,
-      style: TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        prefixIcon: Icon(
-          prefixIcon,
-          color: Colors.grey.shade600,
-          size: 20,
-        ),
-        hintText: hintText,
-        hintStyle: TextStyle(
-          fontSize: 14,
-          color: Colors.grey.shade400,
-        ),
-        border: InputBorder.none,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      ),
-    ),
-  );
 }
 
 class WaveClipper extends CustomClipper<Path> {

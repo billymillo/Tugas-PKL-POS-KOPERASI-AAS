@@ -16,6 +16,7 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class KasirP extends StatefulWidget {
   @override
@@ -26,6 +27,8 @@ class _KasirPState extends State<KasirP> {
   final AuthController logoutController = Get.put(AuthController());
   TextEditingController searchController = TextEditingController();
   TextEditingController saldoController = TextEditingController();
+  TextEditingController topUpController = TextEditingController();
+  final FocusNode barcodeFocusNode = FocusNode();
 
   @override
   void didChangeDependencies() {
@@ -63,7 +66,7 @@ class _KasirPState extends State<KasirP> {
         body: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 77),
+              padding: EdgeInsets.only(top: 77),
               child: RefreshIndicator(
                 onRefresh: () async {
                   await c.refreshPage();
@@ -91,8 +94,7 @@ class _KasirPState extends State<KasirP> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 10),
+                                        padding: EdgeInsets.only(bottom: 10),
                                         child: Text(
                                           'Kategori',
                                           style: GoogleFonts.nunito(
@@ -150,7 +152,7 @@ class _KasirPState extends State<KasirP> {
                                                   return Container(
                                                     child: KasirW().kategori(
                                                       item['kategori'],
-                                                      "http://192.168.1.7/POS_CI/kategori/${item['gambar_kategori']}",
+                                                      "http://10.10.20.109/POS_CI/kategori/${item['gambar_kategori']}",
                                                       Icons.fastfood,
                                                       (kategori) {
                                                         print(
@@ -264,8 +266,8 @@ class _KasirPState extends State<KasirP> {
                             Obx(
                               () => Expanded(
                                   child: Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 1.1,
+                                height: MediaQuery.of(context).size.height *
+                                    (c.selectedMember.value == null ? 1 : 1.3),
                                 margin: EdgeInsets.only(left: 15, bottom: 15),
                                 padding: EdgeInsets.all(20),
                                 color: Colors.white,
@@ -635,83 +637,45 @@ class _KasirPState extends State<KasirP> {
                                                       ],
                                                     ),
                                                     SizedBox(height: 10),
-                                                    Obx(() {
-                                                      return c.checkboxSaldo
-                                                              .value
-                                                          ? Row(
-                                                              children: [
-                                                                Expanded(
-                                                                  child:
-                                                                      TextField(
-                                                                    controller:
-                                                                        c.saldoController,
-                                                                    keyboardType:
-                                                                        TextInputType
-                                                                            .number,
-                                                                    style: GoogleFonts.nunito(
-                                                                        fontSize:
-                                                                            12),
-                                                                    decoration:
-                                                                        InputDecoration(
-                                                                      labelText:
-                                                                          "Gunakan Saldo",
-                                                                      labelStyle:
-                                                                          TextStyle(
-                                                                              fontSize: 12),
-                                                                      isDense:
-                                                                          true,
-                                                                      contentPadding: EdgeInsets.symmetric(
-                                                                          vertical:
-                                                                              10,
-                                                                          horizontal:
-                                                                              12),
-                                                                      border:
-                                                                          OutlineInputBorder(),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                    width: 8),
-                                                                ElevatedButton(
-                                                                  onPressed: () =>
-                                                                      c.simpanSaldo(),
-                                                                  style: ElevatedButton
-                                                                      .styleFrom(
-                                                                    padding: EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            16,
-                                                                        vertical:
-                                                                            10),
-                                                                  ),
-                                                                  child: Text(
-                                                                    "Simpan",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            12),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )
-                                                          : SizedBox();
-                                                    }),
-                                                    const SizedBox(height: 5),
-                                                    Obx(() =>
-                                                        c.checkboxSaldo.value
-                                                            ? Text(
-                                                                "Saldo Member: Rp. ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(c.MemberSaldo) ?? 0)}",
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .nunito(
-                                                                  fontSize: 12,
-                                                                  color:
-                                                                      PrimaryColor()
-                                                                          .blue,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              )
-                                                            : SizedBox()),
+                                                    Obx(
+                                                        () =>
+                                                            c.checkboxSaldo
+                                                                    .value
+                                                                ? Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(
+                                                                        "Saldo Member: Rp. ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(c.MemberSaldo) ?? 0)}",
+                                                                        style: GoogleFonts
+                                                                            .nunito(
+                                                                          fontSize:
+                                                                              11,
+                                                                          color:
+                                                                              PrimaryColor().blue,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      Text(
+                                                                        "Saldo Terpakai: Rp. ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(c.saldoUpdate.toString()) ?? 0)}",
+                                                                        style: GoogleFonts
+                                                                            .nunito(
+                                                                          fontSize:
+                                                                              11,
+                                                                          color:
+                                                                              Colors.red,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                          height:
+                                                                              5),
+                                                                    ],
+                                                                  )
+                                                                : SizedBox()),
                                                   ],
                                                 )),
                                         ),
@@ -755,232 +719,8 @@ class _KasirPState extends State<KasirP> {
                                             ),
                                           ),
                                           onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return Dialog(
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  child: SingleChildScrollView(
-                                                    child: Container(
-                                                      width:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .width *
-                                                              0.5,
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              16),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(16),
-                                                      ),
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          TextField(
-                                                            controller: c
-                                                                .searchController,
-                                                            onChanged: (value) =>
-                                                                c.searchMember(
-                                                                    value,
-                                                                    c.member),
-                                                            style:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        13),
-                                                            cursorColor:
-                                                                Colors.black12,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              prefixIcon: Icon(
-                                                                FontAwesomeIcons
-                                                                    .magnifyingGlass,
-                                                                size: 15,
-                                                                color:
-                                                                    DarkColor()
-                                                                        .grey,
-                                                              ),
-                                                              suffixIcon: Obx(() => c
-                                                                      .searchQuery
-                                                                      .value
-                                                                      .isNotEmpty
-                                                                  ? IconButton(
-                                                                      icon: Icon(
-                                                                          Icons
-                                                                              .close,
-                                                                          color:
-                                                                              Colors.grey),
-                                                                      onPressed:
-                                                                          () {
-                                                                        c.clearSearch();
-                                                                      },
-                                                                    )
-                                                                  : SizedBox()),
-                                                              contentPadding:
-                                                                  const EdgeInsets
-                                                                      .symmetric(
-                                                                      vertical:
-                                                                          5,
-                                                                      horizontal:
-                                                                          20),
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            10.0)),
-                                                                borderSide: BorderSide(
-                                                                    color: ShadowColor()
-                                                                        .blue),
-                                                              ),
-                                                              disabledBorder:
-                                                                  OutlineInputBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            10.0)),
-                                                                borderSide: BorderSide(
-                                                                    color:
-                                                                        ShadowColor()
-                                                                            .blue,
-                                                                    width: 0.2),
-                                                              ),
-                                                              enabledBorder:
-                                                                  OutlineInputBorder(
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            10.0)),
-                                                                borderSide: BorderSide(
-                                                                    color:
-                                                                        ShadowColor()
-                                                                            .blue,
-                                                                    width: 0.2),
-                                                              ),
-                                                              focusedBorder:
-                                                                  OutlineInputBorder(
-                                                                borderSide: BorderSide(
-                                                                    color:
-                                                                        PrimaryColor()
-                                                                            .blue,
-                                                                    width: 0.5),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10.0),
-                                                              ),
-                                                              fillColor:
-                                                                  PrimaryColor()
-                                                                      .grey,
-                                                              filled: true,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 10),
-                                                          Obx(() {
-                                                            if (c.isLoading
-                                                                .value) {
-                                                              return Center(
-                                                                  child:
-                                                                      CircularProgressIndicator());
-                                                            }
-                                                            if (c
-                                                                .filteredMembers
-                                                                .isEmpty) {
-                                                              return Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(
-                                                                        20),
-                                                                child: Text(
-                                                                    "Tidak ada member ditemukan"),
-                                                              );
-                                                            }
-                                                            return Container(
-                                                              height:
-                                                                  300, // Batas tinggi list agar tidak terlalu panjang
-                                                              child: ListView
-                                                                  .builder(
-                                                                itemCount: c
-                                                                    .filteredMembers
-                                                                    .length,
-                                                                itemBuilder:
-                                                                    (context,
-                                                                        index) {
-                                                                  final member =
-                                                                      c.filteredMembers[
-                                                                          index];
-                                                                  return Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        vertical:
-                                                                            5,
-                                                                        horizontal:
-                                                                            10),
-                                                                    child:
-                                                                        ElevatedButton(
-                                                                      style: ElevatedButton
-                                                                          .styleFrom(
-                                                                        backgroundColor:
-                                                                            Colors.white,
-                                                                        padding: EdgeInsets.symmetric(
-                                                                            vertical:
-                                                                                12,
-                                                                            horizontal:
-                                                                                16),
-                                                                        shape:
-                                                                            RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(8),
-                                                                          side:
-                                                                              BorderSide(color: Colors.blueAccent),
-                                                                        ),
-                                                                        elevation:
-                                                                            1, // Efek bayangan
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        c.selectedMember
-                                                                            .value = member[
-                                                                                'id']
-                                                                            .toString();
-                                                                        Get.back();
-                                                                      },
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.spaceBetween,
-                                                                        children: [
-                                                                          Text(
-                                                                            member['nama'],
-                                                                            style: TextStyle(
-                                                                                fontSize: 14,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: Colors.black),
-                                                                          ),
-                                                                          Text(
-                                                                            "${member['no_tlp']}",
-                                                                            style:
-                                                                                TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                },
-                                                              ),
-                                                            );
-                                                          }),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            );
+                                            KasirW()
+                                                .showMemberDialog(context, c);
                                           },
                                         ),
                                         SizedBox(height: 5),
@@ -1016,7 +756,11 @@ class _KasirPState extends State<KasirP> {
                                             );
                                             return;
                                           }
-                                          c.metodePembayaran.value = 1;
+                                          if (c.checkboxSaldo.value == true) {
+                                            c.metodePembayaran.value = 3;
+                                          } else {
+                                            c.metodePembayaran.value = 1;
+                                          }
                                           try {
                                             await c.addTransaksiOut(
                                               c.selectedMember.string,
@@ -1042,20 +786,16 @@ class _KasirPState extends State<KasirP> {
                                             }
 
                                             if (c.checkboxSaldo.value == true) {
-                                              int saldoInput = int.tryParse(c
-                                                      .saldoInput
-                                                      .toString()) ??
-                                                  0;
                                               int saldoMember =
                                                   int.tryParse(c.MemberSaldo) ??
                                                       0;
                                               int kurangSaldo =
-                                                  saldoMember - saldoInput;
-                                              await c.kurangSaldo(
+                                                  saldoMember - c.saldoUpdate;
+                                              await c.ubahSaldo(
                                                   c.selectedMember.string,
                                                   kurangSaldo.toString());
                                             }
-                                            await c.tambahPoin(
+                                            await c.ubahPoin(
                                                 c.selectedMember.string,
                                                 c.poinUpdate.toString());
 
@@ -1203,90 +943,73 @@ class _KasirPState extends State<KasirP> {
                                                                           20),
                                                                   Container(
                                                                     width: 300,
-                                                                    child:
-                                                                        ElevatedButton(
-                                                                      onPressed:
-                                                                          () async {
-                                                                        bool
-                                                                            connected =
-                                                                            await c.checkPrinterStatus();
-
-                                                                        if (connected) {
-                                                                          await c.printReceipt(
-                                                                              "Hello World",
-                                                                              "Tunai");
-                                                                          await c
-                                                                              .disconnectPrinter();
-                                                                        } else {
-                                                                          print(
-                                                                              "Printer belum terhubung, mencari perangkat...");
-                                                                          await c
-                                                                              .scanForDevices();
-
-                                                                          connected =
-                                                                              await c.checkPrinterStatus();
-                                                                          if (connected) {
-                                                                            await c.printReceipt("Hello World",
-                                                                                "Tunai");
-                                                                            await c.disconnectPrinter();
-                                                                          } else {
-                                                                            print("Printer tidak ditemukan atau gagal terhubung.");
-                                                                          }
-                                                                          if (c.statusId.value == 2 &&
-                                                                              c.selectedMember.value != null) {
-                                                                            await c.detKasbon(c.idTransaksiOut.toString());
-                                                                          }
-                                                                          await c
-                                                                              .fetchProduk();
-                                                                          await c
-                                                                              .fetchMember();
-                                                                          c.selectedMember.value =
-                                                                              null;
-                                                                          c.banyakDibeli.value =
-                                                                              0;
-                                                                          setState(
-                                                                              () {
-                                                                            c.checkboxSaldo.value =
-                                                                                false;
-                                                                          });
-                                                                          c.saldoInput.value =
-                                                                              0;
-                                                                          setState(
-                                                                              () {
-                                                                            c.checkbox.value =
-                                                                                false;
-                                                                          });
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                        }
-                                                                      },
-                                                                      style: ElevatedButton
-                                                                          .styleFrom(
-                                                                        backgroundColor:
-                                                                            PrimaryColor().blue,
-                                                                        shape:
-                                                                            RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(12),
-                                                                        ),
-                                                                      ),
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          SizedBox(
-                                                                              width: 8),
-                                                                          Text(
-                                                                            'Cetak Struk',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: 14,
-                                                                              fontWeight: FontWeight.w600,
-                                                                            ),
+                                                                    child: Obx(
+                                                                      () =>
+                                                                          ElevatedButton(
+                                                                        onPressed: c.isPrinting.value
+                                                                            ? null
+                                                                            : () async {
+                                                                                c.isPrinting.value = true;
+                                                                                bool connected = await c.checkPrinterStatus();
+                                                                                if (connected) {
+                                                                                  await c.printReceipt("Hello World", "Tunai");
+                                                                                  await c.disconnectPrinter();
+                                                                                } else {
+                                                                                  print("Printer belum terhubung, mencari perangkat...");
+                                                                                  await c.scanForDevices();
+                                                                                  connected = await c.checkPrinterStatus();
+                                                                                  if (connected) {
+                                                                                    await c.printReceipt("Hello World", "Tunai");
+                                                                                    await c.disconnectPrinter();
+                                                                                  } else {
+                                                                                    print("Printer tidak ditemukan atau gagal terhubung.");
+                                                                                  }
+                                                                                  if (c.statusId.value == 2 && c.selectedMember.value != null) {
+                                                                                    await c.detKasbon(c.idTransaksiOut.toString());
+                                                                                  }
+                                                                                  await c.fetchProduk();
+                                                                                  await c.fetchMember();
+                                                                                  c.selectedMember.value = null;
+                                                                                  c.banyakDibeli.value = 0;
+                                                                                  setState(() {
+                                                                                    c.checkboxSaldo.value = false;
+                                                                                  });
+                                                                                  c.saldoInput.value = 0;
+                                                                                  setState(() {
+                                                                                    c.checkbox.value = false;
+                                                                                  });
+                                                                                  Navigator.pop(context);
+                                                                                }
+                                                                              },
+                                                                        style: ElevatedButton
+                                                                            .styleFrom(
+                                                                          backgroundColor:
+                                                                              PrimaryColor().blue,
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(12),
                                                                           ),
-                                                                        ],
+                                                                        ),
+                                                                        child: c.isPrinting.value
+                                                                            ? CircularProgressIndicator(
+                                                                                color: Colors.white,
+                                                                                strokeWidth: 2,
+                                                                              )
+                                                                            : Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                                children: [
+                                                                                  SizedBox(width: 8),
+                                                                                  Text(
+                                                                                    'Cetak Struk',
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontSize: 14,
+                                                                                      fontWeight: FontWeight.w600,
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
                                                                       ),
                                                                     ),
                                                                   ),
@@ -1378,9 +1101,13 @@ class _KasirPState extends State<KasirP> {
                                           context,
                                           c.isLoading,
                                           "Rp. ${NumberFormat('#,##0', 'id_ID').format(double.parse(c.totalHarga.toString()))}",
-                                          "00020101021126570011ID.DANA.WWW011893600915335349417602093534941760303UMI51440014ID.CO.QRIS.WWW0215ID10222268651970303UMI5204541153033605802ID5925Koperasi Anugrah Artha Ab6010Kota Depok6105164126304A768",
+                                          c.qrData,
                                           () async {
-                                            c.metodePembayaran.value = 2;
+                                            if (c.checkboxSaldo.value == true) {
+                                              c.metodePembayaran.value = 3;
+                                            } else {
+                                              c.metodePembayaran.value = 1;
+                                            }
                                             c.statusTr.value = 1;
                                             try {
                                               await c.addTransaksiOut(
@@ -1412,21 +1139,17 @@ class _KasirPState extends State<KasirP> {
 
                                               if (c.checkboxSaldo.value ==
                                                   true) {
-                                                int saldoInput = int.tryParse(c
-                                                        .saldoInput
-                                                        .toString()) ??
-                                                    0;
                                                 int saldoMember = int.tryParse(
                                                         c.MemberSaldo) ??
                                                     0;
                                                 int kurangSaldo =
-                                                    saldoMember - saldoInput;
-                                                await c.kurangSaldo(
+                                                    saldoMember - c.saldoUpdate;
+                                                await c.ubahSaldo(
                                                     c.selectedMember.string,
                                                     kurangSaldo.toString());
                                                 ;
                                               }
-                                              await c.tambahPoin(
+                                              await c.ubahPoin(
                                                   c.selectedMember.string,
                                                   c.poinUpdate.toString());
                                               c.fetchTransaksiStruk();
@@ -1570,71 +1293,70 @@ class _KasirPState extends State<KasirP> {
                                                                       width:
                                                                           300,
                                                                       child:
-                                                                          ElevatedButton(
-                                                                        onPressed:
-                                                                            () async {
-                                                                          bool
-                                                                              connected =
-                                                                              await c.checkPrinterStatus();
+                                                                          Obx(
+                                                                        () =>
+                                                                            ElevatedButton(
+                                                                          onPressed: c.isPrinting.value
+                                                                              ? null
+                                                                              : () async {
+                                                                                  c.isPrinting.value = true;
+                                                                                  bool connected = await c.checkPrinterStatus();
+                                                                                  if (connected) {
+                                                                                    await c.printReceipt("Hello World", "Qris");
+                                                                                    await c.disconnectPrinter();
+                                                                                  } else {
+                                                                                    print("Printer belum terhubung, mencari perangkat...");
+                                                                                    await c.scanForDevices();
 
-                                                                          if (connected) {
-                                                                            await c.printReceipt("Hello World",
-                                                                                "Qris");
-                                                                            await c.disconnectPrinter();
-                                                                          } else {
-                                                                            print("Printer belum terhubung, mencari perangkat...");
-                                                                            await c.scanForDevices();
-
-                                                                            connected =
-                                                                                await c.checkPrinterStatus();
-                                                                            if (connected) {
-                                                                              await c.printReceipt("Hello World", "Qris");
-                                                                              await c.disconnectPrinter();
-                                                                            } else {
-                                                                              print("Printer tidak ditemukan atau gagal terhubung.");
-                                                                            }
-                                                                            await c.fetchProduk();
-                                                                            await c.fetchMember();
-                                                                            c.selectedMember.value =
-                                                                                null;
-                                                                            c.banyakDibeli.value =
-                                                                                0;
-                                                                            setState(() {
-                                                                              c.checkboxSaldo.value = false;
-                                                                            });
-                                                                            c.saldoInput.value =
-                                                                                0;
-                                                                            setState(() {
-                                                                              c.checkbox.value = false;
-                                                                            });
-                                                                            Navigator.pop(context);
-                                                                          }
-                                                                        },
-                                                                        style: ElevatedButton
-                                                                            .styleFrom(
-                                                                          backgroundColor:
-                                                                              PrimaryColor().blue,
-                                                                          shape:
-                                                                              RoundedRectangleBorder(
-                                                                            borderRadius:
-                                                                                BorderRadius.circular(12),
-                                                                          ),
-                                                                        ),
-                                                                        child:
-                                                                            Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            SizedBox(width: 8),
-                                                                            Text(
-                                                                              'Cetak Struk',
-                                                                              style: TextStyle(
-                                                                                color: Colors.white,
-                                                                                fontSize: 14,
-                                                                                fontWeight: FontWeight.w600,
-                                                                              ),
+                                                                                    connected = await c.checkPrinterStatus();
+                                                                                    if (connected) {
+                                                                                      await c.printReceipt("Hello World", "Qris");
+                                                                                      await c.disconnectPrinter();
+                                                                                    } else {
+                                                                                      print("Printer tidak ditemukan atau gagal terhubung.");
+                                                                                    }
+                                                                                    await c.fetchProduk();
+                                                                                    await c.fetchMember();
+                                                                                    c.selectedMember.value = null;
+                                                                                    c.banyakDibeli.value = 0;
+                                                                                    setState(() {
+                                                                                      c.checkboxSaldo.value = false;
+                                                                                    });
+                                                                                    c.saldoInput.value = 0;
+                                                                                    setState(() {
+                                                                                      c.checkbox.value = false;
+                                                                                    });
+                                                                                    Navigator.pop(context);
+                                                                                  }
+                                                                                },
+                                                                          style:
+                                                                              ElevatedButton.styleFrom(
+                                                                            backgroundColor:
+                                                                                PrimaryColor().blue,
+                                                                            shape:
+                                                                                RoundedRectangleBorder(
+                                                                              borderRadius: BorderRadius.circular(12),
                                                                             ),
-                                                                          ],
+                                                                          ),
+                                                                          child: c.isPrinting.value
+                                                                              ? CircularProgressIndicator(
+                                                                                  color: Colors.white,
+                                                                                  strokeWidth: 2,
+                                                                                )
+                                                                              : Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    SizedBox(width: 8),
+                                                                                    Text(
+                                                                                      'Cetak Struk',
+                                                                                      style: TextStyle(
+                                                                                        color: Colors.white,
+                                                                                        fontSize: 14,
+                                                                                        fontWeight: FontWeight.w600,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
                                                                         ),
                                                                       ),
                                                                     ),
@@ -1746,12 +1468,27 @@ class _KasirPState extends State<KasirP> {
                     flex: 1,
                   ),
                   Expanded(
+                    flex: 2,
                     child: TextFormField(
+                      autofocus: true,
+                      focusNode: barcodeFocusNode,
                       controller: searchController,
                       onChanged: (value) {
                         c.searchProduk(value);
+                        final index = c.filteredProduk
+                            .indexWhere((produk) => produk['barcode'] == value);
+                        if (index != -1) {
+                          c.tambahKeKeranjang(index, null);
+                          searchController.clear();
+
+                          // Kembalikan fokus ke text field
+                          Future.delayed(Duration(milliseconds: 100), () {
+                            FocusScope.of(context)
+                                .requestFocus(barcodeFocusNode);
+                          });
+                        }
                       },
-                      style: const TextStyle(fontSize: 13),
+                      style: TextStyle(fontSize: 13),
                       cursorColor: Colors.black12,
                       decoration: InputDecoration(
                         prefixIcon: Icon(
@@ -1759,8 +1496,8 @@ class _KasirPState extends State<KasirP> {
                           size: 15,
                           color: DarkColor().grey,
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 20),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(10.0)),
                           borderSide: BorderSide(color: ShadowColor().blue),
@@ -1784,14 +1521,12 @@ class _KasirPState extends State<KasirP> {
                         filled: true,
                       ),
                     ),
-                    flex: 2,
                   ),
                   Expanded(
+                    flex: 1,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        KasirW().logout(context),
-                        SizedBox(width: 30),
                         GestureDetector(
                           onTap: () {
                             Get.toNamed(Routes.TRANSAKSIP);
@@ -1804,37 +1539,270 @@ class _KasirPState extends State<KasirP> {
                         SizedBox(
                           width: 30,
                         ),
-                        Icon(
-                          FontAwesomeIcons.gear,
-                          color: PrimaryColor().blue,
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Dialog(
+                                  elevation: 0,
+                                  backgroundColor: Colors.transparent,
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.3,
+                                    padding: EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text('Top-up Saldo Member',
+                                            style: GoogleFonts.nunito(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: Colors.black)),
+                                        SizedBox(height: 5),
+                                        Obx(
+                                          () => Text(
+                                            "Saldo Member: Rp. ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(c.MemberSaldo) ?? 0)}",
+                                            style: GoogleFonts.nunito(
+                                              fontSize: 11,
+                                              color: PrimaryColor().blue,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        QrImageView(
+                                          data: c.qrData,
+                                          version: QrVersions.auto,
+                                          size: 200,
+                                          embeddedImage: AssetImage(
+                                              "assets/image/aas_logo.png"),
+                                        ),
+                                        SizedBox(height: 15),
+                                        GestureDetector(
+                                          child: Container(
+                                            width: 300,
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    width: 1,
+                                                    color: PrimaryColor().blue),
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 11, horizontal: 16),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Icon(
+                                                  CupertinoIcons.person_2_alt,
+                                                  size: 14,
+                                                  color: PrimaryColor().blue,
+                                                ),
+                                                SizedBox(width: 10),
+                                                Obx(
+                                                  () =>
+                                                      c.selectedMember.value ==
+                                                              null
+                                                          ? Text(
+                                                              'Member',
+                                                              style: GoogleFonts.nunito(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 11,
+                                                                  color:
+                                                                      PrimaryColor()
+                                                                          .blue),
+                                                            )
+                                                          : Text(
+                                                              c.MemberName,
+                                                              style: GoogleFonts.nunito(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 11,
+                                                                  color:
+                                                                      PrimaryColor()
+                                                                          .blue),
+                                                            ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            KasirW()
+                                                .showMemberDialog(context, c);
+                                          },
+                                        ),
+                                        SizedBox(height: 10),
+                                        Container(
+                                          width: 300,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            color: Colors.grey.shade50,
+                                            border: Border.all(
+                                                color: Colors.grey.shade200),
+                                          ),
+                                          child: TextField(
+                                            keyboardType: TextInputType.number,
+                                            controller: c.topUpController,
+                                            cursorColor: PrimaryColor().blue,
+                                            style: TextStyle(fontSize: 14),
+                                            decoration: InputDecoration(
+                                              prefixIcon: Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 10, left: 10),
+                                                child: Text('Rp. ',
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: Colors
+                                                            .grey.shade600,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ),
+                                              hintText: 'Jumlah Top-up',
+                                              hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey.shade400,
+                                              ),
+                                              border: InputBorder.none,
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 10),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            ElevatedButton(
+                                              onPressed: () async {
+                                                int topUp = int.tryParse(c
+                                                        .topUpController
+                                                        .text) ??
+                                                    0;
+                                                int saldoMember = int.tryParse(
+                                                        c.MemberSaldo) ??
+                                                    0;
+                                                int tambahSaldo =
+                                                    saldoMember + topUp;
+                                                await c.topupSaldo(
+                                                    c.selectedMember.value
+                                                        .toString(),
+                                                    c.topUpController.text,
+                                                    '1');
+                                                await c.ubahSaldo(
+                                                    c.selectedMember.value
+                                                        .toString(),
+                                                    tambahSaldo.toString());
+                                                c.selectedMember.value = null;
+                                                c.topUpInput.value = 0;
+                                                c.topUpController.text = '';
+                                                c.fetchMember();
+                                                Navigator.pop(context);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    PrimaryColor().blue,
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 30,
+                                                    vertical: 10),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Tunai',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 10),
+                                            ElevatedButton(
+                                              onPressed: () async {
+                                                int topUp = int.tryParse(c
+                                                        .topUpController
+                                                        .text) ??
+                                                    0;
+                                                int saldoMember = int.tryParse(
+                                                        c.MemberSaldo) ??
+                                                    0;
+                                                int tambahSaldo =
+                                                    saldoMember + topUp;
+                                                await c.topupSaldo(
+                                                    c.selectedMember.value
+                                                        .toString(),
+                                                    c.topUpController.text,
+                                                    '2');
+                                                await c.ubahSaldo(
+                                                    c.selectedMember.value
+                                                        .toString(),
+                                                    tambahSaldo.toString());
+                                                c.selectedMember.value = null;
+                                                c.topUpInput.value = 0;
+                                                c.topUpController.text = '';
+                                                c.fetchMember();
+                                                Navigator.pop(context);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    PrimaryColor().green,
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 30,
+                                                    vertical: 10),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Qris',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          child: Icon(
+                            FontAwesomeIcons.moneyBillTransfer,
+                            color: PrimaryColor().blue,
+                          ),
                         ),
+                        SizedBox(width: 30),
+                        KasirW().logout(context),
                       ],
                     ),
-                    flex: 1,
                   ),
                 ],
               ),
             ),
           ],
         ));
-  }
-
-  Widget Button(String label, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.5,
-        decoration:
-            BoxDecoration(color: color, borderRadius: BorderRadius.circular(5)),
-        padding: EdgeInsets.symmetric(vertical: 11, horizontal: 16),
-        child: Center(
-          child: Text(
-            label,
-            style: GoogleFonts.nunito(
-                fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
-          ),
-        ),
-      ),
-    );
   }
 }

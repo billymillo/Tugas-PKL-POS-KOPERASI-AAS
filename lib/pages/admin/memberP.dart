@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bluetooth_thermal_printer_example/controllers/admin/libraryC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:bluetooth_thermal_printer_example/widgets/navAdminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -123,7 +124,7 @@ class _MemberPState extends State<MemberP> {
             ),
             NavbarDrawer(context, scaffoldKey),
             Padding(
-              padding: EdgeInsets.only(top: 90, left: 16),
+              padding: EdgeInsets.only(top: 80, left: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -289,143 +290,150 @@ class _MemberPState extends State<MemberP> {
                                     return Dialog(
                                       elevation: 0,
                                       backgroundColor: Colors.transparent,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.5,
-                                        padding: EdgeInsets.all(20),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Column(
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10),
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(25),
-                                                    decoration: BoxDecoration(
-                                                      color: Color.fromARGB(
-                                                          255, 255, 169, 163),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.delete_outline,
-                                                      color: Colors.red,
-                                                      size: 50,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 25),
-                                                Text(
-                                                  "Hapus Member",
-                                                  style: TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 25,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 10),
-                                                Text(
-                                                  "Apakah anda yakin untuk menghapus Member ini?",
-                                                  style: TextStyle(
-                                                    color: Colors.grey.shade400,
-                                                    fontSize: 15,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 10),
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    await memberController
-                                                        .deleteMember(
-                                                            item['id'],
-                                                            fromButton: true);
-                                                    await memberController
-                                                        .refresh();
-                                                    await memberController
-                                                        .fetchMember();
-                                                    Get.to(MemberP());
-                                                    Navigator.pop(context);
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor: Colors.red,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                        'Hapus',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
+                                      child: SingleChildScrollView(
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.5,
+                                          padding: EdgeInsets.all(20),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 10),
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.all(25),
+                                                      decoration: BoxDecoration(
+                                                        color: Color.fromARGB(
+                                                            255, 255, 169, 163),
+                                                        shape: BoxShape.circle,
                                                       ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 5),
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.grey.shade200,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
+                                                      child: Icon(
+                                                        Icons.delete_outline,
+                                                        color: Colors.red,
+                                                        size: 50,
+                                                      ),
                                                     ),
                                                   ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                        'Batal',
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ],
+                                                  SizedBox(height: 25),
+                                                  Text(
+                                                    "Hapus Member",
+                                                    style: TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 25,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                  SizedBox(height: 10),
+                                                  Text(
+                                                    "Apakah anda yakin untuk menghapus Member ini?",
+                                                    style: TextStyle(
+                                                      color:
+                                                          Colors.grey.shade400,
+                                                      fontSize: 15,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 10),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () async {
+                                                      await memberController
+                                                          .deleteMember(
+                                                              item['id'],
+                                                              fromButton: true);
+                                                      await memberController
+                                                          .refresh();
+                                                      await memberController
+                                                          .fetchMember();
+                                                      Get.to(MemberP());
+                                                      Navigator.pop(context);
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.red,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        SizedBox(width: 8),
+                                                        Text(
+                                                          'Hapus',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 5),
+                                                  ElevatedButton(
+                                                    onPressed: () async {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.grey.shade200,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        SizedBox(width: 8),
+                                                        Text(
+                                                          'Batal',
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     );
@@ -487,8 +495,8 @@ class _MemberPState extends State<MemberP> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildInputLabel('Nama Member', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Nama Member', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newNameController,
                             hintText: 'Nama',
@@ -496,8 +504,8 @@ class _MemberPState extends State<MemberP> {
                             type: TextInputType.name,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('Id Pegawai', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('Id Pegawai', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(12),
                             controller: newIdPegController,
                             hintText: 'ID : 1',
@@ -505,8 +513,8 @@ class _MemberPState extends State<MemberP> {
                             type: TextInputType.name,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('No. Whatsapp', " *"),
-                          buildTextField(
+                          AdminW().buildInputLabel('No. Whatsapp', " *"),
+                          AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(12),
                             controller: newNoController,
                             hintText: '0861-XXXX-XXXX',
@@ -514,8 +522,8 @@ class _MemberPState extends State<MemberP> {
                             type: TextInputType.phone,
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('Saldo', ' *'),
-                          buildTextField(
+                          AdminW().buildInputLabel('Saldo', ' *'),
+                          AdminW().buildTextField(
                             controller: newSaldoController,
                             hintText: 'Rp. 50.000',
                             prefixIcon: FontAwesomeIcons.moneyBill,
@@ -523,8 +531,8 @@ class _MemberPState extends State<MemberP> {
                             inputFormat: LengthLimitingTextInputFormatter(20),
                           ),
                           SizedBox(height: 10),
-                          buildInputLabel('Poin User', ' *'),
-                          buildTextField(
+                          AdminW().buildInputLabel('Poin User', ' *'),
+                          AdminW().buildTextField(
                             controller: newPoinController,
                             hintText: '500 poin',
                             prefixIcon: Icons.star,
@@ -672,41 +680,65 @@ class _MemberPState extends State<MemberP> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  buildInputLabel('Nama Member', ' *'),
-                  buildTextField(
-                    controller: namaMemberController,
-                    hintText: 'Toko Kue XXXX',
-                    prefixIcon: CupertinoIcons.person_2_alt,
-                    type: TextInputType.name,
-                    inputFormat:
-                        FilteringTextInputFormatter.singleLineFormatter,
+                  Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.add_circled,
+                        color: PrimaryColor().blue,
+                        size: 24,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        "Edit Data Member",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 15),
-                  buildInputLabel('No. Whatsapp', ' *'),
-                  buildTextField(
-                    controller: noMemberController,
-                    hintText: '0891-XXXX-XXXX',
-                    prefixIcon: CupertinoIcons.phone_circle,
-                    type: TextInputType.number,
-                    inputFormat: LengthLimitingTextInputFormatter(12),
-                  ),
-                  SizedBox(height: 15),
-                  buildInputLabel('Saldo', ' *'),
-                  buildTextField(
-                    controller: saldoMemberController,
-                    hintText: 'Rp. 50.000',
-                    prefixIcon: FontAwesomeIcons.moneyBill,
-                    type: TextInputType.number,
-                    inputFormat: LengthLimitingTextInputFormatter(20),
-                  ),
-                  SizedBox(height: 15),
-                  buildInputLabel('Poin User', ' *'),
-                  buildTextField(
-                    controller: poinMemberController,
-                    hintText: '500 poin',
-                    prefixIcon: Icons.star,
-                    type: TextInputType.number,
-                    inputFormat: LengthLimitingTextInputFormatter(20),
+                  Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 15),
+                      AdminW().buildInputLabel('Nama Member', ' *'),
+                      AdminW().buildTextField(
+                        controller: namaMemberController,
+                        hintText: 'Toko Kue XXXX',
+                        prefixIcon: CupertinoIcons.person_2_alt,
+                        type: TextInputType.name,
+                        inputFormat:
+                            FilteringTextInputFormatter.singleLineFormatter,
+                      ),
+                      SizedBox(height: 15),
+                      AdminW().buildInputLabel('No. Whatsapp', ' *'),
+                      AdminW().buildTextField(
+                        controller: noMemberController,
+                        hintText: '0891-XXXX-XXXX',
+                        prefixIcon: CupertinoIcons.phone_circle,
+                        type: TextInputType.number,
+                        inputFormat: LengthLimitingTextInputFormatter(12),
+                      ),
+                      SizedBox(height: 15),
+                      AdminW().buildInputLabel('Saldo', ' *'),
+                      AdminW().buildTextField(
+                        controller: saldoMemberController,
+                        hintText: 'Rp. 50.000',
+                        prefixIcon: FontAwesomeIcons.moneyBill,
+                        type: TextInputType.number,
+                        inputFormat: LengthLimitingTextInputFormatter(20),
+                      ),
+                      SizedBox(height: 15),
+                      AdminW().buildInputLabel('Poin User', ' *'),
+                      AdminW().buildTextField(
+                        controller: poinMemberController,
+                        hintText: '500 poin',
+                        prefixIcon: Icons.star,
+                        type: TextInputType.number,
+                        inputFormat: LengthLimitingTextInputFormatter(20),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 24),
                   Row(
@@ -766,69 +798,6 @@ class _MemberPState extends State<MemberP> {
       },
     );
   }
-}
-
-Widget buildInputLabel(String label, String label2) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey.shade700,
-          ),
-        ),
-        Text(label2,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: DarkColor().red,
-            )),
-      ],
-    ),
-  );
-}
-
-Widget buildTextField({
-  required TextEditingController controller,
-  required String hintText,
-  required IconData prefixIcon,
-  required TextInputType type,
-  required inputFormat,
-  // controller
-}) {
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(12),
-      color: Colors.grey.shade50,
-      border: Border.all(color: Colors.grey.shade200),
-    ),
-    child: TextField(
-      inputFormatters: [inputFormat],
-      keyboardType: type,
-      controller: controller,
-      cursorColor: PrimaryColor().blue,
-      style: TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        prefixIcon: Icon(
-          prefixIcon,
-          color: Colors.grey.shade600,
-          size: 20,
-        ),
-        hintText: hintText,
-        hintStyle: TextStyle(
-          fontSize: 14,
-          color: Colors.grey.shade400,
-        ),
-        border: InputBorder.none,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      ),
-    ),
-  );
 }
 
 class WaveClipper extends CustomClipper<Path> {

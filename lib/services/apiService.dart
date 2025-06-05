@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 // Fetch Api
 class ApiService {
-  static const String   baseUrl = 'http://192.168.1.7/POS_CI/api/';
+  static const String baseUrl = 'http://10.10.20.109/POS_CI/api/';
 
   Future<List<dynamic>> fetchUsers({String? id}) async {
     final url = id == null ? '$baseUrl/users' : '$baseUrl/users?id=$id';
@@ -189,7 +189,7 @@ class ApiService {
         'user_input': userInput,
       },
     );
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
       return jsonDecode(response.body);
@@ -245,30 +245,32 @@ class ApiService {
 
   Future<Map<String, dynamic>> addProduk(
     String nama_barang,
+    String barcode,
     File? gambar_barang,
     String id_kategori_barang,
     String id_tipe_barang,
     String id_mitra_barang,
-    String id_add_on,
     String harga_pack,
     String jml_pcs_pack,
     String harga_satuan,
     String harga_jual,
     String stok,
+    String userInput,
   ) async {
     final url = Uri.parse('$baseUrl/product');
     final request = http.MultipartRequest('POST', url);
 
     request.fields['nama_barang'] = nama_barang;
+    request.fields['barcode_barang'] = barcode;
     request.fields['id_kategori_barang'] = id_kategori_barang;
     request.fields['id_tipe_barang'] = id_tipe_barang;
     request.fields['id_mitra_barang'] = id_mitra_barang;
-    request.fields['id_add_on'] = id_add_on;
     request.fields['harga_pack'] = harga_pack;
     request.fields['jml_pcs_pack'] = jml_pcs_pack;
     request.fields['harga_satuan'] = harga_satuan;
     request.fields['harga_jual'] = harga_jual;
     request.fields['stok'] = stok;
+    request.fields['user_input'] = userInput;
 
     var imageFile =
         await http.MultipartFile.fromPath('gambar_barang', gambar_barang!.path);
@@ -291,6 +293,7 @@ class ApiService {
   Future<Map<String, dynamic>> editProduk(
     String id,
     String nama_barang,
+    String barcode,
     File? gambar_barang,
     String id_kategori_barang,
     String id_tipe_barang,
@@ -310,6 +313,7 @@ class ApiService {
     // Tambahkan data produk
     request.fields['id'] = id;
     request.fields['nama_barang'] = nama_barang;
+    request.fields['barcode_barang'] = barcode;
     request.fields['id_kategori_barang'] = id_kategori_barang;
     request.fields['id_tipe_barang'] = id_tipe_barang;
     request.fields['id_mitra_barang'] = id_mitra_barang;
@@ -445,30 +449,6 @@ class ApiService {
         'harga_jual': hargaJual,
         'catatan': catatan,
         'user_update': user_update,
-      },
-    );
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      return jsonDecode(response.body);
-    }
-  }
-
-  static Future<Map<String, dynamic>> addPemOpname(
-      String idOpname,
-      String idProduk,
-      String jumlah,
-      String totalBeli,
-      String userInput) async {
-    final url = '$baseUrl/opname/pembelian';
-    final response = await http.post(
-      Uri.parse(url),
-      body: {
-        'id_opname': idOpname,
-        'id_produk': idProduk,
-        'jumlah': jumlah,
-        'total_beli': totalBeli,
-        'user_input': userInput,
       },
     );
     if (response.statusCode == 200) {

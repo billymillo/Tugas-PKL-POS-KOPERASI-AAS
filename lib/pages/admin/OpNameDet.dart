@@ -1,6 +1,7 @@
 import 'package:bluetooth_thermal_printer_example/controllers/admin/OpNameDetC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
+import 'package:bluetooth_thermal_printer_example/widgets/admin/adminW.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,41 +34,314 @@ class OpNameDet extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
       ),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        color: Color(0xFFF3F4F6),
-        alignment: Alignment.topCenter,
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 1250),
-            child: Card(
-              elevation: 1,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              color: Colors.white,
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Obx(() {
-                      if (controller.isLoading.value) {
-                        return Center(child: CircularProgressIndicator());
-                      }
+      body: RefreshIndicator(
+        onRefresh: () async {
+          controller.fetchOpName();
+          controller.fetchProduk();
+        },
+        child: Container(
+          padding: EdgeInsets.all(16),
+          color: Color(0xFFF3F4F6),
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            child: Container(
+              width: MediaQuery.of(context).orientation == Orientation.landscape
+                  ? MediaQuery.of(context).size.width
+                  : null,
+              child: Card(
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                color: Colors.white,
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Obx(() {
+                        if (controller.isLoading.value) {
+                          return Center(child: CircularProgressIndicator());
+                        }
 
-                      final idOpname =
-                          Get.arguments?['id_opname']?.toString() ?? '';
-                      final opnameItem = controller.opname.firstWhere(
-                        (item) => item['id'].toString() == idOpname,
-                        orElse: () => {},
-                      );
-                      final statusOpname = int.tryParse(
-                              opnameItem['status_opname']?.toString() ?? '0') ??
-                          0;
+                        final idOpname =
+                            Get.arguments?['id_opname']?.toString() ?? '';
+                        final opnameItem = controller.opname.firstWhere(
+                          (item) => item['id'].toString() == idOpname,
+                          orElse: () => {},
+                        );
+                        final statusOpname = int.tryParse(
+                                opnameItem['status_opname']?.toString() ??
+                                    '0') ??
+                            0;
 
-                      return Card(
+                        return Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(color: Colors.grey.shade200),
+                          ),
+                          color: Colors.white,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SingleChildScrollView(
+                              child: Container(
+                                width: MediaQuery.of(context).orientation ==
+                                        Orientation.landscape
+                                    ? MediaQuery.of(context).size.width
+                                    : null,
+                                child: DataTable(
+                                  headingRowColor: MaterialStateProperty.all(
+                                      Color(0xFFF9FAFB)),
+                                  headingTextStyle: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF4B5563),
+                                    fontSize: 14,
+                                  ),
+                                  dataTextStyle: TextStyle(
+                                    color: Color(0xFF111827),
+                                    fontSize: 14,
+                                  ),
+                                  columnSpacing: 24,
+                                  horizontalMargin: 16,
+                                  dividerThickness: 1,
+                                  headingRowHeight: 48,
+                                  columns: [
+                                    DataColumn(label: Text('No')),
+                                    DataColumn(
+                                        label: Text('Produk',
+                                            overflow: TextOverflow.ellipsis)),
+                                    DataColumn(
+                                        label: Text('Stok',
+                                            overflow: TextOverflow.ellipsis)),
+                                    DataColumn(
+                                        label: Text('Stok Asli',
+                                            overflow: TextOverflow.ellipsis)),
+                                    DataColumn(
+                                        label: Text('Harga Satuan',
+                                            overflow: TextOverflow.ellipsis)),
+                                    DataColumn(
+                                        label: Text('Harga Jual',
+                                            overflow: TextOverflow.ellipsis)),
+                                    if (statusOpname != 3)
+                                      DataColumn(
+                                          label: Text('Aksi',
+                                              overflow: TextOverflow.ellipsis)),
+                                  ],
+                                  rows: controller.paginatedProduk
+                                      .asMap()
+                                      .entries
+                                      .map((entry) {
+                                    final index = entry.key;
+                                    final realIndex = entry.key +
+                                        controller.currentPage.value *
+                                            controller.itemsPerPage;
+                                    final produkItem = entry.value;
+                                    final opnameItem =
+                                        controller.opnameDet.firstWhere(
+                                      (item) =>
+                                          item['id_produk'].toString() ==
+                                              produkItem['id'].toString() &&
+                                          item['id_opname'].toString() ==
+                                              idOpname,
+                                      orElse: () => {},
+                                    );
+
+                                    final product = {
+                                      'stok': opnameItem['stok'] ??
+                                          produkItem['stok'],
+                                      'stok_asli': opnameItem['stok_asli'] ??
+                                          produkItem['stok_asli'],
+                                      'harga_satuan':
+                                          opnameItem['harga_satuan'] ??
+                                              produkItem['harga_satuan'],
+                                      'harga_jual': opnameItem['harga_jual'] ??
+                                          produkItem['harga_jual'],
+                                      'stok_input': produkItem['stok_input'],
+                                      'stok_asli_input':
+                                          produkItem['stok_asli_input'],
+                                      'isEdit': produkItem['isEdit'],
+                                      'checked': produkItem['checked'],
+                                      'hasBeenSaved': opnameItem.isNotEmpty,
+                                    };
+
+                                    final isEdit = product['isEdit'] ?? false;
+                                    final isChecked =
+                                        product['checked'] ?? false;
+
+                                    return DataRow(
+                                      color: index % 2 == 0
+                                          ? null
+                                          : MaterialStateProperty.all(
+                                              Color(0xFFF6F9FC)),
+                                      cells: [
+                                        DataCell(SizedBox(
+                                          width: 20,
+                                          child: Text(
+                                            '${realIndex + 1}', // Ini akan menampilkan nomor urut
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        )),
+                                        DataCell(SizedBox(
+                                          width: 150,
+                                          child: Text(
+                                            produkItem['nama_barang'] ?? '',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        )),
+                                        DataCell(product['hasBeenSaved'] == true
+                                            ? SizedBox(
+                                                width: 70,
+                                                child: Text(
+                                                    product['stok'].toString() +
+                                                        ' pcs'),
+                                              )
+                                            : buildTextField(
+                                                product['stok']?.toString() ??
+                                                    '',
+                                                (val) =>
+                                                    produkItem['stok_input'] =
+                                                        int.tryParse(val) ?? 0,
+                                              )),
+                                        DataCell(
+                                          product['hasBeenSaved'] == true
+                                              ? Text(product['stok_asli']
+                                                      .toString() +
+                                                  ' pcs')
+                                              : buildTextField(
+                                                  product['stok_asli_input']
+                                                          ?.toString() ??
+                                                      '',
+                                                  (val) => produkItem[
+                                                          'stok_asli_input'] =
+                                                      int.tryParse(val) ?? 0,
+                                                ),
+                                        ),
+                                        DataCell(Text(currencyFormat.format(
+                                            int.tryParse(product['harga_satuan']
+                                                    .toString()) ??
+                                                0))),
+                                        DataCell(Text(currencyFormat.format(
+                                            int.tryParse(product['harga_jual']
+                                                    .toString()) ??
+                                                0))),
+                                        if (statusOpname != 3)
+                                          DataCell(product['hasBeenSaved'] ==
+                                                  false
+                                              ? ElevatedButton(
+                                                  onPressed: () async {
+                                                    if (product[
+                                                            'hasBeenSaved'] ==
+                                                        true) {
+                                                      controller
+                                                          .toggleEdit(index);
+                                                      return;
+                                                    }
+
+                                                    if (!isEdit) {
+                                                      final stok = int.tryParse(
+                                                              produkItem['stok_input']
+                                                                      ?.toString() ??
+                                                                  '') ??
+                                                          produkItem['stok'];
+                                                      final stokAsli =
+                                                          int.tryParse(produkItem[
+                                                                          'stok_asli_input']
+                                                                      ?.toString() ??
+                                                                  '') ??
+                                                              produkItem[
+                                                                  'stok_asli'];
+
+                                                      final catatan = '';
+
+                                                      await controller
+                                                          .addDetOpname(
+                                                        produkItem['id']
+                                                            .toString(),
+                                                        idOpname,
+                                                        stok.toString(),
+                                                        stokAsli.toString(),
+                                                        produkItem[
+                                                                'harga_satuan']
+                                                            .toString(),
+                                                        produkItem['harga_jual']
+                                                            .toString(),
+                                                        catatan,
+                                                      );
+
+                                                      await controller
+                                                          .fetchDetOpName();
+                                                      await controller
+                                                          .fetchProduk();
+                                                    }
+                                                    await controller.editOpname(
+                                                        idOpname, '5');
+
+                                                    controller
+                                                        .toggleEdit(index);
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        PrimaryColor().blue,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    textStyle: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                    minimumSize: Size(0, 32),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 12),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6),
+                                                    ),
+                                                    elevation: 0,
+                                                  ),
+                                                  child: Text('Simpan'),
+                                                )
+                                              : Row(
+                                                  children: [
+                                                    Text('Selesai',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 13,
+                                                            color:
+                                                                Colors.green)),
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        showEditOpnameDialog(
+                                                            context,
+                                                            opnameItem);
+                                                      },
+                                                      icon: Icon(
+                                                          Icons.edit_calendar),
+                                                      color:
+                                                          PrimaryColor().blue,
+                                                      iconSize: 20,
+                                                    )
+                                                  ],
+                                                )),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                      SizedBox(height: 16),
+                      Card(
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -76,1084 +350,243 @@ class OpNameDet extends StatelessWidget {
                         color: Colors.white,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
-                          child: SingleChildScrollView(
-                            child: Container(
-                              width: MediaQuery.of(context).size.width *
-                                  (MediaQuery.of(context).orientation ==
-                                          Orientation.landscape
-                                      ? 1
-                                      : 1.3),
-                              child: DataTable(
-                                headingRowColor: MaterialStateProperty.all(
-                                    Color(0xFFF9FAFB)),
-                                headingTextStyle: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF4B5563),
-                                  fontSize: 14,
-                                ),
-                                dataTextStyle: TextStyle(
-                                  color: Color(0xFF111827),
-                                  fontSize: 14,
-                                ),
-                                columnSpacing: 24,
-                                horizontalMargin: 16,
-                                dividerThickness: 1,
-                                headingRowHeight: 48,
-                                columns: [
-                                  DataColumn(label: Text('No')),
-                                  DataColumn(
-                                      label: Text('Produk',
-                                          overflow: TextOverflow.ellipsis)),
-                                  DataColumn(
-                                      label: Text('Stok',
-                                          overflow: TextOverflow.ellipsis)),
-                                  DataColumn(
-                                      label: Text('Stok Asli',
-                                          overflow: TextOverflow.ellipsis)),
-                                  DataColumn(
-                                      label: Text('Harga Satuan',
-                                          overflow: TextOverflow.ellipsis)),
-                                  DataColumn(
-                                      label: Text('Harga Jual',
-                                          overflow: TextOverflow.ellipsis)),
-                                  if (statusOpname != 3)
-                                    DataColumn(
-                                        label: Text('Aksi',
-                                            overflow: TextOverflow.ellipsis)),
-                                  if (statusOpname != 3)
-                                    DataColumn(label: Text('Pembelian')),
-                                ],
-                                rows: controller.paginatedProduk
-                                    .asMap()
-                                    .entries
-                                    .map((entry) {
-                                  final index = entry.key;
-                                  final realIndex = entry.key +
-                                      controller.currentPage.value *
-                                          controller.itemsPerPage;
-                                  final produkItem = entry.value;
-                                  final opnameItem =
-                                      controller.opnameDet.firstWhere(
-                                    (item) =>
-                                        item['id_produk'].toString() ==
-                                            produkItem['id'].toString() &&
-                                        item['id_opname'].toString() ==
-                                            idOpname,
-                                    orElse: () => {},
-                                  );
+                          child: Container(
+                            width: MediaQuery.of(context).size.width *
+                                (MediaQuery.of(context).orientation ==
+                                        Orientation.landscape
+                                    ? 1.1
+                                    : 2.2),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Obx(
+                                  () {
+                                    final idOpname = Get.arguments?['id_opname']
+                                            ?.toString() ??
+                                        '';
+                                    final opnameItem =
+                                        controller.opname.firstWhere(
+                                      (item) =>
+                                          item['id'].toString() == idOpname,
+                                      orElse: () => {},
+                                    );
+                                    final statusOpname = int.tryParse(
+                                            opnameItem['status_opname']
+                                                    ?.toString() ??
+                                                '0') ??
+                                        0;
 
-                                  final product = {
-                                    'stok': opnameItem['stok'] ??
-                                        produkItem['stok'],
-                                    'stok_asli': opnameItem['stok_asli'] ??
-                                        produkItem['stok_asli'],
-                                    'harga_satuan':
-                                        opnameItem['harga_satuan'] ??
-                                            produkItem['harga_satuan'],
-                                    'harga_jual': opnameItem['harga_jual'] ??
-                                        produkItem['harga_jual'],
-                                    'stok_input': produkItem['stok_input'],
-                                    'stok_asli_input':
-                                        produkItem['stok_asli_input'],
-                                    'isEdit': produkItem['isEdit'],
-                                    'checked': produkItem['checked'],
-                                    'hasBeenSaved': opnameItem.isNotEmpty,
-                                  };
-
-                                  final isEdit = product['isEdit'] ?? false;
-                                  final isChecked = product['checked'] ?? false;
-
-                                  return DataRow(
-                                    color: index % 2 == 0
-                                        ? null
-                                        : MaterialStateProperty.all(
-                                            Color(0xFFF6F9FC)),
-                                    cells: [
-                                      DataCell(SizedBox(
-                                        width: 20,
-                                        child: Text(
-                                          '${realIndex + 1}', // Ini akan menampilkan nomor urut
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      )),
-                                      DataCell(SizedBox(
-                                        width: 150,
-                                        child: Text(
-                                          produkItem['nama_barang'] ?? '',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      )),
-                                      DataCell(product['hasBeenSaved'] == true
-                                          ? SizedBox(
-                                              width: 70,
-                                              child: Text(
-                                                  product['stok'].toString() +
-                                                      ' pcs'),
-                                            )
-                                          : buildTextField(
-                                              product['stok']?.toString() ?? '',
-                                              (val) =>
-                                                  produkItem['stok_input'] =
-                                                      int.tryParse(val) ?? 0,
-                                            )),
-                                      DataCell(
-                                        product['hasBeenSaved'] == true
-                                            ? Text(product['stok_asli']
-                                                    .toString() +
-                                                ' pcs')
-                                            : buildTextField(
-                                                product['stok_asli_input']
-                                                        ?.toString() ??
-                                                    '',
-                                                (val) => produkItem[
-                                                        'stok_asli_input'] =
-                                                    int.tryParse(val) ?? 0,
-                                              ),
-                                      ),
-                                      DataCell(Text(currencyFormat.format(
-                                          int.tryParse(product['harga_satuan']
-                                                  .toString()) ??
-                                              0))),
-                                      DataCell(Text(currencyFormat.format(
-                                          int.tryParse(product['harga_jual']
-                                                  .toString()) ??
-                                              0))),
-                                      if (statusOpname != 3)
-                                        DataCell(product['hasBeenSaved'] ==
-                                                false
-                                            ? ElevatedButton(
-                                                onPressed: () async {
-                                                  if (product['hasBeenSaved'] ==
-                                                      true) {
-                                                    controller
-                                                        .toggleEdit(index);
-                                                    return;
-                                                  }
-
-                                                  if (!isEdit) {
-                                                    final stok = int.tryParse(
-                                                            produkItem['stok_input']
-                                                                    ?.toString() ??
-                                                                '') ??
-                                                        produkItem['stok'];
-                                                    final stokAsli =
-                                                        int.tryParse(produkItem[
-                                                                        'stok_asli_input']
-                                                                    ?.toString() ??
-                                                                '') ??
-                                                            produkItem[
-                                                                'stok_asli'];
-
-                                                    final catatan = '';
-
-                                                    await controller
-                                                        .addDetOpname(
-                                                      produkItem['id']
-                                                          .toString(),
-                                                      idOpname,
-                                                      stok.toString(),
-                                                      stokAsli.toString(),
-                                                      produkItem['harga_satuan']
-                                                          .toString(),
-                                                      produkItem['harga_jual']
-                                                          .toString(),
-                                                      catatan,
-                                                    );
-
-                                                    await controller
-                                                        .fetchDetOpName();
-                                                    await controller
-                                                        .fetchProduk();
-                                                  }
-                                                  await controller.editOpname(
-                                                      idOpname, '5');
-
-                                                  controller.toggleEdit(index);
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      PrimaryColor().blue,
-                                                  foregroundColor: Colors.white,
-                                                  textStyle: TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                  minimumSize: Size(0, 32),
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 12),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            6),
-                                                  ),
-                                                  elevation: 0,
-                                                ),
-                                                child: Text('Simpan'),
-                                              )
-                                            : Row(
-                                                children: [
-                                                  Text('Selesai',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 13,
-                                                          color: Colors.green)),
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      showEditOpnameDialog(
-                                                          context, opnameItem);
-                                                    },
-                                                    icon: Icon(
-                                                        Icons.edit_calendar),
-                                                    color: PrimaryColor().blue,
-                                                    iconSize: 20,
-                                                  )
-                                                ],
-                                              )),
-                                      if (statusOpname != 3)
-                                        DataCell(
-                                          Checkbox(
-                                            value: isChecked,
-                                            onChanged: (val) =>
-                                                controller.toggleCheck(
-                                                    realIndex, val ?? false),
+                                    if (statusOpname == 3) {
+                                      return SizedBox();
+                                    }
+                                    return Row(
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            final idOpname =
+                                                Get.arguments != null
+                                                    ? Get.arguments['id_opname']
+                                                            ?.toString() ??
+                                                        ''
+                                                    : '';
+                                            AdminW().deleteDialogAlternative(
+                                                context,
+                                                Icons.all_inbox_rounded,
+                                                'Selesaikan Opname?',
+                                                'Anda akan Menyimpan seluruh item pada Opname. Lanjutkan?',
+                                                'Simpan',
+                                                Color.fromARGB(
+                                                    255, 255, 169, 163),
+                                                Colors.red, () async {
+                                              await controller
+                                                  .saveAllUnsavedItems(
+                                                      idOpname);
+                                              await controller.editOpname(
+                                                  idOpname, '5');
+                                              if (!controller
+                                                  .isAllItemSaved(idOpname)) {
+                                                Get.snackbar(
+                                                  'Gagal',
+                                                  'Beberapa item gagal disimpan. Silakan cek ulang.',
+                                                  backgroundColor: Colors.red
+                                                      .withOpacity(0.5),
+                                                  icon: Icon(Icons.crisis_alert,
+                                                      color: Colors.white),
+                                                  colorText: Colors.white,
+                                                );
+                                                return;
+                                              }
+                                              await controller.fetchOpName();
+                                              Get.back();
+                                              Get.toNamed(Routes.OPNAMEP);
+                                              Get.snackbar(
+                                                'Success',
+                                                'Berhasil Menyimpan Seluruh Opname',
+                                                backgroundColor: Colors.green
+                                                    .withOpacity(0.5),
+                                                icon: Icon(Icons.check_circle,
+                                                    color: Colors.white),
+                                              );
+                                            });
+                                          },
+                                          child: Text('Simpan Seluruh Opname'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                PrimaryColor().green,
+                                            foregroundColor: Colors.white,
+                                            textStyle: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500),
+                                            minimumSize: Size(0, 32),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12),
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(4),
+                                                  BorderRadius.circular(6),
                                             ),
-                                            activeColor: Color(0xFF4F46E5),
+                                            elevation: 0,
                                           ),
                                         ),
+                                        SizedBox(width: 12),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            final idOpname =
+                                                Get.arguments != null
+                                                    ? Get.arguments['id_opname']
+                                                            ?.toString() ??
+                                                        ''
+                                                    : '';
+                                            AdminW().deleteDialog(
+                                              context,
+                                              'Hapus Opname',
+                                              'Apakah anda yakin ingin menghapus opname ini ?',
+                                              () async {
+                                                await controller
+                                                    .deleteOpname(idOpname);
+                                                await controller.fetchOpName();
+                                                Get.back();
+                                                Get.toNamed(Routes.OPNAMEP);
+                                              },
+                                            );
+                                          },
+                                          child: Text('Hapus Opname'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                            textStyle: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500),
+                                            minimumSize: Size(0, 32),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            elevation: 0,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            final idOpname =
+                                                Get.arguments != null
+                                                    ? Get.arguments['id_opname']
+                                                            ?.toString() ??
+                                                        ''
+                                                    : '';
+                                            AdminW().deleteDialogAlternative(
+                                              context,
+                                              Icons.check_circle,
+                                              'Close Opname',
+                                              'Apakah anda yakin ingin menutup opname ini ?',
+                                              'Setuju',
+                                              Color.fromARGB(
+                                                  255, 162, 249, 174),
+                                              Colors.green,
+                                              () async {
+                                                if (!controller
+                                                    .isAllItemSaved(idOpname)) {
+                                                  Get.snackbar(
+                                                    'Gagal',
+                                                    'Seluruh item harus tersimpan sebelum Opname di tutup',
+                                                    backgroundColor: Colors.red
+                                                        .withOpacity(0.5),
+                                                    icon: Icon(
+                                                        Icons.crisis_alert,
+                                                        color: Colors.white),
+                                                    colorText: Colors.white,
+                                                  );
+                                                  return;
+                                                }
+                                                await controller.editOpname(
+                                                    idOpname, '3');
+                                                await controller.fetchOpName();
+                                                Get.back();
+                                                Get.toNamed(Routes.OPNAMEP);
+                                              },
+                                            );
+                                          },
+                                          child: Text('Close Opname'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: PrimaryColor().red,
+                                            foregroundColor: Colors.white,
+                                            textStyle: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500),
+                                            minimumSize: Size(0, 32),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            elevation: 0,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                SizedBox(width: 50),
+                                Obx(() {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: controller.previousPage,
+                                        child:
+                                            buildPaginationNumber('<<', false),
+                                      ),
+                                      ...List.generate(controller.totalPages,
+                                          (index) {
+                                        return GestureDetector(
+                                          onTap: () =>
+                                              controller.goToPage(index),
+                                          child: buildPaginationNumber(
+                                            (index + 1).toString(),
+                                            controller.currentPage.value ==
+                                                index,
+                                          ),
+                                        );
+                                      }),
+                                      GestureDetector(
+                                        onTap: controller.nextPage,
+                                        child:
+                                            buildPaginationNumber('>>', false),
+                                      ),
                                     ],
                                   );
-                                }).toList(),
-                              ),
+                                })
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    }),
-                    SizedBox(height: 16),
-                    Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.grey.shade200),
                       ),
-                      color: Colors.white,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Container(
-                          width: MediaQuery.of(context).size.width *
-                              (MediaQuery.of(context).orientation ==
-                                      Orientation.landscape
-                                  ? 0.94
-                                  : 1.1),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Obx(
-                                () {
-                                  final idOpname =
-                                      Get.arguments?['id_opname']?.toString() ??
-                                          '';
-                                  final opnameItem =
-                                      controller.opname.firstWhere(
-                                    (item) => item['id'].toString() == idOpname,
-                                    orElse: () => {},
-                                  );
-                                  final statusOpname = int.tryParse(
-                                          opnameItem['status_opname']
-                                                  ?.toString() ??
-                                              '0') ??
-                                      0;
-
-                                  if (statusOpname == 3) {
-                                    return SizedBox();
-                                  }
-                                  return Row(
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          if (controller
-                                              .selectedProduk.isEmpty) {
-                                            Get.snackbar(
-                                              'Peringatan',
-                                              'Tidak ada produk yang dipilih!',
-                                              backgroundColor:
-                                                  Colors.red.withOpacity(0.5),
-                                              icon: Icon(Icons.error,
-                                                  color: Colors.white),
-                                            );
-                                            return;
-                                          }
-                                          final idOpname = Get.arguments != null
-                                              ? Get.arguments['id_opname']
-                                                      ?.toString() ??
-                                                  ''
-                                              : '';
-                                          prepareAndShowDialog(
-                                              context, idOpname);
-                                        },
-                                        child: Text('Pembelian Opname'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: PrimaryColor().blue,
-                                          foregroundColor: Colors.white,
-                                          textStyle: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500),
-                                          minimumSize: Size(0, 32),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          elevation: 0,
-                                        ),
-                                      ),
-                                      SizedBox(width: 12),
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          final idOpname = Get.arguments != null
-                                              ? Get.arguments['id_opname']
-                                                      ?.toString() ??
-                                                  ''
-                                              : '';
-                                          await showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Dialog(
-                                                elevation: 0,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.3,
-                                                  padding: EdgeInsets.all(20),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        20,
-                                                                    vertical:
-                                                                        10),
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(25),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        255,
-                                                                        163,
-                                                                        163),
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                              ),
-                                                              child: Icon(
-                                                                Icons
-                                                                    .all_inbox_rounded,
-                                                                color:
-                                                                    DarkColor()
-                                                                        .red,
-                                                                size: 50,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 25),
-                                                          Text(
-                                                            "Selesaikan Opname?",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 25,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 10),
-                                                          Text(
-                                                            'Anda akan Menyimpan seluruh item pada Opname. Lanjutkan?',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 15,
-                                                            ),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(height: 10),
-                                                      Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              await controller
-                                                                  .saveAllUnsavedItems(
-                                                                      idOpname);
-                                                              if (!controller
-                                                                  .isAllItemSaved(
-                                                                      idOpname)) {
-                                                                Get.snackbar(
-                                                                  'Gagal',
-                                                                  'Beberapa item gagal disimpan. Silakan cek ulang.',
-                                                                  backgroundColor: Colors
-                                                                      .red
-                                                                      .withOpacity(
-                                                                          0.5),
-                                                                  icon: Icon(
-                                                                      Icons
-                                                                          .crisis_alert,
-                                                                      color: Colors
-                                                                          .white),
-                                                                  colorText:
-                                                                      Colors
-                                                                          .white,
-                                                                );
-                                                                return;
-                                                              }
-                                                              await controller
-                                                                  .editOpname(
-                                                                      idOpname,
-                                                                      '4');
-                                                              await controller
-                                                                  .fetchOpName();
-                                                              Get.back();
-                                                              Get.toNamed(Routes
-                                                                  .OPNAMEP);
-                                                              Get.snackbar(
-                                                                'Success',
-                                                                'Berhasil Menyimpan Seluruh Opname',
-                                                                backgroundColor:
-                                                                    Colors.green
-                                                                        .withOpacity(
-                                                                            0.5),
-                                                                icon: Icon(
-                                                                    Icons
-                                                                        .check_circle,
-                                                                    color: Colors
-                                                                        .white),
-                                                              );
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.red,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Simpan',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 5),
-                                                          ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              Get.back();
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade200,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Batal',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black54,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                        child: Text('Simpan Seluruh Opname'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: PrimaryColor().green,
-                                          foregroundColor: Colors.white,
-                                          textStyle: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500),
-                                          minimumSize: Size(0, 32),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          elevation: 0,
-                                        ),
-                                      ),
-                                      SizedBox(width: 12),
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          final idOpname = Get.arguments != null
-                                              ? Get.arguments['id_opname']
-                                                      ?.toString() ??
-                                                  ''
-                                              : '';
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Dialog(
-                                                elevation: 0,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.5,
-                                                  padding: EdgeInsets.all(20),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        20,
-                                                                    vertical:
-                                                                        10),
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(25),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        255,
-                                                                        169,
-                                                                        163),
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                              ),
-                                                              child: Icon(
-                                                                Icons
-                                                                    .delete_outline,
-                                                                color:
-                                                                    Colors.red,
-                                                                size: 50,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 25),
-                                                          Text(
-                                                            "Hapus Opname",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 25,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 10),
-                                                          Text(
-                                                            "Apakah anda yakin untuk menghapus Opname ini?",
-                                                            style: TextStyle(
-                                                              color: Colors.grey
-                                                                  .shade400,
-                                                              fontSize: 15,
-                                                            ),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(height: 10),
-                                                      Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              await controller
-                                                                  .deleteOpname(
-                                                                      idOpname);
-                                                              await controller
-                                                                  .fetchOpName();
-                                                              Get.back();
-                                                              Get.toNamed(Routes
-                                                                  .OPNAMEP);
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.red,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Hapus',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 5),
-                                                          ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade200,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Batal',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black54,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                        child: Text('Hapus Opname'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red,
-                                          foregroundColor: Colors.white,
-                                          textStyle: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500),
-                                          minimumSize: Size(0, 32),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          elevation: 0,
-                                        ),
-                                      ),
-                                      SizedBox(width: 12),
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          final idOpname = Get.arguments != null
-                                              ? Get.arguments['id_opname']
-                                                      ?.toString() ??
-                                                  ''
-                                              : '';
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Dialog(
-                                                elevation: 0,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.5,
-                                                  padding: EdgeInsets.all(20),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            16),
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Column(
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        20,
-                                                                    vertical:
-                                                                        10),
-                                                            child: Container(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(25),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        255,
-                                                                        169,
-                                                                        163),
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                              ),
-                                                              child: Icon(
-                                                                Icons
-                                                                    .delete_outline,
-                                                                color:
-                                                                    Colors.red,
-                                                                size: 50,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 25),
-                                                          Text(
-                                                            "Close Opname",
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontSize: 25,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 10),
-                                                          Text(
-                                                            "Apakah anda yakin untuk Menutup Opname ini?",
-                                                            style: TextStyle(
-                                                              color: Colors.grey
-                                                                  .shade400,
-                                                              fontSize: 15,
-                                                            ),
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(height: 10),
-                                                      Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              if (!controller
-                                                                  .isAllItemSaved(
-                                                                      idOpname)) {
-                                                                Get.snackbar(
-                                                                  'Gagal',
-                                                                  'Seluruh item harus tersimpan sebelum Opname di tutup',
-                                                                  backgroundColor: Colors
-                                                                      .red
-                                                                      .withOpacity(
-                                                                          0.5),
-                                                                  icon: Icon(
-                                                                      Icons
-                                                                          .crisis_alert,
-                                                                      color: Colors
-                                                                          .white),
-                                                                  colorText:
-                                                                      Colors
-                                                                          .white,
-                                                                );
-                                                                return;
-                                                              }
-                                                              await controller
-                                                                  .editOpname(
-                                                                      idOpname,
-                                                                      '3');
-                                                              await controller
-                                                                  .fetchOpName();
-                                                              Get.back();
-                                                              Get.toNamed(Routes
-                                                                  .OPNAMEP);
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.red,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Setuju',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 5),
-                                                          ElevatedButton(
-                                                            onPressed:
-                                                                () async {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            style:
-                                                                ElevatedButton
-                                                                    .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade200,
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                SizedBox(
-                                                                    width: 8),
-                                                                Text(
-                                                                  'Batal',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black54,
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                        child: Text('Close Opname'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: PrimaryColor().red,
-                                          foregroundColor: Colors.white,
-                                          textStyle: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500),
-                                          minimumSize: Size(0, 32),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          elevation: 0,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                              SizedBox(width: 50),
-                              Obx(() {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: controller.previousPage,
-                                      child: buildPaginationNumber('<<', false),
-                                    ),
-                                    ...List.generate(controller.totalPages,
-                                        (index) {
-                                      return GestureDetector(
-                                        onTap: () => controller.goToPage(index),
-                                        child: buildPaginationNumber(
-                                          (index + 1).toString(),
-                                          controller.currentPage.value == index,
-                                        ),
-                                      );
-                                    }),
-                                    GestureDetector(
-                                      onTap: controller.nextPage,
-                                      child: buildPaginationNumber('>>', false),
-                                    ),
-                                  ],
-                                );
-                              })
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -1203,261 +636,6 @@ class OpNameDet extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         ),
       ),
-    );
-  }
-
-  void prepareAndShowDialog(BuildContext context, String idOpname) {
-    final selected = controller.selectedProduk;
-
-    controller.stokControllers.value = List.generate(
-      selected.length,
-      (index) => TextEditingController(text: '0'),
-    );
-
-    controller.totalHargaList.value = List.generate(
-      selected.length,
-      (index) => 0,
-    );
-
-    showSelectedProductsDialog(context, idOpname);
-  }
-
-  void showSelectedProductsDialog(BuildContext context, String idOpname) {
-    final selected = controller.selectedProduk;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          insetPadding: EdgeInsets.all(16),
-          backgroundColor: Colors.transparent,
-          child: Container(
-            width: getResponsiveWidth(context),
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  blurRadius: 20,
-                  offset: Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.add_circle_outline_rounded,
-                      color: PrimaryColor().blue,
-                      size: 24,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Pembelian Stok Opname',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    color: Color(0xFFF9FAFB),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columnSpacing: 24,
-                        horizontalMargin: 16,
-                        dividerThickness: 1,
-                        headingRowColor: MaterialStateProperty.all(
-                          Color(0xFFEEF2F7),
-                        ),
-                        headingTextStyle: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Color(0xFF374151),
-                        ),
-                        dataTextStyle: TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF111827),
-                        ),
-                        columns: const [
-                          DataColumn(label: Text('Produk')),
-                          DataColumn(label: Text('Tambah Stok')),
-                          DataColumn(label: Text('Harga Satuan')),
-                          DataColumn(label: Text('Harga Jual')),
-                          DataColumn(label: Text('Total Harga')),
-                        ],
-                        rows: List.generate(selected.length, (index) {
-                          final productRx = selected[index];
-                          final product = productRx;
-                          final isEven = index % 2 == 0;
-                          final stokController =
-                              controller.stokControllers[index];
-                          final hargaSatuan = int.tryParse(
-                                  product['harga_satuan'].toString()) ??
-                              0;
-
-                          return DataRow(
-                            color: MaterialStateProperty.all(
-                              isEven ? Colors.white : Color(0xFFF1F5F9),
-                            ),
-                            cells: [
-                              DataCell(Text(product['nama_barang'] ?? '')),
-                              DataCell(
-                                SizedBox(
-                                  width: 60,
-                                  child: TextField(
-                                    controller: stokController,
-                                    keyboardType: TextInputType.number,
-                                    onChanged: (value) {
-                                      final qty = int.tryParse(value) ?? 0;
-                                      controller.totalHargaList[index] =
-                                          qty * hargaSatuan;
-                                    },
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 2),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              DataCell(Text(currencyFormat.format(int.tryParse(
-                                      product['harga_satuan'].toString()) ??
-                                  0))),
-                              DataCell(Text(currencyFormat.format(int.tryParse(
-                                      product['harga_jual'].toString()) ??
-                                  0))),
-                              DataCell(
-                                Obx(() => Text(currencyFormat
-                                    .format(controller.totalHargaList[index]))),
-                              ),
-                            ],
-                          );
-                        }),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        final selected = controller.selectedProduk;
-                        List<Map<String, dynamic>> dataUntukDisimpan = [];
-
-                        bool adaJumlahKosong = false;
-
-                        for (int i = 0; i < selected.length; i++) {
-                          final stokText = controller.stokControllers[i].text;
-                          final qty = int.tryParse(stokText) ?? 0;
-
-                          if (qty <= 0) {
-                            adaJumlahKosong = true;
-                            break;
-                          }
-
-                          final produk = selected[i];
-                          final hargaSatuan =
-                              int.tryParse(produk['harga_satuan'].toString()) ??
-                                  0;
-
-                          dataUntukDisimpan.add({
-                            'id_barang': produk['id'].toString(),
-                            'jumlah': qty.toString(),
-                            'total_beli': (qty * hargaSatuan).toString(),
-                          });
-                        }
-
-                        if (adaJumlahKosong) {
-                          Get.snackbar(
-                            'Gagal',
-                            'Stok pembelian tidak boleh kosong!',
-                            backgroundColor: Colors.red.withOpacity(0.8),
-                            colorText: Colors.white,
-                            icon: Icon(Icons.error, color: Colors.white),
-                          );
-                          return;
-                        }
-
-                        for (var item in dataUntukDisimpan) {
-                          await controller.addPemOpname(
-                            idOpname,
-                            item['id_barang']!,
-                            item['jumlah']!,
-                            item['total_beli']!,
-                          );
-                        }
-                        await Get.snackbar(
-                          'Success',
-                          'Pembelian Opname berhasil ditambahkan',
-                          backgroundColor: Colors.green.withOpacity(0.5),
-                          icon: Icon(Icons.check_circle, color: Colors.white),
-                        );
-
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('Simpan'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF4F46E5),
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        textStyle: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Cancel'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade200,
-                        foregroundColor: Colors.black54,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        textStyle: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 

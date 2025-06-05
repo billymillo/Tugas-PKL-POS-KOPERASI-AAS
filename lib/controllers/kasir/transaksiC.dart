@@ -23,8 +23,11 @@ class TransaksiC extends GetxController {
   var transaksiLunas = <Map<String, dynamic>>[].obs;
   var allTransaksiLunas = <Map<String, dynamic>>[].obs;
   var member = <Map<String, dynamic>>[].obs;
+  var topup = <Map<String, dynamic>>[].obs;
+  var allTopup = <Map<String, dynamic>>[].obs;
   var memberTransaksi = <String>[].obs;
   RxList<Map<String, dynamic>> allKasbon = <Map<String, dynamic>>[].obs;
+  RxList<Map<String, dynamic>> dataKasbon = <Map<String, dynamic>>[].obs;
   var kasbon = <Map<String, dynamic>>[].obs;
   var kasbonDet = <Map<String, dynamic>>[].obs;
   var produkDetail = <Map<String, dynamic>>[].obs;
@@ -72,6 +75,22 @@ class TransaksiC extends GetxController {
     return selected['add_on'] ?? "Tidak Ada";
   }
 
+  String getIdTransaksiOut(String idKasbon) {
+    var selected = kasbonDet.firstWhere(
+      (m) => m['id_kasbon'].toString() == idKasbon,
+      orElse: () => {'id_transaksi_out': '0'},
+    );
+    return selected['id_transaksi_out'] ?? "0";
+  }
+
+  String getTransaksiPrice(String idTransaksi) {
+    var selected = allTransaksiLunas.firstWhere(
+      (m) => m['id'].toString() == idTransaksi,
+      orElse: () => {'total_transaksi': '0'},
+    );
+    return selected['total_transaksi'] ?? "0";
+  }
+
   int addOnHarga(String idAddon) {
     var selected = addOn.firstWhere(
       (m) => m['id'].toString() == idAddon,
@@ -79,7 +98,6 @@ class TransaksiC extends GetxController {
     );
 
     final hargaStr = selected['harga']?.toString() ?? '0';
-
     return int.tryParse(hargaStr) ?? 0;
   }
 
@@ -93,7 +111,7 @@ class TransaksiC extends GetxController {
 
   void onInit() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    fetchTransaksiLunas();
+    fetchTransaksiOut();
     fetchMember();
     fetchTransaksiDetail();
     fetchKasbon();
@@ -101,6 +119,7 @@ class TransaksiC extends GetxController {
     fetchMetode();
     fetchAddonTr();
     fetchAddon();
+    fetchTopup();
     initializeCheckboxList();
 
     super.onInit();
@@ -118,7 +137,7 @@ class TransaksiC extends GetxController {
     }
   }
 
-  Future<void> fetchTransaksiLunas({bool isLoadMore = false}) async {
+  Future<void> fetchTransaksiOut({bool isLoadMore = false}) async {
     try {
       if (isLoadMore) {
         isLoadingLunas(true);
@@ -156,6 +175,7 @@ class TransaksiC extends GetxController {
             memberTransaksi.addAll(memberList);
             memberTransaksi.value = memberTransaksi.toSet().toList();
           } else {
+            allTransaksiLunas.value = transaksiList;
             transaksiLunas.value = transaksiList;
             detailTr.value = detailList;
             memberTransaksi.value = memberList;
@@ -219,9 +239,25 @@ class TransaksiC extends GetxController {
     }
   }
 
+  double totalTransaksi(String idTransaksiOut) {
+    double total = 0;
+
+    var transaksiDetail = detailTr.where(
+      (item) => item['id_transaksi_out'].toString() == idTransaksiOut,
+    );
+
+    for (var item in transaksiDetail) {
+      final totalHargaProduk =
+          double.tryParse(item['total_harga'].toString()) ?? 0;
+      total += totalHargaProduk;
+    }
+
+    return total;
+  }
+
   Future<void> fetchKasbon() async {
     try {
-      isLoading.value = true;
+      isLoading(true);
       var response = await http.get(Uri.parse(urlTr + "/kasbon"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -229,19 +265,36 @@ class TransaksiC extends GetxController {
           var kasbonList = List<Map<String, dynamic>>.from(jsonData['data']);
           kasbon.value = kasbonList;
           allKasbon.value = kasbonList;
-
-          // Initialize checkboxList here after kasbon is updated
           initializeCheckboxList();
+
+          Map<int, int> groupedKasbon = {};
+          for (var item in kasbonList) {
+            int idMember = int.parse(item['id_member'].toString());
+            int totalKasbon = int.parse(item['total_kasbon'].toString());
+
+            if (groupedKasbon.containsKey(idMember)) {
+              groupedKasbon[idMember] = groupedKasbon[idMember]! + totalKasbon;
+            } else {
+              groupedKasbon[idMember] = totalKasbon;
+            }
+          }
+
+          dataKasbon.value = groupedKasbon.entries.map((entry) {
+            return {
+              'id_member': entry.key,
+              'total_kasbon': entry.value,
+            };
+          }).toList();
         } else {
-          throw Exception('Failed to load products');
+          throw Exception('Failed to load kasbon');
         }
       } else {
-        throw Exception('Failed to load data');
+        throw Exception('Failed to fetch data');
       }
     } catch (e) {
       print('Error: $e');
     } finally {
-      isLoading.value = false;
+      isLoading(false);
     }
   }
 
@@ -339,7 +392,7 @@ class TransaksiC extends GetxController {
       if (response['status'] == true) {
         print('Response True' + response['message']);
       } else {
-        print('Response False' + response['message']);
+        print('Response False ' + response['message']);
       }
     } catch (e) {
       print(e);
@@ -385,34 +438,37 @@ class TransaksiC extends GetxController {
     String? userUpdate = prefs.getString('name') ?? 'system';
 
     try {
-      // Track successful and failed payments
       List<String> successfulPayments = [];
       List<String> failedPayments = [];
 
-      // Process each selected kasbon
       for (var kasbon in selectedKasbons) {
         try {
+          final idKasbon = kasbon['id'];
+          final idTransaksiOut = getIdTransaksiOut(idKasbon.toString());
+          final totalTransaksi = getTransaksiPrice(idTransaksiOut.toString());
           final response = await ApiServiceTr.pemKasbon(
             kasbon['id'].toString(),
             kasbon['total_kasbon'].toString(),
             userUpdate,
           );
+          print(
+              'Kasbon ID: $idKasbon | id_transaksi_out: $idTransaksiOut | total_transaksi: $totalTransaksi');
 
           if (response['status'] == 'true') {
-            // Successfully paid kasbon
             successfulPayments.add(kasbon['id'].toString());
-
-            // Lunas Kasbon
+            final totalKasbon =
+                double.tryParse(kasbon['total_kasbon'].toString()) ?? 0;
+            final totalTransaksiDouble =
+                double.tryParse(totalTransaksi.toString()) ?? 0;
+            final totalBaru = totalTransaksiDouble + totalKasbon;
             await lunasKasbon(
-              kasbon['id'].toString(),
-              kasbon['total_kasbon'].toString(),
+              idTransaksiOut.toString(),
+              totalBaru.toString(),
               '1',
             );
 
-            // Delete Kasbon
             await deleteKasbon(kasbon['id'].toString());
           } else {
-            // Failed to pay kasbon
             failedPayments.add(kasbon['id'].toString());
           }
         } catch (e) {
@@ -421,13 +477,11 @@ class TransaksiC extends GetxController {
         }
       }
 
-      // Refresh data
       await fetchKasbon();
       await fetchKasbonDetail();
-      await fetchTransaksiLunas();
+      await fetchTransaksiOut();
       await fetchTransaksiDetail();
 
-      // Show summary snackbar
       if (successfulPayments.isNotEmpty) {
         Get.snackbar(
           'Berhasil',
@@ -538,6 +592,50 @@ class TransaksiC extends GetxController {
     }
   }
 
+  Future<void> fetchTopup() async {
+    try {
+      isLoading.value = true;
+      var response = await http.get(Uri.parse(urlTr + "/member/topup"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          List<Map<String, dynamic>> topUpSort =
+              List<Map<String, dynamic>>.from(jsonData['data']);
+          topUpSort.sort((a, b) => DateTime.parse(b['input_date'])
+              .compareTo(DateTime.parse(a['input_date'])));
+          topup.value = topUpSort;
+          allTopup.value = topUpSort;
+        } else {
+          throw Exception('Failed to load topup data');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void searchTopup(String query) {
+    if (query.isEmpty) {
+      topup.value = allKasbon;
+    } else {
+      topup.value = allKasbon
+          .where((item) =>
+              MemberName(item['id_member'].toString())
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              MetodeName(item['id_metode_pembayaran'].toString())
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+    }
+  }
+
   void searchTransaksi(String query) {
     if (query.isEmpty) {
       transaksiLunas.value = allTransaksiLunas;
@@ -577,13 +675,13 @@ class TransaksiC extends GetxController {
   Future<void> loadMoreTransaksiLunas() async {
     if (isLoadingLunas.value || isLastPageLunas.value) return;
     pageLunas.value++;
-    await fetchTransaksiLunas(isLoadMore: true);
+    await fetchTransaksiOut(isLoadMore: true);
   }
 
   void resetPageLunas() {
     pageLunas.value = 1;
     isLastPageLunas.value = false;
-    fetchTransaksiLunas();
+    fetchTransaksiOut();
   }
 
   Future<void> refresh() async {
@@ -592,7 +690,8 @@ class TransaksiC extends GetxController {
     isLoading(true);
     await fetchKasbonDetail();
     await fetchKasbon();
-    await fetchTransaksiLunas();
+    await fetchTransaksiOut();
     await fetchTransaksiDetail();
+    await fetchTopup();
   }
 }

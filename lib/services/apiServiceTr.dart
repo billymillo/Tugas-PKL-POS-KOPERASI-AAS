@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiServiceTr {
-  static const String baseUrlTr = 'http://192.168.1.7/POS_CI/api';
+  static const String baseUrlTr = 'http://10.10.20.109/POS_CI/api';
 
   Future<String?> getUserInput() async {
     final prefs = await SharedPreferences.getInstance();
@@ -12,7 +12,7 @@ class ApiServiceTr {
 
   static Future<Map<String, dynamic>> TransaksiOut(
     String idMember,
-    String produk,
+    String jumlah,
     String metodePem,
     String totalTr,
     String diskon,
@@ -31,7 +31,7 @@ class ApiServiceTr {
         },
         body: {
           'id_member': idMember,
-          'jumlah_produk': produk,
+          'jumlah_produk': jumlah,
           'id_metode_pembayaran': metodePem,
           'total_transaksi': totalTr,
           'diskon': diskon,
@@ -55,7 +55,7 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> tambahPoin(String id, String poin) async {
+  Future<Map<String, dynamic>> ubahPoin(String id, String poin) async {
     final url = '$baseUrlTr/member/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -402,7 +402,8 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> updateSaldo(String id, String saldo, String userUpdate) async {
+  Future<Map<String, dynamic>> updateSaldo(
+      String id, String saldo, String userUpdate) async {
     final url = '$baseUrlTr/transaksi_out/detail/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -569,8 +570,13 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> editProdukTrIn(String id,
-      String hargaSatuan, String hargaJual, String hargaPerPack, String jumlahPcs, String userUpdate) async {
+  Future<Map<String, dynamic>> editProdukTrIn(
+      String id,
+      String hargaSatuan,
+      String hargaJual,
+      String hargaPerPack,
+      String jumlahPcs,
+      String userUpdate) async {
     final url = '$baseUrlTr/product/ubah/$id';
     final response = await http.put(
       Uri.parse(url),
@@ -605,6 +611,75 @@ class ApiServiceTr {
       return jsonDecode(response.body);
     } else {
       return jsonDecode(response.body);
+    }
+  }
+
+  static Future<Map<String, dynamic>> addTopup(
+    String idMember,
+    String totalTopup,
+    String idMetode,
+    String userInput,
+  ) async {
+    final url = '$baseUrlTr/member/topup';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id_member': idMember,
+          'total_topup': totalTopup,
+          'id_metode': idMetode,
+          'user_input': userInput,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> addTransaksiOutMitra(
+    String mitra,
+    String jumlah,
+    String total,
+    String status,
+    String tanggalAwal,
+    String tanggalAkhir,
+    String userInput,
+  ) async {
+    final url = '$baseUrlTr/transaksi_out_mitra/';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {
+          'id_mitra': mitra,
+          'total_jumlah': jumlah,
+          'total_transaksi': total,
+          'status_transaksi': status,
+          'tanggal_awal': tanggalAwal,
+          'tanggal_akhir': tanggalAkhir,
+          'user_input': userInput,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        return {
+          'status': false,
+          'message': 'Error ${response.statusCode}: ${response.body}',
+        };
+      }
+    } catch (e) {
+      return {'status': false, 'message': 'Request failed: $e'};
     }
   }
 }

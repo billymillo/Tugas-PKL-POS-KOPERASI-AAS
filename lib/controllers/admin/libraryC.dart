@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LibraryController extends GetxController {
   final ApiService apiService = ApiService();
   var url = ApiService.baseUrl + '/product';
+  TextEditingController searchController = TextEditingController();
 
   final ApiServiceTr apiServiceTr = ApiServiceTr();
   var urlTr = ApiServiceTr.baseUrlTr;
@@ -23,6 +24,11 @@ class LibraryController extends GetxController {
   var tipe = <Map<String, dynamic>>[].obs;
   var kategori = <Map<String, dynamic>>[].obs;
   var mitra = <Map<String, dynamic>>[].obs;
+  var banks = <Map<String, dynamic>>[].obs;
+  var selectedBank = Rxn<String>();
+  var filteredBank = <Map<String, dynamic>>[].obs;
+  RxString searchQuery = ''.obs;
+
   var addOn = <Map<String, dynamic>>[].obs;
 
   Rx<File?> imagePathK = Rx<File?>(null);
@@ -42,6 +48,14 @@ class LibraryController extends GetxController {
     Get.toNamed(Routes.ADDPRODUCTP);
   }
 
+  String get KodeBank {
+    var selected = banks.firstWhere(
+      (m) => m['nama'] == selectedBank.value,
+      orElse: () => {'kode': 'Non Member'},
+    );
+    return selected['kode'] ?? 0;
+  }
+
   @override
   void onInit() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
@@ -52,6 +66,7 @@ class LibraryController extends GetxController {
     fetchMember();
     fetchMetode();
     fetchAddOn();
+    fetchBank();
     konfersiPoin();
   }
 
@@ -76,6 +91,50 @@ class LibraryController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  Future<void> fetchBank() async {
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse(urlTr + "/bank"));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          var bankData = List<Map<String, dynamic>>.from(jsonData['data']);
+          banks.value = bankData;
+        } else {
+          banks.value = [];
+        }
+      } else {
+        banks.value = [];
+      }
+    } catch (e) {
+      print('Error fetching bank: $e');
+      banks.value = [];
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void searchBank(String query, List<Map<String, dynamic>> bankList) {
+    searchQuery.value = query;
+    if (query.isEmpty) {
+      filteredBank.assignAll(bankList);
+    } else {
+      filteredBank.assignAll(bankList.where((banks) {
+        final nama = banks['nama'].toString().toLowerCase();
+        final kode = banks['kode'].toString().toLowerCase();
+
+        return nama.contains(query.toLowerCase()) ||
+            kode.contains(query.toLowerCase());
+      }).toList());
+    }
+  }
+
+  void clearSearch() {
+    searchController.clear();
+    searchQuery.value = '';
+    filteredBank.assignAll([]);
   }
 
   Future<void> addNewMitra(String nama, String no_tlp, String email,
@@ -145,7 +204,7 @@ class LibraryController extends GetxController {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );
@@ -154,7 +213,8 @@ class LibraryController extends GetxController {
     }
   }
 
-  Future<void> editMitra(String id, String nama, String no_tlp, String email, String bank, String noRek, String namaRek,
+  Future<void> editMitra(String id, String nama, String no_tlp, String email,
+      String bank, String noRek, String namaRek,
       {bool fromButton = false}) async {
     if (!fromButton) {
       return;
@@ -192,7 +252,7 @@ class LibraryController extends GetxController {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );
@@ -250,7 +310,7 @@ class LibraryController extends GetxController {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );
@@ -318,7 +378,7 @@ class LibraryController extends GetxController {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );
@@ -703,7 +763,7 @@ class LibraryController extends GetxController {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );
@@ -846,7 +906,7 @@ class LibraryController extends GetxController {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );
@@ -915,7 +975,7 @@ class LibraryController extends GetxController {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );

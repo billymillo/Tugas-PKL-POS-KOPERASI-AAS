@@ -64,6 +64,28 @@ class TransaksiOutMController extends GetxController {
     return selected['nama'] ?? "Pilih Mitra Terlebih Dahulu";
   }
 
+  int get totalSaldo {
+    return transaksiOutDet.fold<int>(
+      0,
+      (sum, item) =>
+          sum +
+          (int.tryParse((double.tryParse(item['saldo'].toString()) ?? 0)
+                  .toStringAsFixed(0)) ??
+              0),
+    );
+  }
+
+  int get totalJumlah {
+    return transaksiOutDet.fold<int>(
+      0,
+      (sum, item) =>
+          sum +
+          (int.tryParse((double.tryParse(item['jumlah'].toString()) ?? 0)
+                  .toStringAsFixed(0)) ??
+              0),
+    );
+  }
+
   void filterTransaksiOutDet() {
     final start = selectedStartDate.value;
     final end = selectedEndDate.value;
@@ -224,6 +246,57 @@ class TransaksiOutMController extends GetxController {
       }
     } catch (e) {
       print(e);
+      Get.snackbar(
+        'Gagal',
+        e.toString(),
+        backgroundColor: Colors.red.withOpacity(0.8),
+        colorText: Colors.white,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> addTransaksiOutMitra(
+    String mitra,
+    String jumlah,
+    String total,
+    String status,
+    String tanggalAwal,
+    String tanggalAkhir,
+  ) async {
+    isLoading.value = true;
+    final prefs = await SharedPreferences.getInstance();
+    String? userInput = prefs.getString('name') ?? 'system';
+    final response = await ApiServiceTr.addTransaksiOutMitra(
+      mitra,
+      jumlah,
+      total,
+      status,
+      tanggalAwal,
+      tanggalAkhir,
+      userInput,
+    );
+    try {
+      if (response['status'] == 'true') {
+        Get.snackbar(
+          'Berhasil',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.8),
+          colorText: Colors.white,
+          icon: Icon(Icons.check_circle_outline, color: Colors.white),
+        );
+      } else if (response['status'] == 'false') {
+        Get.snackbar(
+          'Gagal',
+          response['message'],
+          backgroundColor: Colors.red.withOpacity(0.8),
+          colorText: Colors.white,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+      }
+    } catch (e) {
       Get.snackbar(
         'Gagal',
         e.toString(),

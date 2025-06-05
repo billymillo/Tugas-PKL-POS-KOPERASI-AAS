@@ -41,8 +41,8 @@ class OpNameDetController extends GetxController {
   final int itemsPerPage = 10;
 
   var tipeOpname = ''.obs;
-  late String idOpname;
-  late String statusOpname;
+  late var idOpname;
+  late var statusOpname;
 
   int get totalPages => (produk.length / itemsPerPage).ceil();
   List<Map<String, dynamic>> get filteredProduk {
@@ -430,47 +430,6 @@ class OpNameDetController extends GetxController {
         Get.snackbar(
           'Error',
           'Error Saat Mengubah Opname Detail',
-          backgroundColor: DarkColor().red.withOpacity(0.5),
-          icon: Icon(Icons.crisis_alert, color: Colors.black),
-        );
-        print('error message: $response');
-      }
-    } catch (e) {
-      Get.snackbar(
-        'Gagal',
-        e.toString(),
-        backgroundColor: Colors.red.withOpacity(0.8),
-        colorText: Colors.white,
-        icon: Icon(Icons.error, color: Colors.white),
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> addPemOpname(
-    String idOpname,
-    String idProduk,
-    String jumlah,
-    String totalBeli,
-  ) async {
-    isLoading.value = true;
-    final prefs = await SharedPreferences.getInstance();
-    String? userInput = prefs.getString('name') ?? 'system';
-    final response = await ApiService.addPemOpname(
-      idOpname,
-      idProduk,
-      jumlah,
-      totalBeli,
-      userInput,
-    );
-    try {
-      if (response['status'] == true) {
-        print("Pembelian Berhasil" + response['message']);
-      } else if (response['status'] == false) {
-        Get.snackbar(
-          'Error',
-          'Error Saat Menambahkan Opname Pembelian',
           backgroundColor: DarkColor().red.withOpacity(0.5),
           icon: Icon(Icons.crisis_alert, color: Colors.black),
         );

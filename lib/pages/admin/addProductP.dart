@@ -32,7 +32,6 @@ class _AddProductPState extends State<AddProductP> {
   final TextEditingController namaMitraNewController = TextEditingController();
   final TextEditingController noMitraNewController = TextEditingController();
   final TextEditingController emailMitraNewController = TextEditingController();
-  final TextEditingController bankMitraNewController = TextEditingController();
   final TextEditingController noRekMitraNewController = TextEditingController();
   final TextEditingController namaRekMitraNewController =
       TextEditingController();
@@ -42,6 +41,7 @@ class _AddProductPState extends State<AddProductP> {
   final gambarKategoriController = FileImage(File(''));
 
   final TextEditingController namaProdukController = TextEditingController();
+  final TextEditingController barcodeProdukController = TextEditingController();
   final gambarProdukController = FileImage(File(''));
   final TextEditingController hargaSatuanProdukController =
       TextEditingController();
@@ -65,18 +65,18 @@ class _AddProductPState extends State<AddProductP> {
       namaMitraNewController.text,
       noMitraNewController.text,
       emailMitraNewController.text,
-      bankMitraNewController.text,
+      addController.selectedBank.string,
       noRekMitraNewController.text,
       namaRekMitraNewController.text,
     );
 
     addController.addProduct(
       namaProdukController.text,
+      barcodeProdukController.text,
       gambarProdukController.file,
       addController.selectedKategori.string,
       addController.selectedTipe.string,
       addController.selectedMitra.string,
-      addController.selectedAddOn.string,
       addController.hargaDasar.string,
       jumlahIsiProdukController.text,
       hargaSatuanProdukController.text,
@@ -99,7 +99,7 @@ class _AddProductPState extends State<AddProductP> {
               Container(
                 margin: EdgeInsets.only(top: 10),
                 padding:
-                    EdgeInsets.only(bottom: 50, left: 50, right: 50, top: 130),
+                    EdgeInsets.only(bottom: 50, left: 50, right: 50, top: 110),
                 decoration: BoxDecoration(color: Colors.white),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,23 +112,35 @@ class _AddProductPState extends State<AddProductP> {
                           size: 30,
                         ),
                         SizedBox(width: 12),
-                        Text(
-                          'Tambahkan Produk Baru',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                        Flexible(
+                          flex: 1,
+                          child: Text(
+                            'Tambahkan Produk Baru',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ),
                       ],
                     ),
                     SizedBox(height: 30),
-                    buildInputLabel('Nama Produk', ' *'),
-                    buildTextField(
+                    AdminW().buildInputLabel('Nama Produk', ' *'),
+                    AdminW().buildTextField(
                       inputFormat: LengthLimitingTextInputFormatter(200),
                       controller: namaProdukController,
                       hintText: 'Masukkan nama produk',
                       prefixIcon: Icons.fastfood_outlined,
+                      type: TextInputType.name,
+                    ),
+                    SizedBox(height: 20),
+                    AdminW().buildInputLabel('Barcode Produk', ' '),
+                    AdminW().buildTextField(
+                      inputFormat: LengthLimitingTextInputFormatter(200),
+                      controller: barcodeProdukController,
+                      hintText: 'Masukkan barcode produk',
+                      prefixIcon: Icons.barcode_reader,
                       type: TextInputType.name,
                     ),
                     SizedBox(height: 20),
@@ -138,9 +150,9 @@ class _AddProductPState extends State<AddProductP> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              buildInputLabel("Kategori", " *"),
+                              AdminW().buildInputLabel("Kategori", " *"),
                               Obx(() {
-                                return buildDropdown(
+                                return AdminW().buildDropdown(
                                   selectedValue: addController.selectedKategori,
                                   label: 'Pilih Kategori',
                                   items: addController.kategori,
@@ -162,229 +174,242 @@ class _AddProductPState extends State<AddProductP> {
                                       return Dialog(
                                         elevation: 0,
                                         backgroundColor: Colors.white,
-                                        child: Container(
-                                          padding: EdgeInsets.all(20),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    CupertinoIcons.add_circled,
-                                                    color: PrimaryColor().blue,
-                                                    size: 24,
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  Text(
-                                                    "Tambah Kategori Baru",
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 18,
+                                        child: SingleChildScrollView(
+                                          child: Container(
+                                            padding: EdgeInsets.all(20),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      CupertinoIcons
+                                                          .add_circled,
+                                                      color:
+                                                          PrimaryColor().blue,
+                                                      size: 24,
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 15),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  buildInputLabel(
-                                                      'Nama Kategori', " *"),
-                                                  buildTextField(
-                                                    inputFormat:
-                                                        LengthLimitingTextInputFormatter(
-                                                            200),
-                                                    controller:
-                                                        newKategoriController,
-                                                    hintText: 'Makanan',
-                                                    prefixIcon: CupertinoIcons
-                                                        .square_grid_2x2,
-                                                    type: TextInputType.name,
-                                                  ),
-                                                  SizedBox(height: 20),
-                                                  buildInputLabel(
-                                                      'Gambar Kategori', " *"),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      addController
-                                                          .pickImageKategori();
-                                                    },
-                                                    child: Obx(() {
-                                                      if (addController
-                                                              .imagePathK
-                                                              .value ==
-                                                          null) {
-                                                        return Container(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 40),
-                                                          width:
-                                                              double.infinity,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .grey
-                                                                    .shade300,
-                                                                width: 2),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12),
-                                                            color: Colors
-                                                                .grey.shade50,
-                                                          ),
-                                                          child: Column(
-                                                            children: [
-                                                              Container(
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            16),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .blue
-                                                                      .withOpacity(
-                                                                          0.1),
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                child: Icon(
-                                                                  Icons
-                                                                      .category,
-                                                                  size: 40,
-                                                                  color:
-                                                                      PrimaryColor()
-                                                                          .blue,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                  height: 12),
-                                                              Text(
-                                                                'Tambahkan Foto Kategori',
-                                                                style:
-                                                                    TextStyle(
+                                                    SizedBox(width: 12),
+                                                    Text(
+                                                      "Tambah Kategori Baru",
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 15),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    AdminW().buildInputLabel(
+                                                        'Nama Kategori', " *"),
+                                                    AdminW().buildTextField(
+                                                      inputFormat:
+                                                          LengthLimitingTextInputFormatter(
+                                                              200),
+                                                      controller:
+                                                          newKategoriController,
+                                                      hintText: 'Makanan',
+                                                      prefixIcon: CupertinoIcons
+                                                          .square_grid_2x2,
+                                                      type: TextInputType.name,
+                                                    ),
+                                                    SizedBox(height: 20),
+                                                    AdminW().buildInputLabel(
+                                                        'Gambar Kategori',
+                                                        " *"),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        addController
+                                                            .pickImageKategori();
+                                                      },
+                                                      child: Obx(() {
+                                                        if (addController
+                                                                .imagePathK
+                                                                .value ==
+                                                            null) {
+                                                          return Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        40),
+                                                            width:
+                                                                double.infinity,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border: Border.all(
                                                                   color: Colors
                                                                       .grey
-                                                                      .shade400,
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
+                                                                      .shade300,
+                                                                  width: 2),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          12),
+                                                              color: Colors
+                                                                  .grey.shade50,
+                                                            ),
+                                                            child: Column(
+                                                              children: [
+                                                                Container(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              16),
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: Colors
+                                                                        .blue
+                                                                        .withOpacity(
+                                                                            0.1),
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                  ),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .category,
+                                                                    size: 40,
+                                                                    color:
+                                                                        PrimaryColor()
+                                                                            .blue,
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      } else {
-                                                        return Container(
-                                                          width: 800,
-                                                          height: 250,
-                                                          color: Colors.grey,
-                                                          child: Image.file(
-                                                              addController
-                                                                  .imagePathK
-                                                                  .value!,
-                                                              fit:
-                                                                  BoxFit.cover),
-                                                        );
-                                                      }
-                                                    }),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 24),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.pop(context),
-                                                    child: Text(
-                                                      'Batal',
-                                                      style: TextStyle(
-                                                        color: Colors.black45,
-                                                        fontSize: 14,
+                                                                SizedBox(
+                                                                    height: 12),
+                                                                Text(
+                                                                  'Tambahkan Foto Kategori',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade400,
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          return Container(
+                                                            width: 800,
+                                                            height: 250,
+                                                            color: Colors.grey,
+                                                            child: Image.file(
+                                                                addController
+                                                                    .imagePathK
+                                                                    .value!,
+                                                                fit: BoxFit
+                                                                    .cover),
+                                                          );
+                                                        }
+                                                      }),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 24),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child: Text(
+                                                        'Batal',
+                                                        style: TextStyle(
+                                                          color: Colors.black45,
+                                                          fontSize: 14,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  ElevatedButton(
-                                                    onPressed: () async {
-                                                      File? imageFileKategori =
+                                                    SizedBox(width: 12),
+                                                    ElevatedButton(
+                                                      onPressed: () async {
+                                                        File?
+                                                            imageFileKategori =
+                                                            addController
+                                                                .imagePathK
+                                                                .value;
+                                                        if (imageFileKategori ==
+                                                            null) {
+                                                          Get.snackbar(
+                                                            'Error',
+                                                            'Harap pilih gambar terlebih dahulu!',
+                                                            backgroundColor:
+                                                                Colors.red
+                                                                    .withOpacity(
+                                                                        0.5),
+                                                            icon: Icon(
+                                                                Icons
+                                                                    .crisis_alert,
+                                                                color: Colors
+                                                                    .white),
+                                                          );
+                                                          return;
+                                                        }
+                                                        await addController
+                                                            .addNewKategori(
+                                                                newKategoriController
+                                                                    .text,
+                                                                imageFileKategori)
+                                                            .then((_) {
                                                           addController
-                                                              .imagePathK.value;
-                                                      if (imageFileKategori ==
-                                                          null) {
-                                                        Get.snackbar(
-                                                          'Error',
-                                                          'Harap pilih gambar terlebih dahulu!',
-                                                          backgroundColor:
-                                                              Colors.red
-                                                                  .withOpacity(
-                                                                      0.5),
-                                                          icon: Icon(
-                                                              Icons
-                                                                  .crisis_alert,
+                                                              .imagePathK
+                                                              .value = null;
+                                                        });
+                                                        await addController
+                                                            .refresh();
+                                                        Navigator.pop(context);
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            PrimaryColor().blue,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            CupertinoIcons.add,
+                                                            size: 18,
+                                                            color: Colors.white,
+                                                          ),
+                                                          SizedBox(width: 8),
+                                                          Text(
+                                                            'Tambah',
+                                                            style: TextStyle(
                                                               color:
-                                                                  Colors.white),
-                                                        );
-                                                        return;
-                                                      }
-                                                      await addController
-                                                          .addNewKategori(
-                                                              newKategoriController
-                                                                  .text,
-                                                              imageFileKategori)
-                                                          .then((_) {
-                                                        addController.imagePathK
-                                                            .value = null;
-                                                      });
-                                                      await addController
-                                                          .refresh();
-                                                      Navigator.pop(context);
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          PrimaryColor().blue,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
+                                                                  Colors.white,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(
-                                                          CupertinoIcons.add,
-                                                          size: 18,
-                                                          color: Colors.white,
-                                                        ),
-                                                        SizedBox(width: 8),
-                                                        Text(
-                                                          'Tambah',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       );
@@ -400,9 +425,9 @@ class _AddProductPState extends State<AddProductP> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              buildInputLabel("Tipe", " *"),
+                              AdminW().buildInputLabel("Tipe", " *"),
                               Obx(() {
-                                return buildDropdown(
+                                return AdminW().buildDropdown(
                                   selectedValue: addController.selectedTipe,
                                   label: 'Pilih Tipe',
                                   items: addController.tipe,
@@ -437,114 +462,121 @@ class _AddProductPState extends State<AddProductP> {
                                       return Dialog(
                                         elevation: 0,
                                         backgroundColor: Colors.transparent,
-                                        child: Container(
-                                          padding: EdgeInsets.all(20),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    CupertinoIcons.add_circled,
-                                                    color: PrimaryColor().blue,
-                                                    size: 24,
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  Text(
-                                                    "Tambah Tipe Baru",
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 18,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 15),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  buildInputLabel(
-                                                      'Nama Tipe', " *"),
-                                                  buildTextField(
-                                                    inputFormat:
-                                                        LengthLimitingTextInputFormatter(
-                                                            200),
-                                                    controller:
-                                                        newTipeController,
-                                                    hintText: 'Titipan',
-                                                    prefixIcon: CupertinoIcons
-                                                        .person_2_fill,
-                                                    type: TextInputType.name,
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 24),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.pop(context),
-                                                    child: Text(
-                                                      'Batal',
-                                                      style: TextStyle(
-                                                        color: Colors.black45,
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  ElevatedButton(
-                                                    onPressed: () async {
-                                                      await addController
-                                                          .addNewTipe(
-                                                              newTipeController
-                                                                  .text);
-                                                      await addController
-                                                          .refresh();
-                                                      Navigator.pop(context);
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
+                                        child: SingleChildScrollView(
+                                          child: Container(
+                                            padding: EdgeInsets.all(20),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      CupertinoIcons
+                                                          .add_circled,
+                                                      color:
                                                           PrimaryColor().blue,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
+                                                      size: 24,
+                                                    ),
+                                                    SizedBox(width: 12),
+                                                    Text(
+                                                      "Tambah Tipe Baru",
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 18,
                                                       ),
                                                     ),
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(
-                                                          CupertinoIcons.add,
-                                                          size: 18,
-                                                          color: Colors.white,
-                                                        ),
-                                                        SizedBox(width: 8),
-                                                        Text(
-                                                          'Tambah',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                  ],
+                                                ),
+                                                SizedBox(height: 15),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    AdminW().buildInputLabel(
+                                                        'Nama Tipe', " *"),
+                                                    AdminW().buildTextField(
+                                                      inputFormat:
+                                                          LengthLimitingTextInputFormatter(
+                                                              200),
+                                                      controller:
+                                                          newTipeController,
+                                                      hintText: 'Titipan',
+                                                      prefixIcon: CupertinoIcons
+                                                          .person_2_fill,
+                                                      type: TextInputType.name,
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                                  ],
+                                                ),
+                                                SizedBox(height: 24),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child: Text(
+                                                        'Batal',
+                                                        style: TextStyle(
+                                                          color: Colors.black45,
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 12),
+                                                    ElevatedButton(
+                                                      onPressed: () async {
+                                                        await addController
+                                                            .addNewTipe(
+                                                                newTipeController
+                                                                    .text);
+                                                        await addController
+                                                            .refresh();
+                                                        Navigator.pop(context);
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            PrimaryColor().blue,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            CupertinoIcons.add,
+                                                            size: 18,
+                                                            color: Colors.white,
+                                                          ),
+                                                          SizedBox(width: 8),
+                                                          Text(
+                                                            'Tambah',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       );
@@ -564,8 +596,9 @@ class _AddProductPState extends State<AddProductP> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            buildInputLabel('Mitra Produk (Opsional)', ""),
-                            buildDropdown(
+                            AdminW()
+                                .buildInputLabel('Mitra Produk (Opsional)', ""),
+                            AdminW().buildDropdown(
                               selectedValue: addController.selectedMitra,
                               label: 'Pilih Mitra',
                               items: addController.mitra,
@@ -616,41 +649,39 @@ class _AddProductPState extends State<AddProductP> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  buildInputLabel(
-                                                      'Nama Mitra', " *"),
-                                                  buildTextField(
-                                                    inputFormat:
-                                                        LengthLimitingTextInputFormatter(
-                                                            200),
+                                                  SizedBox(height: 15),
+                                                  AdminW().buildInputLabel(
+                                                      'Nama Mitra', ' *'),
+                                                  AdminW().buildTextField(
                                                     controller:
                                                         namaMitraNewController,
                                                     hintText: 'Toko Kue XXXX',
                                                     prefixIcon: CupertinoIcons
                                                         .person_2_alt,
                                                     type: TextInputType.name,
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  buildInputLabel(
-                                                      'Nama No. Telepon', " *"),
-                                                  buildTextField(
                                                     inputFormat:
-                                                        LengthLimitingTextInputFormatter(
-                                                            12),
+                                                        FilteringTextInputFormatter
+                                                            .singleLineFormatter,
+                                                  ),
+                                                  SizedBox(height: 15),
+                                                  AdminW().buildInputLabel(
+                                                      'No. Whatsapp', ' *'),
+                                                  AdminW().buildTextField(
                                                     controller:
                                                         noMitraNewController,
-                                                    hintText: '0861-XXXX-XXXX',
+                                                    hintText: '0891-XXXX-XXXX',
                                                     prefixIcon: CupertinoIcons
                                                         .phone_circle,
-                                                    type: TextInputType.phone,
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  buildInputLabel(
-                                                      'Email Mitra (opsional)',
-                                                      " "),
-                                                  buildTextField(
+                                                    type: TextInputType.number,
                                                     inputFormat:
-                                                        LengthLimitingTextInputFormatter(
-                                                            200),
+                                                        FilteringTextInputFormatter
+                                                            .singleLineFormatter,
+                                                  ),
+                                                  SizedBox(height: 15),
+                                                  AdminW().buildInputLabel(
+                                                      'Email Mitra(opsional)',
+                                                      ' *'),
+                                                  AdminW().buildTextField(
                                                     controller:
                                                         emailMitraNewController,
                                                     hintText:
@@ -659,6 +690,121 @@ class _AddProductPState extends State<AddProductP> {
                                                         Icons.alternate_email,
                                                     type: TextInputType
                                                         .emailAddress,
+                                                    inputFormat:
+                                                        FilteringTextInputFormatter
+                                                            .singleLineFormatter,
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  AdminW().buildInputLabel(
+                                                      'Nama Bank (opsional)',
+                                                      " "),
+                                                  Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        AdminW().showBankDialog(
+                                                            context,
+                                                            addController);
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        elevation: 1,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          side: BorderSide(
+                                                              color: Colors.grey
+                                                                  .shade300),
+                                                        ),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 16,
+                                                                vertical: 14),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start, // rata kiri
+                                                        children: [
+                                                          Icon(Icons.add,
+                                                              color: Colors
+                                                                  .black54),
+                                                          SizedBox(width: 8),
+                                                          Obx(() => addController
+                                                                      .selectedBank
+                                                                      .value ==
+                                                                  null
+                                                              ? Text(
+                                                                  'Pilih Bank',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                )
+                                                              : Text(
+                                                                  addController
+                                                                          .selectedBank
+                                                                          .value
+                                                                          .toString() +
+                                                                      " (${addController.KodeBank})",
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                )),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  AdminW().buildInputLabel(
+                                                      'No Rekening (opsional)',
+                                                      " "),
+                                                  AdminW().buildTextField(
+                                                    inputFormat:
+                                                        LengthLimitingTextInputFormatter(
+                                                            200),
+                                                    controller:
+                                                        noRekMitraNewController,
+                                                    hintText:
+                                                        'contoh: 01982173019',
+                                                    prefixIcon: Icons
+                                                        .account_balance_wallet,
+                                                    type: TextInputType.number,
+                                                  ),
+                                                  SizedBox(height: 10),
+                                                  AdminW().buildInputLabel(
+                                                      'Nama Pemilik Rekening (opsional)',
+                                                      " "),
+                                                  AdminW().buildTextField(
+                                                    inputFormat:
+                                                        LengthLimitingTextInputFormatter(
+                                                            200),
+                                                    controller:
+                                                        namaRekMitraNewController,
+                                                    hintText:
+                                                        'contoh: ARTHA ABADI',
+                                                    prefixIcon: Icons.face,
+                                                    type: TextInputType.name,
                                                   ),
                                                 ],
                                               ),
@@ -689,8 +835,9 @@ class _AddProductPState extends State<AddProductP> {
                                                             .text,
                                                         emailMitraNewController
                                                             .text,
-                                                        bankMitraNewController
-                                                            .text,
+                                                        addController
+                                                            .selectedBank
+                                                            .toString(),
                                                         noRekMitraNewController
                                                             .text,
                                                         namaRekMitraNewController
@@ -699,6 +846,8 @@ class _AddProductPState extends State<AddProductP> {
                                                       );
                                                       await addController
                                                           .refresh();
+                                                      addController.selectedBank
+                                                          .value = null;
                                                       Navigator.pop(context);
                                                     },
                                                     style: ElevatedButton
@@ -740,7 +889,9 @@ class _AddProductPState extends State<AddProductP> {
                                       ),
                                     );
                                   },
-                                );
+                                ).then((value) {
+                                  addController.selectedBank.value = null;
+                                });
                               },
                             ),
                           ],
@@ -751,7 +902,7 @@ class _AddProductPState extends State<AddProductP> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildInputLabel('Add On Produk', " "),
+                        AdminW().buildInputLabel('Add On Produk', " "),
                         Container(
                           width: MediaQuery.of(context).size.width,
                           child: ElevatedButton(
@@ -903,9 +1054,9 @@ class _AddProductPState extends State<AddProductP> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              buildInputLabel(
+                                              AdminW().buildInputLabel(
                                                   'Nama Add On', " *"),
-                                              buildTextField(
+                                              AdminW().buildTextField(
                                                 inputFormat:
                                                     LengthLimitingTextInputFormatter(
                                                         200),
@@ -917,9 +1068,9 @@ class _AddProductPState extends State<AddProductP> {
                                                 type: TextInputType.name,
                                               ),
                                               SizedBox(height: 10),
-                                              buildInputLabel(
+                                              AdminW().buildInputLabel(
                                                   'Harga Add On', " *"),
-                                              buildTextField(
+                                              AdminW().buildTextField(
                                                 inputFormat:
                                                     LengthLimitingTextInputFormatter(
                                                         200),
@@ -1005,57 +1156,6 @@ class _AddProductPState extends State<AddProductP> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    Obx(
-                      () => Row(
-                        children: [
-                          Expanded(
-                            flex: addController.harga.value ? 1 : 1,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                buildInputLabel('Harga Jual Per-pcs', " *"),
-                                buildTextField(
-                                  inputFormat: RupiahFormaters(),
-                                  controller: hargaJualProdukController,
-                                  hintText: 'Rp 5.500',
-                                  prefixIcon: FontAwesomeIcons.moneyBill1Wave,
-                                  type: TextInputType.number,
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (!addController.harga.value) ...[
-                            SizedBox(width: 16),
-                            Expanded(
-                              flex: 1,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  buildInputLabel('Harga Dasar Per-pcs', " *"),
-                                  buildTextField(
-                                    inputFormat: RupiahFormaters(),
-                                    controller: hargaSatuanProdukController,
-                                    hintText: 'Rp 5.000',
-                                    prefixIcon: FontAwesomeIcons.moneyBill1Wave,
-                                    type: TextInputType.number,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    buildInputLabel('Tambah Stok', " *"),
-                    buildTextField(
-                      inputFormat: RupiahFormaters(),
-                      controller: stokProdukController,
-                      hintText: 'Jumlah yang ditambahkan',
-                      prefixIcon: Icons.inventory_2_outlined,
-                      type: TextInputType.number,
-                    ),
-                    SizedBox(height: 20),
                     Row(
                       children: [
                         Expanded(
@@ -1065,8 +1165,8 @@ class _AddProductPState extends State<AddProductP> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  buildInputLabel('Harga Pack', " *"),
-                                  buildTextField(
+                                  AdminW().buildInputLabel('Harga Pack', " *"),
+                                  AdminW().buildTextField(
                                     inputFormat: RupiahFormaters(),
                                     controller: hargaPackProdukController,
                                     hintText: 'Rp 0',
@@ -1093,8 +1193,9 @@ class _AddProductPState extends State<AddProductP> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  buildInputLabel('Jumlah Isi Per-pack', " *"),
-                                  buildTextField(
+                                  AdminW().buildInputLabel(
+                                      'Jumlah Isi Per-pack', " *"),
+                                  AdminW().buildTextField(
                                       inputFormat: RupiahFormaters(),
                                       controller: jumlahIsiProdukController,
                                       hintText: '0 pcs',
@@ -1114,10 +1215,75 @@ class _AddProductPState extends State<AddProductP> {
                       ],
                     ),
                     SizedBox(height: 20),
+                    AdminW().buildInputLabel('Tambah Stok', " *"),
+                    AdminW().buildTextField(
+                      inputFormat: RupiahFormaters(),
+                      controller: stokProdukController,
+                      hintText: 'Jumlah yang ditambahkan',
+                      prefixIcon: Icons.inventory_2_outlined,
+                      type: TextInputType.number,
+                    ),
+                    SizedBox(height: 20),
+                    Obx(
+                      () => Row(
+                        children: [
+                          Expanded(
+                            flex: addController.harga.value ? 1 : 1,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AdminW().buildInputLabel(
+                                    'Harga Jual Per-pcs', " *"),
+                                AdminW().buildTextField(
+                                  inputFormat: RupiahFormaters(),
+                                  controller: hargaJualProdukController,
+                                  hintText: 'Rp 5.500',
+                                  prefixIcon: FontAwesomeIcons.moneyBill1Wave,
+                                  type: TextInputType.number,
+                                  onChanged: (value) {
+                                    addController.hitungLaba(
+                                      addController.hargaDasar.value,
+                                      value,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (!addController.harga.value) ...[
+                            SizedBox(width: 16),
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AdminW().buildInputLabel(
+                                      'Harga Dasar Per-pcs', " *"),
+                                  AdminW().buildTextField(
+                                    inputFormat: RupiahFormaters(),
+                                    controller: hargaSatuanProdukController,
+                                    hintText: 'Rp 5.000',
+                                    prefixIcon: FontAwesomeIcons.moneyBill1Wave,
+                                    type: TextInputType.number,
+                                    onChanged: (value) {
+                                      addController.hitungLaba(
+                                        addController.hargaDasar.value,
+                                        value,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        buildInputLabel('Gambar', " *"),
+                        AdminW().buildInputLabel('Gambar', " *"),
                       ],
                     ),
                     GestureDetector(
@@ -1125,62 +1291,67 @@ class _AddProductPState extends State<AddProductP> {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
+                            final isLandscape =
+                                MediaQuery.of(context).orientation ==
+                                    Orientation.landscape;
+
                             return Dialog(
-                              elevation: 0,
+                              elevation: 2,
                               backgroundColor: Colors.transparent,
-                              child: Container(
-                                padding: EdgeInsets.all(40),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(height: 20),
-                                    Row(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  double dialogWidth =
+                                      constraints.maxWidth * 0.5;
+                                  double dialogHeight = isLandscape
+                                      ? constraints.maxHeight * 0.6
+                                      : constraints.maxHeight * 0.25;
+
+                                  return Container(
+                                    width: dialogWidth,
+                                    height: dialogHeight,
+                                    padding: EdgeInsets.all(24),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            // Action for Camera
-                                            addController.pickImageCam();
-                                          },
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.25,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.3,
-                                            padding: EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: PrimaryColor().green,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black26,
-                                                  blurRadius: 6,
-                                                  offset: Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Center(
+                                        // Kamera Button
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              addController.pickImageCam();
+                                            },
+                                            child: Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 8),
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: PrimaryColor().green,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black26,
+                                                    blurRadius: 6,
+                                                    offset: Offset(0, 4),
+                                                  ),
+                                                ],
+                                              ),
                                               child: Column(
-                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Icon(Icons.camera_alt,
                                                       color: Colors.white,
-                                                      size: 60),
+                                                      size: 40),
                                                   SizedBox(height: 10),
                                                   Text(
                                                     'Kamera',
                                                     style: TextStyle(
-                                                      fontSize: 25,
+                                                      fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Colors.white,
@@ -1191,45 +1362,41 @@ class _AddProductPState extends State<AddProductP> {
                                             ),
                                           ),
                                         ),
-                                        SizedBox(width: 20),
-                                        GestureDetector(
-                                          onTap: () {
-                                            addController.pickImage();
-                                          },
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.25,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.3,
-                                            padding: EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: PrimaryColor().blue,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black26,
-                                                  blurRadius: 6,
-                                                  offset: Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Center(
+
+                                        // Galeri Button
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              addController.pickImage();
+                                            },
+                                            child: Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 8),
+                                              padding: EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: PrimaryColor().blue,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black26,
+                                                    blurRadius: 6,
+                                                    offset: Offset(0, 4),
+                                                  ),
+                                                ],
+                                              ),
                                               child: Column(
-                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Icon(Icons.photo_library,
                                                       color: Colors.white,
-                                                      size: 60),
+                                                      size: 40),
                                                   SizedBox(height: 10),
                                                   Text(
                                                     'Galeri',
                                                     style: TextStyle(
-                                                      fontSize: 25,
+                                                      fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Colors.white,
@@ -1242,8 +1409,8 @@ class _AddProductPState extends State<AddProductP> {
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  );
+                                },
                               ),
                             );
                           },
@@ -1298,17 +1465,34 @@ class _AddProductPState extends State<AddProductP> {
                       }),
                     ),
                     SizedBox(height: 20),
-                    Obx(() => Text(
-                          'Harga Dasar: ' +
-                              addController
-                                  .formatRupiah(addController.hargaDasar.value),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade700,
+                    Obx(() => Visibility(
+                          visible: addController.hargaPack.value == false,
+                          child: Text(
+                            'Harga Dasar Per-pcs: ' +
+                                addController.formatRupiah(
+                                    addController.hargaDasar.value),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
                           ),
                         )),
-                    SizedBox(height: 40),
+                    SizedBox(width: 20),
+                    Obx(() => Visibility(
+                          visible: addController.hargaPack.value == false,
+                          child: Text(
+                            'Laba Per-pcs: ' +
+                                addController.formatRupiah(
+                                    addController.totalLaba.value),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        )),
+                    SizedBox(height: 20),
                     Container(
                       width: double.infinity,
                       height: 50,
@@ -1320,8 +1504,21 @@ class _AddProductPState extends State<AddProductP> {
                                         addController.imagePath.value;
                                     if (imageFile == null) {
                                       Get.snackbar(
-                                        'Error',
+                                        'Gagal',
                                         'Harap pilih gambar terlebih dahulu!',
+                                        backgroundColor:
+                                            Colors.red.withOpacity(0.5),
+                                        icon: Icon(Icons.crisis_alert,
+                                            color: Colors.black),
+                                      );
+                                      return;
+                                    }
+                                    if (int.parse(
+                                            addController.totalLaba.value) <
+                                        0) {
+                                      Get.snackbar(
+                                        'Gagal',
+                                        'Laba tidak boleh minus, Silahkan cek kembali data produk anda!',
                                         backgroundColor:
                                             Colors.red.withOpacity(0.5),
                                         icon: Icon(Icons.crisis_alert,
@@ -1352,11 +1549,11 @@ class _AddProductPState extends State<AddProductP> {
                                     try {
                                       await addController.addProduct(
                                         namaProdukController.text,
+                                        barcodeProdukController.text,
                                         imageFile,
                                         addController.selectedKategori.string,
                                         addController.selectedTipe.string,
                                         addController.selectedMitra.string,
-                                        '2',
                                         hargaPackProdukController.text
                                             .replaceAll('.', ''),
                                         jumlahIsiProdukController.text
@@ -1376,6 +1573,7 @@ class _AddProductPState extends State<AddProductP> {
 
                                       addController.imagePath.value = null;
                                       namaProdukController.clear();
+                                      barcodeProdukController.clear();
                                       hargaPackProdukController.clear();
                                       jumlahIsiProdukController.clear();
                                       hargaSatuanProdukController.clear();
@@ -1386,6 +1584,7 @@ class _AddProductPState extends State<AddProductP> {
                                           null;
                                       addController.selectedTipe.value = null;
                                       addController.selectedMitra.value = null;
+                                      addController.fetchAddOn();
                                     } catch (e) {
                                       Get.snackbar(
                                         'Error',
@@ -1396,8 +1595,7 @@ class _AddProductPState extends State<AddProductP> {
                                             color: Colors.black),
                                       );
                                     } finally {
-                                      addController.isLoading.value =
-                                          false; // Hide loader
+                                      addController.isLoading.value = false;
                                     }
                                   },
                             style: ElevatedButton.styleFrom(
@@ -1478,128 +1676,6 @@ class _AddProductPState extends State<AddProductP> {
         onPressed: () {
           showDialog();
         },
-      ),
-    );
-  }
-
-  Widget buildInputLabel(String label, String label2) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          Text(label2,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: DarkColor().red,
-              )),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData prefixIcon,
-    required TextInputType type,
-    required inputFormat,
-    Function(String)? onChanged,
-    // controller
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: TextField(
-        inputFormatters: [inputFormat],
-        keyboardType: type,
-        controller: controller,
-        cursorColor: PrimaryColor().blue,
-        style: TextStyle(fontSize: 14),
-        decoration: InputDecoration(
-          prefixIcon: Icon(
-            prefixIcon,
-            color: Colors.grey.shade600,
-            size: 20,
-          ),
-          hintText: hintText,
-          hintStyle: TextStyle(
-            fontSize: 14,
-            color: Colors.grey.shade400,
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-        onChanged: onChanged,
-      ),
-    );
-  }
-
-  Widget buildDropdown({
-    required Rxn<String> selectedValue,
-    required String label,
-    required List<Map<String, dynamic>> items,
-    required ValueChanged<String?> onChanged,
-    required String key,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: label,
-                border: InputBorder.none,
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              ),
-              value: selectedValue.value,
-              icon: SizedBox.shrink(),
-              style: TextStyle(fontSize: 14, color: Colors.black87),
-              onChanged: (newValue) {
-                selectedValue.value = newValue;
-                onChanged(newValue);
-              },
-              items: items.map<DropdownMenuItem<String>>((item) {
-                return DropdownMenuItem<String>(
-                  value: item['id'].toString(),
-                  child: SizedBox(
-                    width: double.infinity, // Menghindari overflow
-                    child: Text(
-                      item[key] ?? 'No Name',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Icon(Icons.keyboard_arrow_down,
-                color: Colors.grey.shade600, size: 20),
-          ),
-        ],
       ),
     );
   }

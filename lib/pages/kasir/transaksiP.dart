@@ -18,7 +18,7 @@ class TransaksiP extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
@@ -44,6 +44,15 @@ class TransaksiP extends StatelessWidget {
                   'Kasbon',
                   style: TextStyle(
                     color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Tab(
+                child: Text(
+                  'Top-up',
+                  style: TextStyle(
+                    color: Colors.blue,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -392,7 +401,7 @@ class TransaksiP extends StatelessWidget {
                                                                       height:
                                                                           4),
                                                                   Text(
-                                                                    'SKU: #${item['id_produk']}',
+                                                                    'Qty : ${item['jumlah']} x Rp ${NumberFormat('#,##0', 'id_ID').format(int.parse(item['harga_jual'].toString()))}',
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -412,12 +421,13 @@ class TransaksiP extends StatelessWidget {
                                                                             ...matchedAddons.map((addon) {
                                                                               final hargaPerAddon = controller.addOnHarga(addon['id_add_on'].toString());
                                                                               final jumlah = int.tryParse(item['jumlah'].toString()) ?? 1;
-                                                                              final totalHarga = hargaPerAddon * jumlah;
+                                                                              final totalHargaAddon = hargaPerAddon * jumlah;
+
                                                                               return Row(
                                                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                                                 children: [
                                                                                   Text(
-                                                                                    '(+) ${controller.addOnName(addon['id_add_on'].toString())} : ',
+                                                                                    '(+$jumlah) ${controller.addOnName(addon['id_add_on'].toString())} : ',
                                                                                     style: TextStyle(
                                                                                       fontSize: 13,
                                                                                       color: Colors.grey.shade600,
@@ -425,7 +435,7 @@ class TransaksiP extends StatelessWidget {
                                                                                   ),
                                                                                   SizedBox(width: 10),
                                                                                   Text(
-                                                                                    "Rp ${NumberFormat('#,##0', 'id_ID').format(totalHarga)}",
+                                                                                    "Rp ${NumberFormat('#,##0', 'id_ID').format(totalHargaAddon)}",
                                                                                     style: TextStyle(
                                                                                       fontSize: 13,
                                                                                       color: Colors.grey.shade600,
@@ -469,7 +479,7 @@ class TransaksiP extends StatelessWidget {
                                                                       .end,
                                                               children: [
                                                                 Text(
-                                                                  'Rp ${NumberFormat('#,##0', 'id_ID').format(int.parse(item['harga_jual']))}',
+                                                                  'Rp ${NumberFormat('#,##0', 'id_ID').format(int.parse(item['total_harga']))}',
                                                                   style:
                                                                       const TextStyle(
                                                                     fontSize:
@@ -477,19 +487,6 @@ class TransaksiP extends StatelessWidget {
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w600,
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                    height: 4),
-                                                                Text(
-                                                                  '${NumberFormat('#,##0', 'id_ID').format(int.parse(item['jumlah']))} pcs',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        13,
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade600,
                                                                   ),
                                                                 ),
                                                                 SizedBox(
@@ -526,7 +523,7 @@ class TransaksiP extends StatelessWidget {
                                                               .spaceBetween,
                                                       children: [
                                                         Text(
-                                                          'Diskon',
+                                                          'Potongan Harga (poin)',
                                                           style: TextStyle(
                                                             fontSize: 14,
                                                             color: Colors
@@ -559,7 +556,7 @@ class TransaksiP extends StatelessWidget {
                                                           ),
                                                         ),
                                                         Text(
-                                                          'Rp ${NumberFormat('#,##0', 'id_ID').format(int.parse(transaksi['total_transaksi']) + int.parse(controller.totalKasbon(transaksi['id'])))}',
+                                                          "Rp ${NumberFormat('#,##0', 'id_ID').format(controller.totalTransaksi(transaksi['id']))}",
                                                           style:
                                                               const TextStyle(
                                                             fontSize: 14,
@@ -771,215 +768,6 @@ class TransaksiP extends StatelessWidget {
               if (controller.isLoading.value) {
                 return Center(child: CircularProgressIndicator());
               }
-              if (controller.kasbon.isEmpty) {
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, bottom: 10),
-                      child: Row(
-                        children: [
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: TextField(
-                                controller: searchControllerKasbon,
-                                onChanged: (query) =>
-                                    controller.searchKasbon(query),
-                                decoration: InputDecoration(
-                                  hintText: "Cari Kasbon...",
-                                  prefixIcon: Icon(Icons.search),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          ElevatedButton(
-                            onPressed: () async {
-                              var selectedKasbons =
-                                  controller.getSelectedKasbons();
-                              if (selectedKasbons.isEmpty) {
-                                Get.snackbar(
-                                  "Error",
-                                  "Pilih Kasbon terlebih dahulu.",
-                                  backgroundColor: Colors.red,
-                                  colorText: Colors.white,
-                                );
-                                return;
-                              }
-                              await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Dialog(
-                                    elevation: 0,
-                                    backgroundColor: Colors.transparent,
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.3,
-                                      padding: EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 10),
-                                                child: Container(
-                                                  padding: EdgeInsets.all(25),
-                                                  decoration: BoxDecoration(
-                                                    color: Color.fromARGB(
-                                                        255, 255, 169, 163),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.payments,
-                                                    color: Colors.red,
-                                                    size: 50,
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(height: 25),
-                                              Text(
-                                                "Pembayaran Kasbon",
-                                                style: TextStyle(
-                                                  color: Colors.black87,
-                                                  fontSize: 25,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text(
-                                                'Anda akan melunasi ${selectedKasbons.length} kasbon. Lanjutkan?',
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 15,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 10),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  Get.back();
-                                                  controller
-                                                      .pembayaranMultipleKasbon(
-                                                          selectedKasbons);
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.red,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(width: 8),
-                                                    Text(
-                                                      'Lunaskan Kasbon',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              SizedBox(height: 5),
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  Get.back();
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      Colors.grey.shade200,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(width: 8),
-                                                    Text(
-                                                      'Batal',
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 12),
-                              elevation: 4,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize
-                                  .min, // Agar ukuran sesuai dengan kontennya
-                              children: [
-                                Icon(Icons.payment,
-                                    color: Colors.white, size: 20),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Lunaskan Pembayaran',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                        ],
-                      ),
-                    ),
-                    Center(child: Text("Data kasbon kosong")),
-                  ],
-                );
-              }
               return Column(
                 children: [
                   Padding(
@@ -1009,6 +797,13 @@ class TransaksiP extends StatelessWidget {
                           onPressed: () async {
                             var selectedKasbons =
                                 controller.getSelectedKasbons();
+                            int totalKasbon = 0;
+                            for (var item in selectedKasbons) {
+                              totalKasbon += int.tryParse(
+                                      item['total_kasbon'].toString()) ??
+                                  0;
+                            }
+                            print('Cek selected $selectedKasbons');
                             if (selectedKasbons.isEmpty) {
                               Get.snackbar(
                                 "Error",
@@ -1068,6 +863,14 @@ class TransaksiP extends StatelessWidget {
                                             SizedBox(height: 10),
                                             Text(
                                               'Anda akan melunasi ${selectedKasbons.length} kasbon. Lanjutkan?',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            Text(
+                                              'Total Kasbon Keseluruhan: Rp ${NumberFormat('#,##0', 'id_ID').format(totalKasbon)}',
                                               style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 15,
@@ -1161,14 +964,192 @@ class TransaksiP extends StatelessWidget {
                             elevation: 4,
                           ),
                           child: Row(
-                            mainAxisSize: MainAxisSize
-                                .min, // Agar ukuran sesuai dengan kontennya
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.payment,
                                   color: Colors.white, size: 20),
                               SizedBox(width: 8),
                               Text(
                                 'Lunaskan Pembayaran',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  insetPadding: EdgeInsets.all(16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxHeight:
+                                          MediaQuery.of(context).size.height *
+                                              0.8,
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.4,
+                                    ),
+                                    child: Container(
+                                      padding: EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Data Kasbon Member',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Get.back();
+                                                },
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 25,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(height: 20),
+                                          Flexible(
+                                            child: Obx(() {
+                                              final data =
+                                                  controller.dataKasbon;
+                                              final sortedData = [...data];
+                                              sortedData.sort((a, b) =>
+                                                  double.parse(b['total_kasbon']
+                                                          .toString())
+                                                      .compareTo(double.parse(
+                                                          a['total_kasbon']
+                                                              .toString())));
+
+                                              if (data.isEmpty) {
+                                                return Center(
+                                                  child: Text(
+                                                      'Tidak ada data kasbon.'),
+                                                );
+                                              }
+                                              return SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.4,
+                                                  child: DataTable(
+                                                    columnSpacing: 10,
+                                                    horizontalMargin: 20,
+                                                    dividerThickness: 1,
+                                                    headingRowHeight: 48,
+                                                    headingRowColor:
+                                                        MaterialStateProperty
+                                                            .all(
+                                                      Color(0xFFEEF2F7),
+                                                    ),
+                                                    headingTextStyle: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 14,
+                                                      color: Color(0xFF374151),
+                                                    ),
+                                                    dataTextStyle: TextStyle(
+                                                      fontSize: 13,
+                                                      color: Color(0xFF111827),
+                                                    ),
+                                                    columns: const [
+                                                      DataColumn(
+                                                          label: Text('No')),
+                                                      DataColumn(
+                                                          label: Text(
+                                                              'Nama Member')),
+                                                      DataColumn(
+                                                          label: Text(
+                                                              'Total Kasbon')),
+                                                    ],
+                                                    rows: List.generate(
+                                                        sortedData.length,
+                                                        (index) {
+                                                      final item =
+                                                          sortedData[index];
+                                                      final isEven =
+                                                          index % 2 == 0;
+                                                      return DataRow(
+                                                        color:
+                                                            MaterialStateProperty
+                                                                .all(
+                                                          isEven
+                                                              ? Colors.white
+                                                              : Color(
+                                                                  0xFFF1F5F9),
+                                                        ),
+                                                        cells: [
+                                                          DataCell(Text(
+                                                              '${index + 1}')),
+                                                          DataCell(Text(controller
+                                                              .MemberName(item[
+                                                                      'id_member']
+                                                                  .toString()))),
+                                                          DataCell(Text(
+                                                            'Rp ${NumberFormat('#,##0', 'id_ID').format(item['total_kasbon'] ?? 0)}',
+                                                          )),
+                                                        ],
+                                                      );
+                                                    }),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 12),
+                            elevation: 4,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.people_alt,
+                                  color: Colors.white, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Data Kasbon',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
@@ -1750,6 +1731,122 @@ class TransaksiP extends StatelessWidget {
                 ],
               );
             }),
+            Obx(() {
+              if (controller.isLoading.value && controller.topup.isEmpty) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (query) => controller.searchTopup(query),
+                      decoration: InputDecoration(
+                        hintText: "Cari data Top-up...",
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        await controller.refresh();
+                      },
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: controller.topup.length,
+                        itemBuilder: (context, index) {
+                          if (index == controller.topup.length) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Text(
+                                  "Koperasi Anugrah Artha Abadi",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          final topup = controller.topup[index];
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            controller.MemberName(
+                                                topup['id_member'].toString()),
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            formatDateHour(topup['input_date']),
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            currencyFormat.format(int.parse(
+                                                topup['total_topup'])),
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${controller.MetodeName(topup['id_metode'].toString())}',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
           ],
         ),
       ),
@@ -1758,7 +1855,13 @@ class TransaksiP extends StatelessWidget {
 
   String formatDate(String dateString) {
     final date = DateTime.parse(dateString);
-    final formatter = DateFormat('dd MMM yyyy');
+    final formatter = DateFormat('dd MMM yyyy ');
+    return formatter.format(date);
+  }
+
+  String formatDateHour(String dateString) {
+    final date = DateTime.parse(dateString);
+    final formatter = DateFormat('dd MMM yyyy HH:mm');
     return formatter.format(date);
   }
 }

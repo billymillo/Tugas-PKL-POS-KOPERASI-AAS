@@ -108,7 +108,7 @@ class ReportingP extends StatelessWidget {
                                 controller.filterData();
                                 controller.filterTransaksiOutDet();
                                 controller.filterTransaksiInDet();
-                                controller.groupAndSortTransaksi( 
+                                controller.groupAndSortTransaksi(
                                     controller.transaksiOutDet);
                               },
                               icon: Icon(Icons.search, color: Colors.white),
@@ -336,16 +336,17 @@ class ReportingP extends StatelessWidget {
                                 for (var item in data) {
                                   final String date =
                                       item['input_date'].substring(0, 10);
-
                                   if (groupedData.containsKey(date)) {
                                     groupedData[date]!.add(item);
                                   } else {
                                     groupedData[date] = [item];
                                   }
                                 }
-
                                 return Container(
-                                  width: MediaQuery.of(context).size.width * 1,
+                                  width: MediaQuery.of(context).orientation ==
+                                          Orientation.landscape
+                                      ? MediaQuery.of(context).size.width
+                                      : null,
                                   child: DataTable(
                                     columnSpacing: 24,
                                     horizontalMargin: 16,
@@ -511,89 +512,100 @@ class ReportingP extends StatelessWidget {
                                     SizedBox(height: 20),
                                     Expanded(
                                         child: SingleChildScrollView(
-                                      scrollDirection: Axis.vertical,
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                1,
-                                            decoration: BoxDecoration(
-                                              color: Color(0xFFEEF2F7),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: DataTable(
-                                              columnSpacing: 20,
-                                              horizontalMargin: 20,
-                                              dividerThickness: 1,
-                                              headingRowHeight: 48,
-                                              headingRowColor:
-                                                  MaterialStateProperty.all(
-                                                      Color(0xFFEEF2F7)),
-                                              headingTextStyle: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 14,
-                                                color: Color(0xFF374151),
+                                      scrollDirection: Axis.horizontal,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.vertical,
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                          .orientation ==
+                                                      Orientation.landscape
+                                                  ? MediaQuery.of(context)
+                                                      .size
+                                                      .width
+                                                  : null,
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFFEEF2F7),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
-                                              dataTextStyle: TextStyle(
-                                                fontSize: 13,
-                                                color: Color(0xFF111827),
-                                              ),
-                                              columns: const [
-                                                DataColumn(label: Text('No')),
-                                                DataColumn(
-                                                    label: Text('Nama Produk')),
-                                                DataColumn(
-                                                    label: Text('Jumlah')),
-                                                DataColumn(
-                                                    label: Text('Harga Dasar')),
-                                                DataColumn(
-                                                    label: Text('Total Harga')),
-                                                DataColumn(label: Text('Laba')),
-                                              ],
-                                              rows: List.generate(
-                                                  allItems.length, (index) {
-                                                final item = allItems[index];
-                                                final isEven = index % 2 == 0;
+                                              child: DataTable(
+                                                columnSpacing: 20,
+                                                horizontalMargin: 20,
+                                                dividerThickness: 1,
+                                                headingRowHeight: 48,
+                                                headingRowColor:
+                                                    MaterialStateProperty.all(
+                                                        Color(0xFFEEF2F7)),
+                                                headingTextStyle: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                  color: Color(0xFF374151),
+                                                ),
+                                                dataTextStyle: TextStyle(
+                                                  fontSize: 13,
+                                                  color: Color(0xFF111827),
+                                                ),
+                                                columns: const [
+                                                  DataColumn(label: Text('No')),
+                                                  DataColumn(
+                                                      label:
+                                                          Text('Nama Produk')),
+                                                  DataColumn(
+                                                      label: Text('Jumlah')),
+                                                  DataColumn(
+                                                      label:
+                                                          Text('Harga Dasar')),
+                                                  DataColumn(
+                                                      label:
+                                                          Text('Harga Jual')),
+                                                  DataColumn(
+                                                      label: Text('Laba')),
+                                                ],
+                                                rows: List.generate(
+                                                    allItems.length, (index) {
+                                                  final item = allItems[index];
+                                                  final isEven = index % 2 == 0;
 
-                                                return DataRow(
-                                                  color:
-                                                      MaterialStateProperty.all(
-                                                    isEven
-                                                        ? Colors.white
-                                                        : Color(0xFFF1F5F9),
-                                                  ),
-                                                  cells: [
-                                                    DataCell(
-                                                        Text('${index + 1}')),
-                                                    DataCell(Text(
-                                                      controller.ProdukName(
-                                                          item['id_produk']
-                                                              .toString()),
-                                                      style: TextStyle(
-                                                          fontSize: 12),
-                                                    )),
-                                                    DataCell(Text(
-                                                        '${item['jumlah']} pcs')),
-                                                    DataCell(Text(
-                                                      'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga_dasar'].toString()) ?? 0)}',
-                                                    )),
-                                                    DataCell(Text(
-                                                      'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}',
-                                                    )),
-                                                    DataCell(Text(
-                                                      'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['laba'].toString()) ?? 0)}',
-                                                      style: TextStyle(
-                                                          color: Colors.green),
-                                                    )),
-                                                  ],
-                                                );
-                                              }),
+                                                  return DataRow(
+                                                    color: MaterialStateProperty
+                                                        .all(
+                                                      isEven
+                                                          ? Colors.white
+                                                          : Color(0xFFF1F5F9),
+                                                    ),
+                                                    cells: [
+                                                      DataCell(
+                                                          Text('${index + 1}')),
+                                                      DataCell(Text(
+                                                        controller.ProdukName(
+                                                            item['id_produk']
+                                                                .toString()),
+                                                        style: TextStyle(
+                                                            fontSize: 12),
+                                                      )),
+                                                      DataCell(Text(
+                                                          '${item['jumlah']} pcs')),
+                                                      DataCell(Text(
+                                                        'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga_dasar'].toString()) ?? 0)}',
+                                                      )),
+                                                      DataCell(Text(
+                                                        'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}',
+                                                      )),
+                                                      DataCell(Text(
+                                                        'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['laba'].toString()) ?? 0)}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.green),
+                                                      )),
+                                                    ],
+                                                  );
+                                                }),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     )),
                                     SizedBox(height: 20),
@@ -672,22 +684,32 @@ class ReportingP extends StatelessWidget {
                                   color: Colors.white,
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
+                                        horizontal: 12, vertical: 12),
                                     child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Image.network(
-                                          "http://192.168.1.7/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
-                                          width: 50, // atur lebar
-                                          height: 50, // atur tinggi
-                                          fit: BoxFit
-                                              .cover, // atau BoxFit.contain, sesuai kebutuhan
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Center(
-                                                child: Icon(Icons.error));
-                                          },
+                                        // Gambar Produk
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          child: Image.network(
+                                            "http://10.10.20.109/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
+                                            width: 50,
+                                            height: 50,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                width: 50,
+                                                height: 50,
+                                                color: Colors.grey.shade200,
+                                                child: Icon(
+                                                    Icons.image_not_supported,
+                                                    color: Colors.grey),
+                                              );
+                                            },
+                                          ),
                                         ),
                                         SizedBox(width: 12),
                                         Expanded(
@@ -703,36 +725,56 @@ class ReportingP extends StatelessWidget {
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 14,
+                                                  color: Colors.black87,
                                                 ),
                                               ),
                                               SizedBox(height: 4),
                                               Text(
-                                                '${item['jumlah']} Item terjual',
+                                                '${item['jumlah']} item terjual',
                                                 style: TextStyle(
-                                                  color: Colors.grey.shade700,
                                                   fontSize: 12,
+                                                  color: Colors.grey.shade700,
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
+
+                                        // Pendapatan & Laba
+                                        SizedBox(width: 8),
                                         Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              'Pendapatan Produk : Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}',
+                                              'Pendapatan:',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.grey.shade600,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w500,
                                                 fontSize: 13,
                                                 color: Colors.black87,
                                               ),
                                             ),
+                                            SizedBox(height: 4),
                                             Text(
-                                              'Total Laba : Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['laba'].toString()) ?? 0)}',
+                                              'Laba:',
                                               style: TextStyle(
-                                                color: Colors.green,
+                                                fontSize: 11,
+                                                color: Colors.grey.shade600,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['laba'].toString()) ?? 0)}',
+                                              style: TextStyle(
                                                 fontSize: 12,
+                                                color: Colors.green,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
                                           ],
@@ -803,103 +845,116 @@ class ReportingP extends StatelessWidget {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          Container(
+                                          Container(  
                                             color: Color(0xFFF9FAFB),
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
                                                 1,
                                             child: SingleChildScrollView(
-                                              scrollDirection: Axis.horizontal,
-                                              child: Obx(() {
-                                                final data =
-                                                    controller.transaksiInDet;
-                                                if (data.isEmpty) {
-                                                  return SizedBox(
-                                                    height: 10,
-                                                  );
-                                                }
-                                                return Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      1,
-                                                  child: DataTable(
-                                                    columnSpacing: 10,
-                                                    horizontalMargin: 9,
-                                                    dividerThickness: 1,
-                                                    headingRowHeight: 48,
-                                                    headingRowColor:
-                                                        MaterialStateProperty
-                                                            .all(
-                                                      Color(0xFFEEF2F7),
-                                                    ),
-                                                    headingTextStyle: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 14,
-                                                      color: Color(0xFF374151),
-                                                    ),
-                                                    dataTextStyle: TextStyle(
-                                                      fontSize: 13,
-                                                      color: Color(0xFF111827),
-                                                    ),
-                                                    columns: const [
-                                                      DataColumn(
-                                                          label: Text('No')),
-                                                      DataColumn(
-                                                          label:
-                                                              Text('Tanggal')),
-                                                      DataColumn(
-                                                          label: Text(
-                                                              'No. Transaksi')),
-                                                      DataColumn(
-                                                          label:
-                                                              Text('Produk')),
-                                                      DataColumn(
-                                                          label: Text(
-                                                              'Jumlah Produk')),
-                                                      DataColumn(
-                                                          label: Text(
-                                                              'Total Harga')),
-                                                    ],
-                                                    rows: List.generate(
-                                                        data.length, (index) {
-                                                      final item = data[index];
-                                                      final isEven =
-                                                          index % 2 == 0;
-
-                                                      return DataRow(
+                                              scrollDirection: Axis.vertical,
+                                              child: SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: Obx(() {
+                                                  final data =
+                                                      controller.transaksiInDet;
+                                                  if (data.isEmpty) {
+                                                    return SizedBox(
+                                                      height: 10,
+                                                    );
+                                                  }
+                                                  return Container(
+                                                    width: MediaQuery.of(
+                                                                    context)
+                                                                .orientation ==
+                                                            Orientation
+                                                                .landscape
+                                                        ? MediaQuery.of(context)
+                                                            .size
+                                                            .width
+                                                        : null,
+                                                    child: DataTable(
+                                                      columnSpacing: 10,
+                                                      horizontalMargin: 9,
+                                                      dividerThickness: 1,
+                                                      headingRowHeight: 48,
+                                                      headingRowColor:
+                                                          MaterialStateProperty
+                                                              .all(
+                                                        Color(0xFFEEF2F7),
+                                                      ),
+                                                      headingTextStyle:
+                                                          TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 14,
                                                         color:
-                                                            MaterialStateProperty
-                                                                .all(
-                                                          isEven
-                                                              ? Colors.white
-                                                              : Color(
-                                                                  0xFFF1F5F9),
-                                                        ),
-                                                        cells: [
-                                                          DataCell(Text(
-                                                              '${index + 1}')),
-                                                          DataCell(Text(
-                                                              formatTanggal(item[
-                                                                  'input_date']))),
-                                                          DataCell(Text(controller
-                                                              .NoTransaksi(item[
-                                                                  'id_transaksi_in']))),
-                                                          DataCell(Text(controller
-                                                              .ProdukName(item[
-                                                                  'id_produk']))),
-                                                          DataCell(Text(
-                                                              '${item['jumlah']} Pcs')),
-                                                          DataCell(Text(
-                                                              'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}')),
-                                                        ],
-                                                      );
-                                                    }),
-                                                  ),
-                                                );
-                                              }),
+                                                            Color(0xFF374151),
+                                                      ),
+                                                      dataTextStyle: TextStyle(
+                                                        fontSize: 13,
+                                                        color:
+                                                            Color(0xFF111827),
+                                                      ),
+                                                      columns: const [
+                                                        DataColumn(
+                                                            label: Text('No')),
+                                                        DataColumn(
+                                                            label: Text(
+                                                                'Tanggal')),
+                                                        DataColumn(
+                                                            label: Text(
+                                                                'No. Transaksi')),
+                                                        DataColumn(
+                                                            label:
+                                                                Text('Produk')),
+                                                        DataColumn(
+                                                            label: Text(
+                                                                'Jumlah Produk')),
+                                                        DataColumn(
+                                                            label: Text(
+                                                                'Total Harga')),
+                                                      ],
+                                                      rows: List.generate(
+                                                          data.length, (index) {
+                                                        final item =
+                                                            data[index];
+                                                        final isEven =
+                                                            index % 2 == 0;
+
+                                                        return DataRow(
+                                                          color:
+                                                              MaterialStateProperty
+                                                                  .all(
+                                                            isEven
+                                                                ? Colors.white
+                                                                : Color(
+                                                                    0xFFF1F5F9),
+                                                          ),
+                                                          cells: [
+                                                            DataCell(Text(
+                                                                '${index + 1}')),
+                                                            DataCell(Text(
+                                                                formatTanggal(item[
+                                                                    'input_date']))),
+                                                            DataCell(Text(controller
+                                                                .NoTransaksi(item[
+                                                                    'id_transaksi_in']))),
+                                                            DataCell(Text(controller
+                                                                .ProdukName(item[
+                                                                    'id_produk']))),
+                                                            DataCell(Text(
+                                                                '${item['jumlah']} Pcs')),
+                                                            DataCell(Text(
+                                                                'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(item['total_harga'].toString()) ?? 0)}')),
+                                                          ],
+                                                        );
+                                                      }),
+                                                    ),
+                                                  );
+                                                }),
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -1105,7 +1160,10 @@ class ReportingP extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
                                 color: Color(0xFFF9FAFB),
-                                width: MediaQuery.of(context).size.width * 1,
+                                width: MediaQuery.of(context).orientation ==
+                                        Orientation.landscape
+                                    ? MediaQuery.of(context).size.width
+                                    : null,
                                 child: Obx(() {
                                   final data = controller.kasbon;
                                   final sortedData = [...data];
@@ -1118,53 +1176,61 @@ class ReportingP extends StatelessWidget {
                                       height: 10,
                                     );
                                   }
-                                  return Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 1,
-                                    child: DataTable(
-                                      columnSpacing: 1,
-                                      horizontalMargin: 20,
-                                      dividerThickness: 1,
-                                      headingRowHeight: 48,
-                                      headingRowColor:
-                                          MaterialStateProperty.all(
-                                        Color(0xFFEEF2F7),
-                                      ),
-                                      headingTextStyle: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                        color: Color(0xFF374151),
-                                      ),
-                                      dataTextStyle: TextStyle(
-                                        fontSize: 13,
-                                        color: Color(0xFF111827),
-                                      ),
-                                      columns: const [
-                                        DataColumn(label: Text('No')),
-                                        DataColumn(label: Text('Nama Member')),
-                                        DataColumn(label: Text('Total Kasbon')),
-                                      ],
-                                      rows: List.generate(sortedData.length,
-                                          (index) {
-                                        final item = sortedData[index];
-                                        final isEven = index % 2 == 0;
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Container(
+                                      width: MediaQuery.of(context)
+                                                  .orientation ==
+                                              Orientation.landscape
+                                          ? MediaQuery.of(context).size.width
+                                          : null,
+                                      child: DataTable(
+                                        columnSpacing: 10,
+                                        horizontalMargin: 20,
+                                        dividerThickness: 1,
+                                        headingRowHeight: 48,
+                                        headingRowColor:
+                                            MaterialStateProperty.all(
+                                          Color(0xFFEEF2F7),
+                                        ),
+                                        headingTextStyle: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: Color(0xFF374151),
+                                        ),
+                                        dataTextStyle: TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFF111827),
+                                        ),
+                                        columns: const [
+                                          DataColumn(label: Text('No')),
+                                          DataColumn(
+                                              label: Text('Nama Member')),
+                                          DataColumn(
+                                              label: Text('Total Kasbon')),
+                                        ],
+                                        rows: List.generate(sortedData.length,
+                                            (index) {
+                                          final item = sortedData[index];
+                                          final isEven = index % 2 == 0;
 
-                                        return DataRow(
-                                          color: MaterialStateProperty.all(
-                                            isEven
-                                                ? Colors.white
-                                                : Color(0xFFF1F5F9),
-                                          ),
-                                          cells: [
-                                            DataCell(Text('${index + 1}')),
-                                            DataCell(Text(
-                                                '${controller.MemberName(item['id_member'].toString())}'
-                                                    .toString())),
-                                            DataCell(Text(
-                                                'Rp ${NumberFormat('#,##0', 'id_ID').format(item['total_kasbon'] ?? 0)}')),
-                                          ],
-                                        );
-                                      }),
+                                          return DataRow(
+                                            color: MaterialStateProperty.all(
+                                              isEven
+                                                  ? Colors.white
+                                                  : Color(0xFFF1F5F9),
+                                            ),
+                                            cells: [
+                                              DataCell(Text('${index + 1}')),
+                                              DataCell(Text(
+                                                  '${controller.MemberName(item['id_member'].toString())}'
+                                                      .toString())),
+                                              DataCell(Text(
+                                                  'Rp ${NumberFormat('#,##0', 'id_ID').format(item['total_kasbon'] ?? 0)}')),
+                                            ],
+                                          );
+                                        }),
+                                      ),
                                     ),
                                   );
                                 }),
@@ -1437,6 +1503,9 @@ Widget buildChart({
       children: [
         SizedBox(height: 20),
         Container(
+          width: MediaQuery.of(context).orientation == Orientation.landscape
+              ? MediaQuery.of(context).size.width
+              : null,
           padding: EdgeInsets.only(left: 20),
           child: Text(
             text,
@@ -1445,7 +1514,7 @@ Widget buildChart({
           ),
         ),
         Container(
-          width: MediaQuery.of(context).size.width * 0.9,
+          width: MediaQuery.of(context).size.width * 1,
           height: 150,
           decoration: BoxDecoration(
             color: ShadowColor().aqua,

@@ -133,80 +133,83 @@ class _ProductPState extends State<ProductP> {
               right: 0,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      height: 45,
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 6,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search, color: Colors.grey, size: 24),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: searchController,
-                              onChanged: (value) {
-                                productController.searchProduct(value);
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Cari produk...',
-                                border: InputBorder.none,
-                                hintStyle: TextStyle(color: Colors.grey[600]),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        height: 45,
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 6,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.search, color: Colors.grey, size: 24),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: searchController,
+                                onChanged: (value) {
+                                  productController.searchProduct(value);
+                                },
+                                decoration: InputDecoration(
+                                  hintText: 'Cari produk...',
+                                  border: InputBorder.none,
+                                  hintStyle: TextStyle(color: Colors.grey[600]),
+                                ),
                               ),
                             ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.close, color: Colors.grey),
-                            onPressed: () {
-                              searchController.clear();
-                              productController.searchProduct('');
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Get.toNamed(Routes.ADDPRODUCTP);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                            IconButton(
+                              icon: Icon(Icons.close, color: Colors.grey),
+                              onPressed: () {
+                                searchController.clear();
+                                productController.searchProduct('');
+                              },
+                            )
+                          ],
                         ),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        elevation: 4,
                       ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.add, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Tambah Produk',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      SizedBox(width: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Get.toNamed(Routes.ADDPRODUCTP);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        ],
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          elevation: 4,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.add, color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Tambah Produk',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -244,7 +247,7 @@ class _ProductPState extends State<ProductP> {
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
                       image: NetworkImage(
-                        "http://192.168.1.7/POS_CI/uploads/${item['gambar_barang']}",
+                        "http://10.10.20.109/POS_CI/uploads/${item['gambar_barang']}",
                       ),
                       fit: BoxFit.cover,
                     ),
