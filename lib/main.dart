@@ -1,9 +1,12 @@
+import 'package:bluetooth_thermal_printer_example/controllers/validationC.dart';
 import 'package:bluetooth_thermal_printer_example/models/colorPalleteModel.dart';
 import 'package:bluetooth_thermal_printer_example/routes/appPages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Get.put(ValidationC());
   runApp(MyApp());
 }
 
@@ -24,7 +27,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           primaryColor: PrimaryColor().blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
-          primarySwatch: Colors.green,  
+          primarySwatch: Colors.green,
           scaffoldBackgroundColor: Colors.white),
       darkTheme: ThemeData(primarySwatch: Colors.grey),
       getPages: AppPages.routes,

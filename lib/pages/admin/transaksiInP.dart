@@ -507,6 +507,20 @@ class TransaksiInP extends StatelessWidget {
                                                     Obx(
                                                       () => ElevatedButton(
                                                         onPressed: () async {
+                                                          print(
+                                                              'pilih product: ${c.selectedProduct}');
+                                                          print(
+                                                              'nama product: ${c.NamaBarang}');
+                                                          print(
+                                                              'barcode product: ${c.BarcodeBarang}');
+                                                          print(
+                                                              'gambar product: ${c.GambarBarang}');
+                                                          print(
+                                                              'id kategori product: ${c.KategoriBarang}');
+                                                          print(
+                                                              'id tipe product: ${c.TipeBarang}');
+                                                          print(
+                                                              'id mitra product: ${c.MitraBarang}');
                                                           int stok = int.tryParse(
                                                                   stokController
                                                                       .text) ??
@@ -517,9 +531,20 @@ class TransaksiInP extends StatelessWidget {
                                                                       .text
                                                                       .toString()) ??
                                                                   0;
+
+                                                          0;
+
+                                                          int stokProduk =
+                                                              int.tryParse(c
+                                                                      .StokBarang) ??
+                                                                  0;
                                                           int totalHarga =
                                                               stok *
                                                                   produkSatuan;
+                                                          int totalStok =
+                                                              stok + stokProduk;
+                                                          print(
+                                                              'stok product: ${totalStok}');
                                                           if (c.selectedProduct
                                                                   .value ==
                                                               null) {
@@ -559,6 +584,28 @@ class TransaksiInP extends StatelessWidget {
                                                             );
                                                             return;
                                                           }
+                                                          if (c.checkbox
+                                                                      .value ==
+                                                                  true &&
+                                                              c.hargaDasar
+                                                                      .value ==
+                                                                  0) {
+                                                            Get.snackbar(
+                                                              'Gagal',
+                                                              'Cek Harga Dasar jika 0 input kembali data!',
+                                                              backgroundColor:
+                                                                  Colors.red
+                                                                      .withOpacity(
+                                                                          0.8),
+                                                              colorText:
+                                                                  Colors.white,
+                                                              icon: Icon(
+                                                                  Icons.error,
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                            return;
+                                                          }
                                                           Get.back();
                                                           if (c.checkbox
                                                                   .value ==
@@ -569,48 +616,70 @@ class TransaksiInP extends StatelessWidget {
                                                                     .toString(),
                                                                 stokController
                                                                     .text);
+                                                            await c.addTransaksiIn(
+                                                                stokController
+                                                                    .text,
+                                                                totalHarga
+                                                                    .toString());
+                                                            await c.addDetTransaksiIn(
+                                                                c.selectedProduct
+                                                                    .value
+                                                                    .toString(),
+                                                                stokController
+                                                                    .text,
+                                                                c.ProdukSatuan,
+                                                                c.jualController
+                                                                    .text
+                                                                    .toString());
                                                           } else if (c.checkbox
                                                                   .value ==
                                                               true) {
                                                             print('hargaDasar : ' +
                                                                 c.hargaDasar
                                                                     .toString());
-                                                            await c.editProduk(
-                                                              c.selectedProduct
-                                                                  .value
-                                                                  .toString(),
-                                                              c.hargaDasar.value
-                                                                  .toString(),
-                                                              c.jualController
-                                                                  .text,
-                                                              c.hargaPackController
-                                                                  .text,
-                                                              c.jumlahPcsController
-                                                                  .text,
-                                                            );
+                                                            await c.addTransaksiIn(
+                                                                stokController
+                                                                    .text,
+                                                                totalHarga
+                                                                    .toString());
                                                             await c.tambahStok(
                                                                 c.selectedProduct
                                                                     .value
                                                                     .toString(),
                                                                 stokController
                                                                     .text);
-                                                          }
-                                                          await c.addTransaksiIn(
-                                                              stokController
-                                                                  .text,
-                                                              totalHarga
-                                                                  .toString());
-                                                          await c.addDetTransaksiIn(
+                                                            await c.editProduk(
                                                               c.selectedProduct
                                                                   .value
                                                                   .toString(),
-                                                              stokController
+                                                              c.NamaBarang,
+                                                              c.BarcodeBarang,
+                                                              c.GambarBarang,
+                                                              c.KategoriBarang,
+                                                              c.TipeBarang,
+                                                              c.MitraBarang,
+                                                              c.hargaPackController
                                                                   .text,
-                                                              c.hargaController
+                                                              c.jumlahPcsController
                                                                   .text,
+                                                              c.hargaDasar.value
+                                                                  .toString(),
                                                               c.jualController
-                                                                  .text
-                                                                  .toString());
+                                                                  .text,
+                                                              totalStok
+                                                                  .toString(),
+                                                            );
+                                                            await c.addDetTransaksiIn(
+                                                                c.selectedProduct
+                                                                    .value
+                                                                    .toString(),
+                                                                stokController
+                                                                    .text,
+                                                                c.ProdukSatuan,
+                                                                c.jualController
+                                                                    .text
+                                                                    .toString());
+                                                          }
                                                           await c
                                                               .fetchTransaksiDet();
                                                           await c
@@ -618,8 +687,6 @@ class TransaksiInP extends StatelessWidget {
                                                           await c.fetchProduk();
                                                           stokController
                                                               .clear();
-                                                          c.selectedProduct
-                                                              .value = null;
                                                           c.toggleCheckbox(
                                                               false);
                                                           c.clearSearch();

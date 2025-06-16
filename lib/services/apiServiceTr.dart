@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiServiceTr {
-  static const String baseUrlTr = 'http://10.10.20.109/POS_CI/api';
+  static const String baseUrlTr = 'https://api-koperasi.aaslabs.com/api';   
+  // static const String baseUrlTr = 'http://localhost/POS_CI/api/';   
 
   Future<String?> getUserInput() async {
     final prefs = await SharedPreferences.getInstance();
@@ -21,7 +22,7 @@ class ApiServiceTr {
     String getPoin,
     String userInput,
   ) async {
-    final url = '$baseUrlTr/transaksi_out';
+    final url = '$baseUrlTr/Transaksi_Out';
 
     try {
       final response = await http.post(
@@ -55,12 +56,16 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> ubahPoin(String id, String poin) async {
+  Future<Map<String, dynamic>> ubahPoin(
+      String id, String nama, String no_tlp, String saldo, String poin) async {
     final url = '$baseUrlTr/member/$id';
     final response = await http.put(
       Uri.parse(url),
       body: {
         'id': id,
+        'nama': nama,
+        'no_tlp': no_tlp,
+        'saldo': saldo,
         'poin': poin,
       },
     );
@@ -105,13 +110,17 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> gunakanSaldo(String id, String saldo) async {
+  Future<Map<String, dynamic>> gunakanSaldo(
+      String id, String nama, String no_tlp, String saldo, String poin) async {
     final url = '$baseUrlTr/member/$id';
     final response = await http.put(
       Uri.parse(url),
       body: {
         'id': id,
+        'nama': nama,
+        'no_tlp': no_tlp,
         'saldo': saldo,
+        'poin': poin,
       },
     );
     if (response.statusCode == 200) {
@@ -190,14 +199,12 @@ class ApiServiceTr {
     String metode,
     String userInput,
   ) async {
-    final url = '$baseUrlTr/transaksi_in/pembayaran';
+    final url = '$baseUrlTr/Transaksi_In/pembayaran';
     final response = await http.post(
       Uri.parse(url),
-      body: {
-        'metode': metode,
-      },
+      body: {'metode': metode, 'user_input': userInput},
     );
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
       return jsonDecode(response.body);
@@ -206,7 +213,7 @@ class ApiServiceTr {
 
   Future<Map<String, dynamic>> editMetode(
       String id, String metode, String update) async {
-    final url = '$baseUrlTr/transaksi_in/pembayaran/$id';
+    final url = '$baseUrlTr/Transaksi_In/pembayaran/$id';
     final response = await http.put(
       Uri.parse(url),
       body: {'id': id, 'metode': metode, 'user_update': update},
@@ -221,7 +228,7 @@ class ApiServiceTr {
   Future<Map<String, dynamic>> deleteMetode(
     String id,
   ) async {
-    final url = '$baseUrlTr/transaksi_in/pembayaran/$id';
+    final url = '$baseUrlTr/Transaksi_In/pembayaran/$id';
     final response = await http.delete(
       Uri.parse(url),
       body: {
@@ -327,7 +334,7 @@ class ApiServiceTr {
     String statusTr,
     String userUpdate,
   ) async {
-    final url = '$baseUrlTr/transaksi_out/';
+    final url = '$baseUrlTr/Transaksi_Out/';
     final response = await http.put(
       Uri.parse(url),
       body: {
@@ -369,7 +376,7 @@ class ApiServiceTr {
     String hargaAddOn,
     String userInput,
   ) async {
-    final url = '$baseUrlTr/transaksi_out/detail';
+    final url = '$baseUrlTr/Transaksi_Out/detail';
 
     try {
       final response = await http.post(
@@ -404,7 +411,7 @@ class ApiServiceTr {
 
   Future<Map<String, dynamic>> updateSaldo(
       String id, String saldo, String userUpdate) async {
-    final url = '$baseUrlTr/transaksi_out/detail/$id';
+    final url = '$baseUrlTr/Transaksi_Out/detail/$id';
     final response = await http.put(
       Uri.parse(url),
       body: {
@@ -427,7 +434,7 @@ class ApiServiceTr {
     String hargaJual,
     String userInput,
   ) async {
-    final url = '$baseUrlTr/transaksi_in/detail';
+    final url = '$baseUrlTr/Transaksi_In/detail';
 
     try {
       final response = await http.post(
@@ -461,7 +468,7 @@ class ApiServiceTr {
     String hargaJual,
     String userInput,
   ) async {
-    final url = '$baseUrlTr/transaksi_mitra/detail';
+    final url = '$baseUrlTr/Transaksi_Mitra/detail';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -492,7 +499,7 @@ class ApiServiceTr {
     String total,
     String userInput,
   ) async {
-    final url = '$baseUrlTr/transaksi_in/';
+    final url = '$baseUrlTr/Transaksi_In/';
 
     try {
       final response = await http.post(
@@ -524,7 +531,7 @@ class ApiServiceTr {
     String status,
     String userInput,
   ) async {
-    final url = '$baseUrlTr/transaksi_mitra/';
+    final url = '$baseUrlTr/Transaksi_Mitra/';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -550,42 +557,37 @@ class ApiServiceTr {
     }
   }
 
-  Future<Map<String, dynamic>> editProduk(String id, String stok,
-      String hargaSatuan, String hargaJual, String userUpdate) async {
-    final url = '$baseUrlTr/product/ubah/$id';
-    final response = await http.put(
-      Uri.parse(url),
-      body: {
-        'id': id,
-        'stok': stok,
-        'harga_satuan': hargaSatuan,
-        'harga_jual': hargaJual,
-        'user_update': userUpdate,
-      },
-    );
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      return jsonDecode(response.body);
-    }
-  }
 
   Future<Map<String, dynamic>> editProdukTrIn(
       String id,
+      String nama,
+      String barcode_barang,
+      String gambar_barang,
+      String id_kategori,
+      String id_tipe,
+      String id_mitra,
+      String harga_pack,
+      String jumlah_pcs,
       String hargaSatuan,
       String hargaJual,
-      String hargaPerPack,
-      String jumlahPcs,
+      String stok,
       String userUpdate) async {
     final url = '$baseUrlTr/product/ubah/$id';
     final response = await http.put(
       Uri.parse(url),
       body: {
         'id': id,
+        'nama_barang': nama,
+        'barcode_barang': barcode_barang,
+        'gambar_barang': gambar_barang,
+        'id_kategori_barang': id_kategori,
+        'id_tipe_barang': id_tipe,
+        'id_mitra_barang': id_mitra,
+        'harga_pack': harga_pack,
+        'jml_pcs_pack': jumlah_pcs,
         'harga_satuan': hargaSatuan,
         'harga_jual': hargaJual,
-        'harga_pack': hargaPerPack,
-        'jml_pcs_pack': jumlahPcs,
+        'stok': stok,
         'user_update': userUpdate,
       },
     );
@@ -655,7 +657,7 @@ class ApiServiceTr {
     String tanggalAkhir,
     String userInput,
   ) async {
-    final url = '$baseUrlTr/transaksi_out_mitra/';
+    final url = '$baseUrlTr/Transaksi_Out_Mitra/';
     try {
       final response = await http.post(
         Uri.parse(url),

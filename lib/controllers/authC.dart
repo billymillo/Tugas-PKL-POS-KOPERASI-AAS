@@ -22,7 +22,7 @@ class AuthController extends GetxController {
       final response = await apiService.login(name, password);
       if (response['status'] == true) {
         validationC.setLoginStatus(true, response['role'], response['name']);
-        if (response['role'] == 'admin') {
+        if (response['role'] == 'admin' || response['role'] == 'kasirAdmin') {
           Get.offNamed(Routes.DASHBOARDADMINP);
         } else {
           Get.offNamed(Routes.LOCKDEVICEP);

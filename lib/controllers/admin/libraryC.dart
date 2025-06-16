@@ -50,8 +50,8 @@ class LibraryController extends GetxController {
 
   String get KodeBank {
     var selected = banks.firstWhere(
-      (m) => m['nama'] == selectedBank.value,
-      orElse: () => {'kode': 'Non Member'},
+      (m) => m['name'] == selectedBank.value,
+      orElse: () => {'kode': '??'},
     );
     return selected['kode'] ?? 0;
   }
@@ -717,7 +717,7 @@ class LibraryController extends GetxController {
     try {
       isLoading(true);
       var response =
-          await http.get(Uri.parse(urlTr + "/transaksi_in/pembayaran"));
+          await http.get(Uri.parse(urlTr + "/Transaksi_In/pembayaran"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {

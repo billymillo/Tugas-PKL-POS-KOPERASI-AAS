@@ -247,7 +247,7 @@ class _ProductPState extends State<ProductP> {
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
                       image: NetworkImage(
-                        "http://10.10.20.109/POS_CI/uploads/${item['gambar_barang']}",
+                        "https://api-koperasi.aaslabs.com/uploads/${item['gambar_barang']}",
                       ),
                       fit: BoxFit.cover,
                     ),

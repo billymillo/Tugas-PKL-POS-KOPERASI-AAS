@@ -142,10 +142,10 @@ class _MemberPState extends State<MemberP> {
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: buildDialog(),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(right: 16),
+                  //   child: buildDialog(),
+                  // ),
                 ],
               ),
             ),
@@ -240,208 +240,208 @@ class _MemberPState extends State<MemberP> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 13, vertical: 6),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.blue,
-                            ),
-                            child: GestureDetector(
-                              child: Text(
-                                'Edit',
-                                style: GoogleFonts.nunito(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                    color: Colors.white),
-                              ),
-                              onTap: () {
-                                showEditDialog(
-                                  context,
-                                  item['id'],
-                                  item['nama'],
-                                  item['no_tlp'],
-                                  item['saldo'],
-                                  item['poin'],
-                                );
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 13, vertical: 6),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.red,
-                            ),
-                            child: GestureDetector(
-                              child: Text(
-                                'Hapus',
-                                style: GoogleFonts.nunito(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                    color: Colors.white),
-                              ),
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Dialog(
-                                      elevation: 0,
-                                      backgroundColor: Colors.transparent,
-                                      child: SingleChildScrollView(
-                                        child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.5,
-                                          padding: EdgeInsets.all(20),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                          ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Column(
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 10),
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(25),
-                                                      decoration: BoxDecoration(
-                                                        color: Color.fromARGB(
-                                                            255, 255, 169, 163),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: Icon(
-                                                        Icons.delete_outline,
-                                                        color: Colors.red,
-                                                        size: 50,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 25),
-                                                  Text(
-                                                    "Hapus Member",
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontSize: 25,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  Text(
-                                                    "Apakah anda yakin untuk menghapus Member ini?",
-                                                    style: TextStyle(
-                                                      color:
-                                                          Colors.grey.shade400,
-                                                      fontSize: 15,
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 10),
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () async {
-                                                      await memberController
-                                                          .deleteMember(
-                                                              item['id'],
-                                                              fromButton: true);
-                                                      await memberController
-                                                          .refresh();
-                                                      await memberController
-                                                          .fetchMember();
-                                                      Get.to(MemberP());
-                                                      Navigator.pop(context);
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                      ),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        SizedBox(width: 8),
-                                                        Text(
-                                                          'Hapus',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 5),
-                                                  ElevatedButton(
-                                                    onPressed: () async {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          Colors.grey.shade200,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                      ),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        SizedBox(width: 8),
-                                                        Text(
-                                                          'Batal',
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          )
+                          //   Container(
+                          //     padding: EdgeInsets.symmetric(
+                          //         horizontal: 13, vertical: 6),
+                          //     decoration: BoxDecoration(
+                          //       borderRadius: BorderRadius.circular(10),
+                          //       color: Colors.blue,
+                          //     ),
+                          //     child: GestureDetector(
+                          //       child: Text(
+                          //         'Edit',
+                          //         style: GoogleFonts.nunito(
+                          //             fontWeight: FontWeight.bold,
+                          //             fontSize: 11,
+                          //             color: Colors.white),
+                          //       ),
+                          //       onTap: () {
+                          //         showEditDialog(
+                          //           context,
+                          //           item['id'],
+                          //           item['nama'],
+                          //           item['no_tlp'],
+                          //           item['saldo'],
+                          //           item['poin'],
+                          //         );
+                          //       },
+                          //     ),
+                          //   ),
+                          //   SizedBox(width: 10),
+                          //   Container(
+                          //     padding: EdgeInsets.symmetric(
+                          //         horizontal: 13, vertical: 6),
+                          //     decoration: BoxDecoration(
+                          //       borderRadius: BorderRadius.circular(10),
+                          //       color: Colors.red,
+                          //     ),
+                          //     child: GestureDetector(
+                          //       child: Text(
+                          //         'Hapus',
+                          //         style: GoogleFonts.nunito(
+                          //             fontWeight: FontWeight.bold,
+                          //             fontSize: 11,
+                          //             color: Colors.white),
+                          //       ),
+                          //       onTap: () {
+                          //         showDialog(
+                          //           context: context,
+                          //           builder: (BuildContext context) {
+                          //             return Dialog(
+                          //               elevation: 0,
+                          //               backgroundColor: Colors.transparent,
+                          //               child: SingleChildScrollView(
+                          //                 child: Container(
+                          //                   width: MediaQuery.of(context)
+                          //                           .size
+                          //                           .width *
+                          //                       0.5,
+                          //                   padding: EdgeInsets.all(20),
+                          //                   decoration: BoxDecoration(
+                          //                     color: Colors.white,
+                          //                     borderRadius:
+                          //                         BorderRadius.circular(16),
+                          //                   ),
+                          //                   child: Column(
+                          //                     mainAxisSize: MainAxisSize.min,
+                          //                     children: [
+                          //                       Column(
+                          //                         children: [
+                          //                           Padding(
+                          //                             padding: const EdgeInsets
+                          //                                 .symmetric(
+                          //                                 horizontal: 20,
+                          //                                 vertical: 10),
+                          //                             child: Container(
+                          //                               padding:
+                          //                                   EdgeInsets.all(25),
+                          //                               decoration: BoxDecoration(
+                          //                                 color: Color.fromARGB(
+                          //                                     255, 255, 169, 163),
+                          //                                 shape: BoxShape.circle,
+                          //                               ),
+                          //                               child: Icon(
+                          //                                 Icons.delete_outline,
+                          //                                 color: Colors.red,
+                          //                                 size: 50,
+                          //                               ),
+                          //                             ),
+                          //                           ),
+                          //                           SizedBox(height: 25),
+                          //                           Text(
+                          //                             "Hapus Member",
+                          //                             style: TextStyle(
+                          //                               color: Colors.black87,
+                          //                               fontSize: 25,
+                          //                               fontWeight:
+                          //                                   FontWeight.bold,
+                          //                             ),
+                          //                           ),
+                          //                           SizedBox(height: 10),
+                          //                           Text(
+                          //                             "Apakah anda yakin untuk menghapus Member ini?",
+                          //                             style: TextStyle(
+                          //                               color:
+                          //                                   Colors.grey.shade400,
+                          //                               fontSize: 15,
+                          //                             ),
+                          //                             textAlign: TextAlign.center,
+                          //                           ),
+                          //                         ],
+                          //                       ),
+                          //                       SizedBox(height: 10),
+                          //                       Column(
+                          //                         mainAxisAlignment:
+                          //                             MainAxisAlignment.center,
+                          //                         children: [
+                          //                           ElevatedButton(
+                          //                             onPressed: () async {
+                          //                               await memberController
+                          //                                   .deleteMember(
+                          //                                       item['id'],
+                          //                                       fromButton: true);
+                          //                               await memberController
+                          //                                   .refresh();
+                          //                               await memberController
+                          //                                   .fetchMember();
+                          //                               Get.to(MemberP());
+                          //                               Navigator.pop(context);
+                          //                             },
+                          //                             style: ElevatedButton
+                          //                                 .styleFrom(
+                          //                               backgroundColor:
+                          //                                   Colors.red,
+                          //                               shape:
+                          //                                   RoundedRectangleBorder(
+                          //                                 borderRadius:
+                          //                                     BorderRadius
+                          //                                         .circular(12),
+                          //                               ),
+                          //                             ),
+                          //                             child: Row(
+                          //                               mainAxisAlignment:
+                          //                                   MainAxisAlignment
+                          //                                       .center,
+                          //                               children: [
+                          //                                 SizedBox(width: 8),
+                          //                                 Text(
+                          //                                   'Hapus',
+                          //                                   style: TextStyle(
+                          //                                     color: Colors.white,
+                          //                                     fontSize: 14,
+                          //                                     fontWeight:
+                          //                                         FontWeight.w600,
+                          //                                   ),
+                          //                                 ),
+                          //                               ],
+                          //                             ),
+                          //                           ),
+                          //                           SizedBox(height: 5),
+                          //                           ElevatedButton(
+                          //                             onPressed: () async {
+                          //                               Navigator.pop(context);
+                          //                             },
+                          //                             style: ElevatedButton
+                          //                                 .styleFrom(
+                          //                               backgroundColor:
+                          //                                   Colors.grey.shade200,
+                          //                               shape:
+                          //                                   RoundedRectangleBorder(
+                          //                                 borderRadius:
+                          //                                     BorderRadius
+                          //                                         .circular(12),
+                          //                               ),
+                          //                             ),
+                          //                             child: Row(
+                          //                               mainAxisAlignment:
+                          //                                   MainAxisAlignment
+                          //                                       .center,
+                          //                               children: [
+                          //                                 SizedBox(width: 8),
+                          //                                 Text(
+                          //                                   'Batal',
+                          //                                   style: TextStyle(
+                          //                                     color: Colors.black,
+                          //                                     fontSize: 14,
+                          //                                     fontWeight:
+                          //                                         FontWeight.w600,
+                          //                                   ),
+                          //                                 ),
+                          //                               ],
+                          //                             ),
+                          //                           ),
+                          //                         ],
+                          //                       ),
+                          //                     ],
+                          //                   ),
+                          //                 ),
+                          //               ),
+                          //             );
+                          //           },
+                          //         );
+                          //       },
+                          //     ),
+                          //   )
                         ],
                       ),
                     ],
@@ -698,8 +698,7 @@ class _MemberPState extends State<MemberP> {
                     ],
                   ),
                   Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 15),
                       AdminW().buildInputLabel('Nama Member', ' *'),

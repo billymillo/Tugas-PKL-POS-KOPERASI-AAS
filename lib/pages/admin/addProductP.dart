@@ -731,46 +731,55 @@ class _AddProductPState extends State<AddProductP> {
                                                       child: Row(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
-                                                                .start, // rata kiri
+                                                                .start,
                                                         children: [
                                                           Icon(Icons.add,
                                                               color: Colors
                                                                   .black54),
                                                           SizedBox(width: 8),
-                                                          Obx(() => addController
-                                                                      .selectedBank
-                                                                      .value ==
-                                                                  null
-                                                              ? Text(
-                                                                  'Pilih Bank',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black87,
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                  ),
-                                                                )
-                                                              : Text(
-                                                                  addController
+                                                          Expanded(
+                                                            // tambahkan ini
+                                                            child: Obx(
+                                                              () => addController
                                                                           .selectedBank
-                                                                          .value
-                                                                          .toString() +
-                                                                      " (${addController.KodeBank})",
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .black87,
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                  ),
-                                                                )),
+                                                                          .value ==
+                                                                      null
+                                                                  ? Text(
+                                                                      'Pilih Bank',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .black87,
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                    )
+                                                                  : Text(
+                                                                      "${addController.selectedBank.value} (${addController.KodeBank})",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        color: Colors
+                                                                            .black87,
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                      ),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      maxLines:
+                                                                          1,
+                                                                    ),
+                                                            ),
+                                                          ),
                                                         ],
                                                       ),
                                                     ),
@@ -1306,108 +1315,110 @@ class _AddProductPState extends State<AddProductP> {
                                       ? constraints.maxHeight * 0.6
                                       : constraints.maxHeight * 0.25;
 
-                                  return Container(
-                                    width: dialogWidth,
-                                    height: dialogHeight,
-                                    padding: EdgeInsets.all(24),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        // Kamera Button
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              addController.pickImageCam();
-                                            },
-                                            child: Container(
-                                              margin: EdgeInsets.symmetric(
-                                                  horizontal: 8),
-                                              padding: EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                color: PrimaryColor().green,
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black26,
-                                                    blurRadius: 6,
-                                                    offset: Offset(0, 4),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(Icons.camera_alt,
-                                                      color: Colors.white,
-                                                      size: 40),
-                                                  SizedBox(height: 10),
-                                                  Text(
-                                                    'Kamera',
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.white,
+                                  return SingleChildScrollView(
+                                    child: Container(
+                                      width: dialogWidth,
+                                      height: dialogHeight,
+                                      padding: EdgeInsets.all(24),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          // Kamera Button
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                addController.pickImageCam();
+                                              },
+                                              child: Container(
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 8),
+                                                padding: EdgeInsets.all(16),
+                                                decoration: BoxDecoration(
+                                                  color: PrimaryColor().green,
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black26,
+                                                      blurRadius: 6,
+                                                      offset: Offset(0, 4),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.camera_alt,
+                                                        color: Colors.white,
+                                                        size: 40),
+                                                    SizedBox(height: 10),
+                                                    Text(
+                                                      'Kamera',
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
 
-                                        // Galeri Button
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              addController.pickImage();
-                                            },
-                                            child: Container(
-                                              margin: EdgeInsets.symmetric(
-                                                  horizontal: 8),
-                                              padding: EdgeInsets.all(16),
-                                              decoration: BoxDecoration(
-                                                color: PrimaryColor().blue,
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black26,
-                                                    blurRadius: 6,
-                                                    offset: Offset(0, 4),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(Icons.photo_library,
-                                                      color: Colors.white,
-                                                      size: 40),
-                                                  SizedBox(height: 10),
-                                                  Text(
-                                                    'Galeri',
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.white,
+                                          // Galeri Button
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                addController.pickImage();
+                                              },
+                                              child: Container(
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 8),
+                                                padding: EdgeInsets.all(16),
+                                                decoration: BoxDecoration(
+                                                  color: PrimaryColor().blue,
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black26,
+                                                      blurRadius: 6,
+                                                      offset: Offset(0, 4),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(Icons.photo_library,
+                                                        color: Colors.white,
+                                                        size: 40),
+                                                    SizedBox(height: 10),
+                                                    Text(
+                                                      'Galeri',
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },

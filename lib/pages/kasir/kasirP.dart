@@ -104,7 +104,7 @@ class _KasirPState extends State<KasirP> {
                                         ),
                                       ),
                                       Obx(() {
-                                        if (c.isLoading.value) {
+                                        if (c.isLoading2.value) {
                                           return Center(
                                               child:
                                                   CircularProgressIndicator());
@@ -152,7 +152,7 @@ class _KasirPState extends State<KasirP> {
                                                   return Container(
                                                     child: KasirW().kategori(
                                                       item['kategori'],
-                                                      "http://10.10.20.109/POS_CI/kategori/${item['gambar_kategori']}",
+                                                      "https://api-koperasi.aaslabs.com/kategori/${item['gambar_kategori']}",
                                                       Icons.fastfood,
                                                       (kategori) {
                                                         print(
@@ -793,12 +793,20 @@ class _KasirPState extends State<KasirP> {
                                                   saldoMember - c.saldoUpdate;
                                               await c.ubahSaldo(
                                                   c.selectedMember.string,
-                                                  kurangSaldo.toString());
+                                                  c.MemberName.toString(),
+                                                  c.MemberTlp.toString(),
+                                                  kurangSaldo.toString(),
+                                                  c.poinUpdate.toString());
                                             }
-                                            await c.ubahPoin(
-                                                c.selectedMember.string,
-                                                c.poinUpdate.toString());
-
+                                            if (c.selectedMember.value !=
+                                                null) {
+                                              await c.ubahPoin(
+                                                  c.selectedMember.string,
+                                                  c.MemberName.toString(),
+                                                  c.MemberTlp.toString(),
+                                                  c.MemberSaldo.toString(),
+                                                  c.poinUpdate.toString());
+                                            }
                                             if (c.statusId.value == 2 &&
                                                 c.selectedMember.value !=
                                                     null) {
@@ -1146,12 +1154,21 @@ class _KasirPState extends State<KasirP> {
                                                     saldoMember - c.saldoUpdate;
                                                 await c.ubahSaldo(
                                                     c.selectedMember.string,
-                                                    kurangSaldo.toString());
+                                                    c.MemberName.toString(),
+                                                    c.MemberTlp.toString(),
+                                                    kurangSaldo.toString(),
+                                                    c.poinUpdate.toString());
                                                 ;
                                               }
-                                              await c.ubahPoin(
-                                                  c.selectedMember.string,
-                                                  c.poinUpdate.toString());
+                                              if (c.selectedMember.value !=
+                                                  null) {
+                                                await c.ubahPoin(
+                                                    c.selectedMember.string,
+                                                    c.MemberName.toString(),
+                                                    c.MemberTlp.toString(),
+                                                    c.MemberSaldo.toString(),
+                                                    c.poinUpdate.toString());
+                                              }
                                               c.fetchTransaksiStruk();
                                             } catch (e) {
                                               Get.snackbar(
@@ -1683,105 +1700,195 @@ class _KasirPState extends State<KasirP> {
                                           ),
                                         ),
                                         SizedBox(height: 10),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                int topUp = int.tryParse(c
-                                                        .topUpController
-                                                        .text) ??
-                                                    0;
-                                                int saldoMember = int.tryParse(
-                                                        c.MemberSaldo) ??
-                                                    0;
-                                                int tambahSaldo =
-                                                    saldoMember + topUp;
-                                                await c.topupSaldo(
-                                                    c.selectedMember.value
-                                                        .toString(),
-                                                    c.topUpController.text,
-                                                    '1');
-                                                await c.ubahSaldo(
-                                                    c.selectedMember.value
-                                                        .toString(),
-                                                    tambahSaldo.toString());
-                                                c.selectedMember.value = null;
-                                                c.topUpInput.value = 0;
-                                                c.topUpController.text = '';
-                                                c.fetchMember();
-                                                Navigator.pop(context);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    PrimaryColor().blue,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 30,
-                                                    vertical: 10),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
+                                        Obx(() => Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: c
+                                                          .isLoadingTopup.value
+                                                      ? null
+                                                      : () async {
+                                                          c.isLoadingTopup
+                                                              .value = true;
+                                                          int topUp = int.tryParse(c
+                                                                  .topUpController
+                                                                  .text) ??
+                                                              0;
+                                                          int saldoMember =
+                                                              int.tryParse(c
+                                                                      .MemberSaldo) ??
+                                                                  0;
+                                                          int tambahSaldo =
+                                                              saldoMember +
+                                                                  topUp;
+                                                          await c.topupSaldo(
+                                                            c.selectedMember
+                                                                .value
+                                                                .toString(),
+                                                            c.topUpController
+                                                                .text,
+                                                            '1',
+                                                          );
+                                                          await c.ubahSaldo(
+                                                            c.selectedMember
+                                                                .value
+                                                                .toString(),
+                                                            c.MemberName
+                                                                .toString(),
+                                                            c.MemberTlp
+                                                                .toString(),
+                                                            tambahSaldo
+                                                                .toString(),
+                                                            c.MemberPoin
+                                                                .toString(),
+                                                          );
+
+                                                          c.selectedMember
+                                                              .value = null;
+                                                          c.topUpInput.value =
+                                                              0;
+                                                          c.topUpController
+                                                              .text = '';
+                                                          c.fetchMember();
+                                                          c.isLoading.value =
+                                                              false;
+                                                          c.isLoadingTopup2
+                                                              .value = false;
+                                                          c.isLoadingTopup
+                                                              .value = false;
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        PrimaryColor().blue,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 30,
+                                                        vertical: 10),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                  ),
+                                                  child: c.isLoadingTopup.value
+                                                      ? const SizedBox(
+                                                          width: 20,
+                                                          height: 20,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color: Colors.white,
+                                                            strokeWidth: 2,
+                                                          ),
+                                                        )
+                                                      : const Text(
+                                                          'Tunai',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
                                                 ),
-                                              ),
-                                              child: Text(
-                                                'Tunai',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
+                                                const SizedBox(width: 10),
+                                                ElevatedButton(
+                                                  onPressed: c
+                                                          .isLoadingTopup2.value
+                                                      ? null
+                                                      : () async {
+                                                          c.isLoadingTopup2
+                                                              .value = true;
+                                                          int topUp = int.tryParse(c
+                                                                  .topUpController
+                                                                  .text) ??
+                                                              0;
+                                                          int saldoMember =
+                                                              int.tryParse(c
+                                                                      .MemberSaldo) ??
+                                                                  0;
+                                                          int tambahSaldo =
+                                                              saldoMember +
+                                                                  topUp;
+                                                          await c.topupSaldo(
+                                                            c.selectedMember
+                                                                .value
+                                                                .toString(),
+                                                            c.topUpController
+                                                                .text,
+                                                            '2',
+                                                          );
+                                                          await c.ubahSaldo(
+                                                            c.selectedMember
+                                                                .value
+                                                                .toString(),
+                                                            c.MemberName
+                                                                .toString(),
+                                                            c.MemberTlp
+                                                                .toString(),
+                                                            tambahSaldo
+                                                                .toString(),
+                                                            c.MemberPoin
+                                                                .toString(),
+                                                          );
+
+                                                          c.selectedMember
+                                                              .value = null;
+                                                          c.topUpInput.value =
+                                                              0;
+                                                          c.topUpController
+                                                              .text = '';
+                                                          c.fetchMember();
+                                                          c.isLoading.value =
+                                                              false;
+                                                          c.isLoadingTopup2
+                                                              .value = false;
+                                                          c.isLoadingTopup
+                                                              .value = false;
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        PrimaryColor().green,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 30,
+                                                        vertical: 10),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                  ),
+                                                  child: c.isLoadingTopup2.value
+                                                      ? const SizedBox(
+                                                          width: 20,
+                                                          height: 20,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color: Colors.white,
+                                                            strokeWidth: 2,
+                                                          ),
+                                                        )
+                                                      : const Text(
+                                                          'Qris',
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
                                                 ),
-                                              ),
-                                            ),
-                                            SizedBox(width: 10),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                int topUp = int.tryParse(c
-                                                        .topUpController
-                                                        .text) ??
-                                                    0;
-                                                int saldoMember = int.tryParse(
-                                                        c.MemberSaldo) ??
-                                                    0;
-                                                int tambahSaldo =
-                                                    saldoMember + topUp;
-                                                await c.topupSaldo(
-                                                    c.selectedMember.value
-                                                        .toString(),
-                                                    c.topUpController.text,
-                                                    '2');
-                                                await c.ubahSaldo(
-                                                    c.selectedMember.value
-                                                        .toString(),
-                                                    tambahSaldo.toString());
-                                                c.selectedMember.value = null;
-                                                c.topUpInput.value = 0;
-                                                c.topUpController.text = '';
-                                                c.fetchMember();
-                                                Navigator.pop(context);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    PrimaryColor().green,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 30,
-                                                    vertical: 10),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                'Qris',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                              ],
+                                            ))
                                       ],
                                     ),
                                   ),

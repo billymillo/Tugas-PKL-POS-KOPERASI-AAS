@@ -26,6 +26,7 @@ class DashboardController extends GetxController {
   var totalProduk = 0.obs;
   final totalQRIS = 0.obs;
   final totalCash = 0.obs;
+  final totalSaldoMetode = 0.obs;
   var totalSaldo = 0.obs;
   var totalLaba = 0.obs;
   var totalTransaksiIn = 0.obs;
@@ -119,7 +120,7 @@ class DashboardController extends GetxController {
   }
 
   Future<void> fetchTransaksiOut() async {
-    var url = ApiService.baseUrl + '/transaksi_out';
+    var url = ApiService.baseUrl + '/Transaksi_Out';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -134,6 +135,7 @@ class DashboardController extends GetxController {
           int jumlah = 0;
           int qrisTotal = 0;
           int cashTotal = 0;
+          int saldoTotal = 0;
           int pemMember = 0;
           int pemNonMember = 0;
 
@@ -146,7 +148,10 @@ class DashboardController extends GetxController {
               cashTotal += 1;
             } else if (metodePem == 2) {
               qrisTotal += 1;
+            } else if (metodePem == 3) {
+              saldoTotal += 1;
             }
+
             if (member == 0) {
               pemNonMember += 1;
             } else {
@@ -157,6 +162,7 @@ class DashboardController extends GetxController {
           totalProduk.value = jumlah;
           totalQRIS.value = qrisTotal;
           totalCash.value = cashTotal;
+          totalSaldoMetode.value = saldoTotal;
           member.value = pemMember;
           nonMember.value = pemNonMember;
         } else {
@@ -173,7 +179,7 @@ class DashboardController extends GetxController {
   }
 
   Future<void> fetchTransaksiOutDet() async {
-    var url = ApiService.baseUrl + '/transaksi_out/detail';
+    var url = ApiService.baseUrl + '/Transaksi_Out/detail';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -204,7 +210,7 @@ class DashboardController extends GetxController {
   }
 
   Future<void> fetchTransaksiInDet() async {
-    var url = ApiService.baseUrl + '/transaksi_in/detail';
+    var url = ApiService.baseUrl + '/Transaksi_In/detail';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -234,7 +240,7 @@ class DashboardController extends GetxController {
   }
 
   Future<void> fetchTransaksiIn() async {
-    var url = ApiService.baseUrl + '/transaksi_in';
+    var url = ApiService.baseUrl + '/Transaksi_In';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));

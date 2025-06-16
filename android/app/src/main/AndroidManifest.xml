@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
-        android:label="Koperasi AAS"
+        android:label="Koperasi Artha Abadi"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

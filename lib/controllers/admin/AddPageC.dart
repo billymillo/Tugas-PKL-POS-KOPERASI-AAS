@@ -66,8 +66,8 @@ class AddPageController extends GetxController {
 
   String get KodeBank {
     var selected = banks.firstWhere(
-      (m) => m['nama'] == selectedBank.value,
-      orElse: () => {'kode': 'Non Member'},
+      (m) => m['name'] == selectedBank.value,
+      orElse: () => {'kode': '??'},
     );
     return selected['kode'] ?? 0;
   }

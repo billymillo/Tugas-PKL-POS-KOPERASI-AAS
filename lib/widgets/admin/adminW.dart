@@ -63,11 +63,20 @@ class AdminW {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(35.0),
-                      child: Image(
-                          width: 150,
-                          height: 140,
-                          image: NetworkImage(
-                              "http://10.10.20.109/POS_CI/uploads/${produk[count]['gambar_barang']}")),
+                      child: Image.network(
+                        "https://api-koperasi.aaslabs.com/uploads/${produk[count]['gambar_barang'] ?? 'default.png'}",
+                        width: 150,
+                        height: 140,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.network(
+                            "https://api-koperasi.aaslabs.com/uploads/default.png",
+                            width: 150,
+                            height: 140,
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,7 +422,8 @@ class AdminW {
     );
   }
 
-  void showBankDialog(BuildContext context, dynamic controller, {String namaBank = ''}) {
+  void showBankDialog(BuildContext context, dynamic controller,
+      {String namaBank = ''}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -509,26 +519,35 @@ class AdminW {
                               ),
                               onPressed: () {
                                 controller.selectedBank.value =
-                                    bank['nama'] ?? namaBank.toString();
+                                    bank['name'] ?? namaBank.toString();
                                 Get.back();
                               },
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    bank['nama'],
-                                    style: TextStyle(
+                                  Expanded(
+                                    child: Text(
+                                      bank['name'] ?? '',
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                        color: Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
                                   ),
+                                  SizedBox(width: 8),
                                   Text(
                                     "(${bank['kode']})",
                                     style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
                                 ],
                               ),

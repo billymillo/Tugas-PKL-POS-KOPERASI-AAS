@@ -197,6 +197,7 @@ class _TipePState extends State<TipeP> {
   Widget buildNewTipeDialog() {
     return ElevatedButton(
       onPressed: () {
+        tipeController.refresh();
         showDialog(
           context: context,
           builder: (BuildContext context) {

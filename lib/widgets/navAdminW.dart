@@ -300,7 +300,7 @@ Widget NavbarDrawer(
                                       children: [
                                         SizedBox(width: 8),
                                         Text(
-                                          'Batal',
+                                          'Cancel',
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontSize: 14,

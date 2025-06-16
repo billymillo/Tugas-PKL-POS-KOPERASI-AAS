@@ -50,7 +50,7 @@ class _EditProductPState extends State<EditProductP> {
     hargaPackProdukController.text = item['harga_pack']?.toString() ?? '';
     jumlahIsiProdukController.text = item['jml_pcs_pack']?.toString() ?? '';
     editController.imageUrl.value =
-        "http://10.10.20.109/POS_CI/uploads/${item['gambar_barang']}";
+        "https://api-koperasi.aaslabs.com/uploads/${item['gambar_barang']}";
     editController.hasNewImage.value = false;
     fetchData();
     editController.fetchAddOn();
@@ -522,64 +522,6 @@ class _EditProductPState extends State<EditProductP> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    Obx(
-                      () => Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                AdminW().buildInputLabel(
-                                    'Harga Jual Per-pcs', " *"),
-                                AdminW().buildTextField(
-                                  inputFormat: RupiahFormaters(),
-                                  controller: hargaJualProdukController,
-                                  hintText: 'Rp 5.500',
-                                  prefixIcon: FontAwesomeIcons.moneyBill1Wave,
-                                  type: TextInputType.number,
-                                  onChanged: (value) {
-                                    editController.hitungLaba(
-                                      editController.hargaDasar.value,
-                                      value,
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (!editController.harga.value) ...[
-                            SizedBox(width: 16),
-                            Expanded(
-                              flex: editController.harga.value ? 1 : 1,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AdminW().buildInputLabel(
-                                      'Harga Dasar Per-pcs', " *"),
-                                  AdminW().buildTextField(
-                                    inputFormat: RupiahFormaters(),
-                                    controller: hargaSatuanProdukController,
-                                    hintText: 'Rp 5.000',
-                                    prefixIcon: FontAwesomeIcons.moneyBill1Wave,
-                                    type: TextInputType.number,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ]
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    AdminW().buildInputLabel('Tambah Stok', " *"),
-                    AdminW().buildTextField(
-                      inputFormat: RupiahFormaters(),
-                      controller: stokProdukController,
-                      hintText: 'Jumlah yang ditambahkan',
-                      prefixIcon: Icons.inventory_2_outlined,
-                      type: TextInputType.number,
-                    ),
-                    SizedBox(height: 20),
                     Row(
                       children: [
                         Expanded(
@@ -637,6 +579,64 @@ class _EditProductPState extends State<EditProductP> {
                           ),
                         ),
                       ],
+                    ),
+                    SizedBox(height: 20),
+                    AdminW().buildInputLabel('Tambah Stok', " *"),
+                    AdminW().buildTextField(
+                      inputFormat: RupiahFormaters(),
+                      controller: stokProdukController,
+                      hintText: 'Jumlah yang ditambahkan',
+                      prefixIcon: Icons.inventory_2_outlined,
+                      type: TextInputType.number,
+                    ),
+                    SizedBox(height: 20),
+                    Obx(
+                      () => Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AdminW().buildInputLabel(
+                                    'Harga Jual Per-pcs', " *"),
+                                AdminW().buildTextField(
+                                  inputFormat: RupiahFormaters(),
+                                  controller: hargaJualProdukController,
+                                  hintText: 'Rp 5.500',
+                                  prefixIcon: FontAwesomeIcons.moneyBill1Wave,
+                                  type: TextInputType.number,
+                                  onChanged: (value) {
+                                    editController.hitungLaba(
+                                      editController.hargaDasar.value,
+                                      value,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (!editController.harga.value) ...[
+                            SizedBox(width: 16),
+                            Expanded(
+                              flex: editController.harga.value ? 1 : 1,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AdminW().buildInputLabel(
+                                      'Harga Dasar Per-pcs', " *"),
+                                  AdminW().buildTextField(
+                                    inputFormat: RupiahFormaters(),
+                                    controller: hargaSatuanProdukController,
+                                    hintText: 'Rp 5.000',
+                                    prefixIcon: FontAwesomeIcons.moneyBill1Wave,
+                                    type: TextInputType.number,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ]
+                        ],
+                      ),
                     ),
                     SizedBox(height: 40),
                     Row(
@@ -884,9 +884,10 @@ class _EditProductPState extends State<EditProductP> {
                                 : () async {
                                     File? imageFile =
                                         editController.imagePath.value;
-                                    if (int.parse(
-                                            editController.totalLaba.value) <
-                                        0) {
+                                    var laba = int.tryParse(
+                                            editController.totalLaba.value) ??
+                                        0;
+                                    if (laba < 0) {
                                       Get.snackbar(
                                         'Gagal',
                                         'Laba tidak boleh minus, Silahkan cek kembali data produk anda!',
@@ -900,12 +901,10 @@ class _EditProductPState extends State<EditProductP> {
                                     if (editController.selectedTipe.value ==
                                         '1') {
                                       final int hargaPack = int.tryParse(
-                                              hargaPackProdukController.text
-                                                  .replaceAll('.', '')) ??
+                                              hargaPackProdukController.text) ??
                                           0;
                                       final int jumlahIsi = int.tryParse(
-                                              jumlahIsiProdukController.text
-                                                  .replaceAll('.', '')) ??
+                                              jumlahIsiProdukController.text) ??
                                           1;
                                       editController.hargaDasar.value =
                                           (hargaPack ~/ jumlahIsi).toString();

@@ -356,9 +356,10 @@ class EditPageController extends GetxController {
         });
       } else {
         Get.back(); // Tutup loading dialog jika gagal
+        String errorMessage = _parseErrorMessages(response['message']);
         Get.snackbar(
           'Error',
-          'Gagal mengedit produk: ${response['message']}',
+          errorMessage,
           backgroundColor: Colors.red.withOpacity(0.5),
           icon: Icon(Icons.error, color: Colors.white),
         );
@@ -425,5 +426,12 @@ class EditPageController extends GetxController {
     await fetchMitra();
     await fetchAddOn();
     await fetchAddonPr();
+  }
+
+  String _parseErrorMessages(dynamic message) {
+    if (message is Map) {
+      return message.values.join("\n");
+    }
+    return message.toString();
   }
 }

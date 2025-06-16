@@ -100,6 +100,62 @@ class TransaksiInController extends GetxController {
     return selected['jml_pcs_pack'] ?? '0';
   }
 
+  String get NamaBarang {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'nama_barang': ' '},
+    );
+    return selected['nama_barang'] ?? '0';
+  }
+
+  String get BarcodeBarang {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'barcode_barang': ' '},
+    );
+    return selected['barcode_barang'] ?? '0';
+  }
+
+  String get GambarBarang {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'gambar_barang': ' '},
+    );
+    return selected['gambar_barang'] ?? '0';
+  }
+
+  String get KategoriBarang {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'id_kategori_barang': ' '},
+    );
+    return selected['id_kategori_barang'] ?? '0';
+  }
+
+  String get TipeBarang {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'id_tipe_barang': ' '},
+    );
+    return selected['id_tipe_barang'] ?? '0';
+  }
+
+  String get MitraBarang {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'id_mitra_barang': ' '},
+    );
+    return selected['id_mitra_barang'] ?? '0';
+  }
+
+  String get StokBarang {
+    var selected = produk.firstWhere(
+      (m) => m['id'] == selectedProduct.value,
+      orElse: () => {'stok': ' '},
+    );
+    return selected['stok'] ?? '0';
+  }
+
   void toggleCheckbox(bool? value) {
     checkbox.value = value ?? false;
   }
@@ -116,7 +172,7 @@ class TransaksiInController extends GetxController {
     if (jumlahPcs != 0) {
       hargaDasar.value = hargaPack ~/ jumlahPcs;
     } else {
-      hargaDasar.value = 0;
+      hargaDasar.value = int.parse(ProdukSatuan);
     }
   }
 
@@ -150,7 +206,7 @@ class TransaksiInController extends GetxController {
   }
 
   Future<void> fetchTransaksiDet() async {
-    var url = ApiService.baseUrl + '/transaksi_in/detail';
+    var url = ApiService.baseUrl + '/Transaksi_In/detail';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -181,7 +237,7 @@ class TransaksiInController extends GetxController {
   }
 
   Future<void> fetchTransaksiIn() async {
-    var url = ApiService.baseUrl + '/transaksi_in';
+    var url = ApiService.baseUrl + '/Transaksi_In';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -312,10 +368,17 @@ class TransaksiInController extends GetxController {
 
   Future<void> editProduk(
     String id,
+    String nama,
+    String barcode_barang,
+    String gambar_barang,
+    String id_kategori,
+    String id_tipe,
+    String id_mitra,
+    String harga_pack,
+    String jumlah_pcs,
     String hargaSatuan,
     String hargaJual,
-    String hargaPerPack,
-    String jumlahPcs,
+    String stok,
   ) async {
     isLoading.value = true;
     final prefs = await SharedPreferences.getInstance();
@@ -323,7 +386,19 @@ class TransaksiInController extends GetxController {
 
     try {
       final response = await apiServiceTr.editProdukTrIn(
-          id, hargaSatuan, hargaJual, hargaPerPack, jumlahPcs, userInput);
+          id,
+          nama,
+          barcode_barang,
+          gambar_barang,
+          id_kategori,
+          id_tipe,
+          id_mitra,
+          harga_pack,
+          jumlah_pcs,
+          hargaSatuan,
+          hargaJual,
+          stok,
+          userInput);
       if (response['status'] == true) {
         Get.snackbar(
           'Berhasil',

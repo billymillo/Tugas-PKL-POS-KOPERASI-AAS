@@ -312,7 +312,7 @@ class LoginP extends StatelessWidget {
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width,
-                                color: Colors.transparent,
+                                color: PrimaryColor().blue,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -326,7 +326,8 @@ class LoginP extends StatelessWidget {
                                               right: 50,
                                               top: 100),
                                           decoration: BoxDecoration(
-                                              color: Colors.white),
+                                            color: Colors.white,
+                                          ),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,

@@ -215,7 +215,7 @@ class _MitraPState extends State<MitraP> {
                             color: PrimaryColor().blue, size: 45),
                       ),
                       SizedBox(height: 10),
-                      Text(item['nama'],
+                      Text(item['nama'] ?? ' ',
                           style: GoogleFonts.nunito(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -225,7 +225,7 @@ class _MitraPState extends State<MitraP> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1),
                       Text(
-                        item['no_tlp'],
+                        item['no_tlp'] ?? ' ',
                         style: GoogleFonts.nunito(
                           fontSize: 12,
                           color: Colors.white,
@@ -285,8 +285,8 @@ class _MitraPState extends State<MitraP> {
                                 showEditDialog(
                                     context,
                                     item['id'],
-                                    item['nama'],
-                                    item['no_tlp'],
+                                    item['nama'] ?? ' ',
+                                    item['no_tlp'] ?? ' ',
                                     item['email'] ?? ' ',
                                     item['bank_rek'] ?? ' ',
                                     item['no_rek'] ?? ' ',
@@ -314,7 +314,7 @@ class _MitraPState extends State<MitraP> {
                                 AdminW().deleteDialog(
                                   context,
                                   'Hapus Mitra',
-                                  'Apakah anda yakin ingin menghapus mitra ${item['nama']} ?',
+                                  'Apakah anda yakin ingin menghapus mitra ini ?',
                                   () async {
                                     await mitraController.deleteMitra(
                                         item['id'],
@@ -398,8 +398,7 @@ class _MitraPState extends State<MitraP> {
                             type: TextInputType.phone,
                           ),
                           SizedBox(height: 10),
-                          AdminW()
-                              .buildInputLabel('Email Mitra (opsional)', " "),
+                          AdminW().buildInputLabel('Email Mitra', " *"),
                           AdminW().buildTextField(
                             inputFormat: LengthLimitingTextInputFormatter(200),
                             controller: newEmailController,
@@ -427,31 +426,38 @@ class _MitraPState extends State<MitraP> {
                                     horizontal: 16, vertical: 14),
                               ),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.start, // rata kiri
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(Icons.add, color: Colors.black54),
                                   SizedBox(width: 8),
-                                  Obx(() =>
-                                      mitraController.selectedBank.value == null
+                                  Expanded(
+                                    // tambahkan ini
+                                    child: Obx(
+                                      () => mitraController
+                                                  .selectedBank.value ==
+                                              null
                                           ? Text(
                                               'Pilih Bank',
                                               style: TextStyle(
                                                 color: Colors.black87,
-                                                fontSize: 16,
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.w500,
                                               ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
                                             )
                                           : Text(
-                                              mitraController.selectedBank.value
-                                                      .toString() +
-                                                  " (${mitraController.KodeBank})",
+                                              "${mitraController.selectedBank.value} (${mitraController.KodeBank})",
                                               style: TextStyle(
                                                 color: Colors.black87,
-                                                fontSize: 16,
+                                                fontSize: 12,
                                                 fontWeight: FontWeight.w500,
                                               ),
-                                            )),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -633,7 +639,7 @@ class _MitraPState extends State<MitraP> {
                       ),
                       SizedBox(width: 12),
                       Text(
-                        "Edit Member ",
+                        "Edit Mitra ",
                         style: TextStyle(
                           color: Colors.black87,
                           fontSize: 18,
@@ -665,7 +671,7 @@ class _MitraPState extends State<MitraP> {
                             FilteringTextInputFormatter.singleLineFormatter,
                       ),
                       SizedBox(height: 15),
-                      AdminW().buildInputLabel('Email Mitra(opsional)', ' *'),
+                      AdminW().buildInputLabel('Email Mitra', ' *'),
                       AdminW().buildTextField(
                         controller: emailMitraController,
                         hintText: 'contoh: 3yL6A@example.com',
@@ -694,31 +700,37 @@ class _MitraPState extends State<MitraP> {
                                 horizontal: 16, vertical: 14),
                           ),
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.start, // rata kiri
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Icon(Icons.add, color: Colors.black54),
                               SizedBox(width: 8),
-                              Obx(() =>
-                                  mitraController.selectedBank.value == null
-                                      ? Text(
-                                          selectedBankEdit,
-                                          style: TextStyle(
-                                            color: Colors.black87,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        )
-                                      : Text(
-                                          mitraController.selectedBank.value
-                                                  .toString() +
-                                              " (${mitraController.KodeBank})",
-                                          style: TextStyle(
-                                            color: Colors.black87,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        )),
+                              Expanded(
+                                // tambahkan ini
+                                child: Obx(
+                                  () =>
+                                      mitraController.selectedBank.value == null
+                                          ? Text(
+                                              'Pilih Bank',
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            )
+                                          : Text(
+                                              "${mitraController.selectedBank.value} (${mitraController.KodeBank})",
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                ),
+                              ),
                             ],
                           ),
                         ),

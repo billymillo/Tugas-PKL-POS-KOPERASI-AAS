@@ -204,7 +204,7 @@ class TransaksiOutMController extends GetxController {
   }
 
   Future<void> fetchTransaksiOutDet() async {
-    var url = ApiService.baseUrl + '/transaksi_out/detail';
+    var url = ApiService.baseUrl + '/Transaksi_Out/detail';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -287,6 +287,7 @@ class TransaksiOutMController extends GetxController {
           colorText: Colors.white,
           icon: Icon(Icons.check_circle_outline, color: Colors.white),
         );
+        print("Cek Cek Berhasil $response['message']");
       } else if (response['status'] == 'false') {
         Get.snackbar(
           'Gagal',
@@ -295,6 +296,7 @@ class TransaksiOutMController extends GetxController {
           colorText: Colors.white,
           icon: Icon(Icons.error, color: Colors.white),
         );
+        print("Cek Gagal $response['message']");
       }
     } catch (e) {
       Get.snackbar(
@@ -343,6 +345,14 @@ class TransaksiOutMController extends GetxController {
     final tanggalCetak =
         DateFormat('dd MMMM yyyy', 'id_ID').format(DateTime.now());
 
+    final imageKiri = pw.MemoryImage(
+        (await rootBundle.load('assets/image/logo_kopindo.png'))
+            .buffer
+            .asUint8List());
+    final imageKanan = pw.MemoryImage(
+        (await rootBundle.load('assets/image/aas_logo.png'))
+            .buffer
+            .asUint8List());
     pdf.addPage(pw.Page(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.all(32),
@@ -350,22 +360,63 @@ class TransaksiOutMController extends GetxController {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Koperasi Artha Abadi',
-                style:
-                    pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
-            pw.Text('Jl. Raya Jakarta-Bogor No.KM.37 Sukamaju, Kec. Cilodong,'),
-            pw.Text('Kota Depok, Jawa Barat 16415'),
-            pw.Text('Telp. Kantor: (021) 29629393'),
-            pw.SizedBox(height: 20),
-            pw.Text('INVOICE PEMBAYARAN KE MITRA',
+            // Header dengan logo kiri, teks tengah, dan logo kanan
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Image(imageKiri, width: 60),
+                pw.Expanded(
+                  child: pw.Column(
+                    mainAxisAlignment: pw.MainAxisAlignment.center,
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text('KOPERASI KARYAWAN DIVISI TIC SARASWANTI',
+                          style: pw.TextStyle(
+                              fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                      pw.Text('ANUGRAH ARTHA ABADI',
+                          style: pw.TextStyle(
+                              fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(
+                          'SK KEMENKUMHAM AHU-AHU-0000720.AH.01.38 TAHUN 2025',
+                          style: pw.TextStyle(fontSize: 10)),
+                      pw.Text(
+                          'HEAD OFFICE: GRAHA AAS, G. Floor, Jl. Raya Jakarta-Bogor KM. 37',
+                          style: pw.TextStyle(fontSize: 10),
+                          textAlign: pw.TextAlign.center),
+                      pw.Text('Sukamaju, Cilodong, Kota Depok, Jawa Barat',
+                          style: pw.TextStyle(fontSize: 10)),
+                      pw.Text('anugraharthaa@gmail.com | 082125931519',
+                          style: pw.TextStyle(fontSize: 10)),
+                    ],
+                  ),
+                ),
+                pw.Image(imageKanan, width: 60),
+              ],
+            ),
+            pw.Divider(thickness: 1),
+            pw.SizedBox(height: 10),
+
+            // Judul invoice
+            pw.Text('INVOICE PEMBAYARAN MITRA',
                 style:
                     pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 4),
-            pw.Text('Tanggal Invoice: $tanggalCetak'),
+            pw.Text(
+              'Tanggal Cetak: $tanggalCetak',
+            ),
             pw.SizedBox(height: 4),
-            pw.Text(MitraName(selectedMitra.value.toString()),
-                style: pw.TextStyle(fontSize: 14)),
-            pw.SizedBox(height: 4),
+            pw.Text(
+              'Tanggal Penjualan: ' +
+                  '${formatTanggal(selectedStartDate.value.toString())} - ${formatTanggal(selectedEndDate.value.toString())}',
+            ),
+            pw.SizedBox(height: 10),
+            pw.Text("Nama Mitra : " + MitraName(selectedMitra.value.toString()),
+                style:
+                    pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 10),
+
+            // Tabel transaksi
             pw.TableHelper.fromTextArray(
               context: context,
               cellAlignment: pw.Alignment.centerLeft,
@@ -401,6 +452,8 @@ class TransaksiOutMController extends GetxController {
               ],
             ),
             pw.SizedBox(height: 20),
+
+            // Total pembayaran
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.end,
               children: [

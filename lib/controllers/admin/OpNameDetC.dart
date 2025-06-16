@@ -29,6 +29,7 @@ class OpNameDetController extends GetxController {
   var isEditList = <bool>[].obs;
   var isCheckedList = <bool>[].obs;
   var isLastPage = false.obs;
+  final startPage = 0.obs;
 
   RxMap<int, bool> isEditMap = <int, bool>{}.obs;
   RxMap<int, bool> hasBeenSavedMap = <int, bool>{}.obs;
@@ -98,18 +99,33 @@ class OpNameDetController extends GetxController {
   void goToPage(int page) {
     if (page >= 0 && page < totalPages) {
       currentPage.value = page;
+
+      // Atur jendela tampilan blok halaman agar tetap 5
+      if (page < startPage.value) {
+        startPage.value = page;
+      } else if (page >= startPage.value + 5) {
+        startPage.value = page - 4;
+      }
     }
   }
 
   void nextPage() {
     if (currentPage.value < totalPages - 1) {
       currentPage.value++;
+
+      if (currentPage.value >= startPage.value + 5) {
+        startPage.value++;
+      }
     }
   }
 
   void previousPage() {
     if (currentPage.value > 0) {
       currentPage.value--;
+
+      if (currentPage.value < startPage.value) {
+        startPage.value--;
+      }
     }
   }
 

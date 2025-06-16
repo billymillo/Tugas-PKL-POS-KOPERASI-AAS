@@ -24,10 +24,11 @@ class ProductController extends GetxController {
 
   var isLoading = false.obs;
   var produk = <Map<String, dynamic>>[].obs;
+  var produkAll = <Map<String, dynamic>>[].obs;
 
   var isLastPage = false.obs;
   var page = 1.obs;
-  final int limit = 10;
+  var limit = 20;
 
   final NotchBottomBarController notchController =
       NotchBottomBarController(index: 0);
@@ -36,6 +37,7 @@ class ProductController extends GetxController {
   void onInit() {
     super.onInit();
     fetchProduk();
+    fetchAllProduk();
     scrollController.addListener(() {
       if (scrollController.position.pixels ==
           scrollController.position.maxScrollExtent) {
@@ -52,6 +54,27 @@ class ProductController extends GetxController {
     );
   }
 
+  Future<void> fetchAllProduk() async {
+    try {
+      isLoading(true);
+      var response = await http.get(Uri.parse('$url/produk'));
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body);
+        if (jsonData['status'] == true) {
+          produkAll.value = List<Map<String, dynamic>>.from(jsonData['data']);
+        } else {
+          throw Exception('Failed to load products');
+        }
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<void> fetchProduk() async {
     try {
       isLoading(true);
@@ -61,7 +84,6 @@ class ProductController extends GetxController {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
           var newProduk = List<Map<String, dynamic>>.from(jsonData['data']);
-
           if (newProduk.length < limit) {
             isLastPage(true);
           }
@@ -156,7 +178,7 @@ class ProductController extends GetxController {
     if (query.isEmpty) {
       fetchProduk();
     }
-    produk.value = produk
+    produk.value = produkAll
         .where((product) =>
             product['nama_barang']
                 .toString()
@@ -167,6 +189,10 @@ class ProductController extends GetxController {
                 .toLowerCase()
                 .contains(query.toLowerCase()) ||
             product['tipe_name']
+                .toString()
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            product['barcode_barang']
                 .toString()
                 .toLowerCase()
                 .contains(query.toLowerCase()) ||

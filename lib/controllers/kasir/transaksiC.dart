@@ -146,7 +146,7 @@ class TransaksiC extends GetxController {
       }
       var response = await http.get(
         Uri.parse(
-            '$urlTr/transaksi_out?page=${pageLunas.value}&limit=$limitLunas&sort=desc'),
+            '$urlTr/Transaksi_Out?page=${pageLunas.value}&limit=$limitLunas&sort=desc'),
       );
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -220,7 +220,7 @@ class TransaksiC extends GetxController {
     try {
       isLoading.value = true;
       var response =
-          await http.get(Uri.parse(urlTr + "/transaksi_out/detail?produk=1"));
+          await http.get(Uri.parse(urlTr + "/Transaksi_Out/detail?produk=1"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {
@@ -532,7 +532,7 @@ class TransaksiC extends GetxController {
     try {
       isLoading.value = true;
       var response =
-          await http.get(Uri.parse(urlTr + "/transaksi_in/pembayaran"));
+          await http.get(Uri.parse(urlTr + "/Transaksi_In/pembayaran"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {

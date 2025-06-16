@@ -178,7 +178,7 @@ class OpNameDet extends StatelessWidget {
                                               Color(0xFFF6F9FC)),
                                       cells: [
                                         DataCell(SizedBox(
-                                          width: 20,
+                                          width: 30,
                                           child: Text(
                                             '${realIndex + 1}', // Ini akan menampilkan nomor urut
                                             overflow: TextOverflow.ellipsis,
@@ -354,8 +354,8 @@ class OpNameDet extends StatelessWidget {
                             width: MediaQuery.of(context).size.width *
                                 (MediaQuery.of(context).orientation ==
                                         Orientation.landscape
-                                    ? 1.1
-                                    : 2.2),
+                                    ? 1.3
+                                    : 2.4),
                             padding: EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
                             child: Row(
@@ -552,6 +552,10 @@ class OpNameDet extends StatelessWidget {
                                 ),
                                 SizedBox(width: 50),
                                 Obx(() {
+                                  final start = controller.startPage.value;
+                                  final end = (start + 5)
+                                      .clamp(0, controller.totalPages);
+
                                   return Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -560,15 +564,15 @@ class OpNameDet extends StatelessWidget {
                                         child:
                                             buildPaginationNumber('<<', false),
                                       ),
-                                      ...List.generate(controller.totalPages,
-                                          (index) {
+                                      ...List.generate(end - start, (index) {
+                                        final pageIndex = start + index;
                                         return GestureDetector(
                                           onTap: () =>
-                                              controller.goToPage(index),
+                                              controller.goToPage(pageIndex),
                                           child: buildPaginationNumber(
-                                            (index + 1).toString(),
+                                            (pageIndex + 1).toString(),
                                             controller.currentPage.value ==
-                                                index,
+                                                pageIndex,
                                           ),
                                         );
                                       }),

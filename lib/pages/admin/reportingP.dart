@@ -694,7 +694,7 @@ class ReportingP extends StatelessWidget {
                                           borderRadius:
                                               BorderRadius.circular(6),
                                           child: Image.network(
-                                            "http://10.10.20.109/POS_CI/uploads/${controller.GambarBarang(item['id_produk'])}",
+                                            "https://api-koperasi.aaslabs.com/uploads/${controller.GambarBarang(item['id_produk'])}",
                                             width: 50,
                                             height: 50,
                                             fit: BoxFit.cover,
@@ -845,7 +845,7 @@ class ReportingP extends StatelessWidget {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          Container(  
+                                          Container(
                                             color: Color(0xFFF9FAFB),
                                             width: MediaQuery.of(context)
                                                     .size

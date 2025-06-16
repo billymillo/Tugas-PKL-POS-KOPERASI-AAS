@@ -186,8 +186,18 @@ class KasirW {
                 height: MediaQuery.of(context).size.width * 0.15,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  image: DecorationImage(
-                      image: NetworkImage(foto), fit: BoxFit.cover),
+                ),
+                clipBehavior: Clip.hardEdge,
+                child: Image.network(
+                  foto ??
+                      'https://api-koperasi.aaslabs.com/uploads/default.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.network(
+                      'https://api-koperasi.aaslabs.com/uploads/default.png',
+                      fit: BoxFit.cover,
+                    );
+                  },
                 ),
               ),
               SizedBox(

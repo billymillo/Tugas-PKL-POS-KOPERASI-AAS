@@ -62,6 +62,9 @@ class KasirC extends GetxController {
   var transaksiId = ''.obs;
 
   var isLoading = true.obs;
+  var isLoadingTopup = false.obs;
+  var isLoadingTopup2 = false.obs;
+  var isLoading2 = true.obs;
   var isPrinting = false.obs;
 
   BlueThermalPrinter printer = BlueThermalPrinter.instance;
@@ -209,6 +212,14 @@ class KasirC extends GetxController {
       orElse: () => {'Poin': '0'},
     );
     return selected['poin'] ?? '0';
+  }
+
+  String get MemberTlp {
+    var selected = member.firstWhere(
+      (m) => m['id'] == selectedMember.value,
+      orElse: () => {'no_tlp': '0'},
+    );
+    return selected['no_tlp'] ?? '0';
   }
 
   String get MemberSaldo {
@@ -387,7 +398,7 @@ class KasirC extends GetxController {
   Future<void> fetchProduk() async {
     var url = ApiService.baseUrl;
     try {
-      isLoading(true);
+      isLoading2(true);
       var response = await http.get(Uri.parse(url + "/product"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -403,13 +414,13 @@ class KasirC extends GetxController {
     } catch (e) {
       print('Error: $e');
     } finally {
-      isLoading(false);
+      isLoading2(false);
     }
   }
 
   Future<void> fetchKategori() async {
     try {
-      isLoading.value = true;
+      isLoading2.value = true;
       var response = await http.get(Uri.parse(url + "/kategori"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -424,7 +435,7 @@ class KasirC extends GetxController {
     } catch (e) {
       print('Error: $e');
     } finally {
-      isLoading.value = false;
+      isLoading2.value = false;
     }
   }
 
@@ -469,13 +480,14 @@ class KasirC extends GetxController {
           "jumlah": item['stok'].toString(),
           "jumlahDibeli": 0,
           "listDibeli": [],
-          "foto": "http://10.10.20.109/POS_CI/uploads/${item['gambar_barang']}",
+          "foto":
+              "https://api-koperasi.aaslabs.com/uploads/${item['gambar_barang']}",
         }));
   }
 
   Future<void> fetchMember() async {
     try {
-      isLoading.value = true;
+      isLoading2.value = true;
       var response = await http.get(Uri.parse(urlTr + "/member"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -490,7 +502,7 @@ class KasirC extends GetxController {
     } catch (e) {
       print('Error: $e');
     } finally {
-      isLoading.value = false;
+      isLoading2.value = false;
     }
   }
 
@@ -644,22 +656,30 @@ class KasirC extends GetxController {
 
   Future<void> ubahPoin(
     String id,
+    String nama,
+    String no_tlp,
+    String saldo,
     String poin,
   ) async {
     isLoading.value = true;
     try {
       final response = await apiServiceTr.ubahPoin(
         id,
+        nama,
+        no_tlp,
+        saldo,
         poin,
       );
       if (response['status'] == true) {
         print('Berhasil' + response['message']);
+      } else if (response['status'] == false) {
+        print('Gagal' + response['message']);
       }
     } catch (e) {
       print(e);
       Get.snackbar(
         'Error',
-        'Terjadi kesalahan saat Menghapus Mitra.',
+        'Terjadi kesalahan saat Menambah Poin.',
         backgroundColor: Colors.red.withOpacity(0.5),
         icon: Icon(Icons.error, color: Colors.white),
       );
@@ -669,15 +689,11 @@ class KasirC extends GetxController {
   }
 
   Future<void> ubahSaldo(
-    String id,
-    String saldo,
-  ) async {
+      String id, String nama, String no_tlp, String saldo, String poin) async {
     isLoading.value = true;
     try {
-      final response = await apiServiceTr.gunakanSaldo(
-        id,
-        saldo,
-      );
+      final response =
+          await apiServiceTr.gunakanSaldo(id, nama, no_tlp, saldo, poin);
       if (response['status'] == true) {
         print(response['message']);
       }
@@ -726,7 +742,7 @@ class KasirC extends GetxController {
 
   Future<void> fetchStatus() async {
     try {
-      isLoading(true);
+      isLoading2(true);
       var response = await http.get(Uri.parse(urlTr + "/status"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
@@ -741,7 +757,7 @@ class KasirC extends GetxController {
     } catch (e) {
       print('Error: $e');
     } finally {
-      isLoading(false);
+      isLoading2(false);
     }
   }
 
@@ -806,7 +822,7 @@ class KasirC extends GetxController {
   Future<void> fetchTransaksiStruk() async {
     try {
       isLoading.value = true;
-      var response = await http.get(Uri.parse(urlTr + "/transaksi_out/struk"));
+      var response = await http.get(Uri.parse(urlTr + "/Transaksi_Out/struk"));
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body);
         if (jsonData['status'] == true) {

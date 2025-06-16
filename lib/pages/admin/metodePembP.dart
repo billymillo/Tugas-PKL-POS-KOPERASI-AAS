@@ -77,11 +77,11 @@ class _MetodePState extends State<MetodeP> {
                                           ],
                                         ),
                                         SizedBox(width: 20),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(right: 16),
-                                          child: buildNewMetodeDialog(),
-                                        ),
+                                        // Padding(
+                                        //   padding:
+                                        //       const EdgeInsets.only(right: 16),
+                                        //   child: buildNewMetodeDialog(),
+                                        // ),
                                       ],
                                     ),
                                   ),
@@ -104,48 +104,48 @@ class _MetodePState extends State<MetodeP> {
                                           children: [
                                             buildMetodeDialog(
                                                 metode['id'], metode['metode']),
-                                            Positioned(
-                                              right: 4,
-                                              top: 0,
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  AdminW().deleteDialog(
-                                                    context,
-                                                    'Hapus Metode',
-                                                    'Apakah anda yakin untuk menghapus Metode ini',
-                                                    () async {
-                                                      await metodeController
-                                                          .deleteMetode(
-                                                              metode['id'],
-                                                              fromButton: true);
-                                                      await metodeController
-                                                          .refresh();
-                                                      Get.to(MetodeP());
-                                                      Navigator.pop(context);
-                                                    },
-                                                  );
-                                                },
-                                                child: Container(
-                                                  width: 20,
-                                                  height: 20,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.red,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      'X',
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
+                                            //   Positioned(
+                                            //     right: 4,
+                                            //     top: 0,
+                                            //     child: GestureDetector(
+                                            //       onTap: () {
+                                            //         // AdminW().deleteDialog(
+                                            //         //   context,
+                                            //         //   'Hapus Metode',
+                                            //         //   'Apakah anda yakin untuk menghapus Metode ini',
+                                            //         //   () async {
+                                            //         //     await metodeController
+                                            //         //         .deleteMetode(
+                                            //         //             metode['id'],
+                                            //         //             fromButton: true);
+                                            //         //     await metodeController
+                                            //         //         .refresh();
+                                            //         //     Get.to(MetodeP());
+                                            //         //     Navigator.pop(context);
+                                            //         //   },
+                                            //         // );
+                                            //       },
+                                            //       child: Container(
+                                            //         width: 20,
+                                            //         height: 20,
+                                            //         decoration: BoxDecoration(
+                                            //           color: Colors.red,
+                                            //           shape: BoxShape.circle,
+                                            //         ),
+                                            //         child: Center(
+                                            //           child: Text(
+                                            //             'X',
+                                            //             style: TextStyle(
+                                            //               fontSize: 14,
+                                            //               fontWeight:
+                                            //                   FontWeight.bold,
+                                            //               color: Colors.white,
+                                            //             ),
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //     ),
+                                            //   ),
                                           ],
                                         ),
                                       );
@@ -432,114 +432,114 @@ class _MetodePState extends State<MetodeP> {
         TextEditingController(text: metodeLama);
     return GestureDetector(
       onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Dialog(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              child: Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            FontAwesomeIcons.moneyCheck,
-                            color: PrimaryColor().blue,
-                            size: 24,
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            "Edit Metode Pembayaran ",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 15),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AdminW()
-                              .buildInputLabel('Nama Metode Pembayaran', " *"),
-                          AdminW().buildTextField(
-                            inputFormat: LengthLimitingTextInputFormatter(200),
-                            controller: namaMetodeController,
-                            hintText: 'Metode Pembayaran',
-                            prefixIcon: FontAwesomeIcons.moneyCheck,
-                            type: TextInputType.name,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              'Batal',
-                              style: TextStyle(
-                                color: Colors.black45,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          ElevatedButton(
-                            onPressed: () async {
-                              await metodeController.editMetode(
-                                id,
-                                namaMetodeController.text,
-                                fromButton: true,
-                              );
-                              await metodeController.refresh();
-                              Navigator.pop(context);
-                              namaMetodeController.clear();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: PrimaryColor().blue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  CupertinoIcons.add,
-                                  size: 18,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Simpan',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
+        // showDialog(
+        //   context: context,
+        //   builder: (BuildContext context) {
+        //     return Dialog(
+        //       elevation: 0,
+        //       backgroundColor: Colors.transparent,
+        //       child: Container(
+        //         padding: EdgeInsets.all(20),
+        //         decoration: BoxDecoration(
+        //           color: Colors.white,
+        //           borderRadius: BorderRadius.circular(16),
+        //         ),
+        //         child: SingleChildScrollView(
+        //           child: Column(
+        //             mainAxisSize: MainAxisSize.min,
+        //             children: [
+        //               Row(
+        //                 children: [
+        //                   Icon(
+        //                     FontAwesomeIcons.moneyCheck,
+        //                     color: PrimaryColor().blue,
+        //                     size: 24,
+        //                   ),
+        //                   SizedBox(width: 12),
+        //                   Text(
+        //                     "Edit Metode Pembayaran ",
+        //                     style: TextStyle(
+        //                       color: Colors.black87,
+        //                       fontSize: 18,
+        //                     ),
+        //                   ),
+        //                 ],
+        //               ),
+        //               SizedBox(height: 15),
+        //               Column(
+        //                 crossAxisAlignment: CrossAxisAlignment.start,
+        //                 children: [
+        //                   AdminW()
+        //                       .buildInputLabel('Nama Metode Pembayaran', " *"),
+        //                   AdminW().buildTextField(
+        //                     inputFormat: LengthLimitingTextInputFormatter(200),
+        //                     controller: namaMetodeController,
+        //                     hintText: 'Metode Pembayaran',
+        //                     prefixIcon: FontAwesomeIcons.moneyCheck,
+        //                     type: TextInputType.name,
+        //                   ),
+        //                 ],
+        //               ),
+        //               SizedBox(height: 24),
+        //               Row(
+        //                 mainAxisAlignment: MainAxisAlignment.end,
+        //                 children: [
+        //                   TextButton(
+        //                     onPressed: () => Navigator.pop(context),
+        //                     child: Text(
+        //                       'Batal',
+        //                       style: TextStyle(
+        //                         color: Colors.black45,
+        //                         fontSize: 14,
+        //                       ),
+        //                     ),
+        //                   ),
+        //                   SizedBox(width: 12),
+        //                   ElevatedButton(
+        //                     onPressed: () async {
+        //                       // await metodeController.editMetode(
+        //                       //   id,
+        //                       //   namaMetodeController.text,
+        //                       //   fromButton: true,
+        //                       // );
+        //                       // await metodeController.refresh();
+        //                       // Navigator.pop(context);
+        //                       // namaMetodeController.clear();
+        //                     },
+        //                     style: ElevatedButton.styleFrom(
+        //                       backgroundColor: PrimaryColor().blue,
+        //                       shape: RoundedRectangleBorder(
+        //                         borderRadius: BorderRadius.circular(12),
+        //                       ),
+        //                     ),
+        //                     child: Row(
+        //                       children: [
+        //                         Icon(
+        //                           CupertinoIcons.add,
+        //                           size: 18,
+        //                           color: Colors.white,
+        //                         ),
+        //                         SizedBox(width: 8),
+        //                         Text(
+        //                           'Simpan',
+        //                           style: TextStyle(
+        //                             color: Colors.white,
+        //                             fontSize: 14,
+        //                             fontWeight: FontWeight.w600,
+        //                           ),
+        //                         ),
+        //                       ],
+        //                     ),
+        //                   ),
+        //                 ],
+        //               ),
+        //             ],
+        //           ),
+        //         ),
+        //       ),
+        //     );
+        //   },
+        // );
       },
       child: Card(
         shape: RoundedRectangleBorder(

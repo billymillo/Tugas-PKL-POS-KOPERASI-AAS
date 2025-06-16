@@ -64,12 +64,84 @@ class TransaksiInMitraController extends GetxController {
     return selected['mitra_name'] ?? "Pilih Produk";
   }
 
-  String get ProdukMitra {
+  String ProdukMitra(String idProduk) {
     var selected = produkM.firstWhere(
-      (m) => m['id'] == selectedProductM.value,
-      orElse: () => {'id_mitra_barang': '  '},
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'id_mitra': 'Kosong'},
     );
-    return selected['id_mitra_barang'] ?? 0;
+    return selected['id_mitra'] ?? "Kosong";
+  }
+
+  String barcodeMitra(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'barcode_barang': '0'},
+    );
+    return selected['barcode_barang'] ?? "0";
+  }
+
+  String gambarMitra(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'gambar_barang': 'default.png'},
+    );
+    return selected['gambar_barang'] ?? "default.png";
+  }
+
+  String hargaPackMitra(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'harga_pack': 'Pilih Produk'},
+    );
+    return selected['harga_pack'] ?? "Pilih Produk";
+  }
+
+  String jumlahPcsMitra(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'jml_pcs_pack': 'Pilih Produk'},
+    );
+    return selected['jml_pcs_pack'] ?? "Pilih Produk";
+  }
+
+  String kategoriMitra(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'id_kategori_barang': 'Pilih Produk'},
+    );
+    return selected['id_kategori_barang'] ?? "Pilih Produk";
+  }
+
+  String tipeMitra(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'id_tipe_barang': 'Pilih Produk'},
+    );
+    return selected['id_tipe_barang'] ?? "Pilih Produk";
+  }
+
+  String kategoriMitraName(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'kategori_name': 'Pilih Produk'},
+    );
+    return selected['kategori_name'] ?? "Pilih Produk";
+  }
+
+  String produkMitraName(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'mitra_name': 'Pilih Produk'},
+    );
+    return selected['mitra_name'] ?? "Pilih Produk";
+  }
+
+  String tipeMitraName(String idProduk) {
+    var selected = produkM.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'tipe_name': 'Pilih Produk'},
+    );
+    return selected['tipe_name'] ?? "Pilih Produk";
   }
 
   String NamaMitra(String idProduk) {
@@ -95,6 +167,79 @@ class TransaksiInMitraController extends GetxController {
     );
     return selected['harga_jual'] ?? 0;
   }
+
+    String get HargaPack {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'harga_pack': '  '},
+    );
+    return selected['harga_pack'] ?? '0';
+  }
+
+  String get JumlahPcs {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'jml_pcs_pack': ' '},
+    );
+    return selected['jml_pcs_pack'] ?? '0';
+  }
+
+  String get NamaBarang {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'nama_barang': ' '},
+    );
+    return selected['nama_barang'] ?? '0';
+  }
+
+  String get BarcodeBarang {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'barcode_barang': ' '},
+    );
+    return selected['barcode_barang'] ?? '0';
+  }
+
+  String get GambarBarang {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'gambar_barang': ' '},
+    );
+    return selected['gambar_barang'] ?? '0';
+  }
+
+  String get KategoriBarang {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'id_kategori_barang': ' '},
+    );
+    return selected['id_kategori_barang'] ?? '0';
+  }
+
+  String get TipeBarang {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'id_tipe_barang': ' '},
+    );
+    return selected['id_tipe_barang'] ?? '0';
+  }
+
+  String get MitraBarang {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'id_mitra_barang': ' '},
+    );
+    return selected['id_mitra_barang'] ?? '0';
+  }
+
+  String get StokBarang {
+    var selected = produkM.firstWhere(
+      (m) => m['id'] == selectedProductM.value,
+      orElse: () => {'stok': ' '},
+    );
+    return selected['stok'] ?? '0';
+  }
+
 
   String NoTransaksiM(String idProduk) {
     var selected = transaksiM.firstWhere(
@@ -138,7 +283,7 @@ class TransaksiInMitraController extends GetxController {
   }
 
   Future<void> fetchTransaksiDetMitra() async {
-    var url = ApiService.baseUrl + '/transaksi_mitra/detail';
+    var url = ApiService.baseUrl + '/Transaksi_Mitra/detail';
     try {
       isLoadingM(true);
       var response = await http.get(Uri.parse(url));
@@ -169,7 +314,7 @@ class TransaksiInMitraController extends GetxController {
   }
 
   Future<void> fetchTransaksiInMitra() async {
-    var url = ApiService.baseUrl + '/transaksi_mitra';
+    var url = ApiService.baseUrl + '/Transaksi_Mitra';
     try {
       isLoadingM(true);
       var response = await http.get(Uri.parse(url));
@@ -297,20 +442,53 @@ class TransaksiInMitraController extends GetxController {
 
   Future<void> editProduk(
     String id,
-    String stok,
+    String nama,
+    String barcode_barang,
+    String gambar_barang,
+    String id_kategori,
+    String id_tipe,
+    String id_mitra,
+    String harga_pack,
+    String jumlah_pcs,
     String hargaSatuan,
     String hargaJual,
+    String stok,
   ) async {
     isLoadingM.value = true;
     final prefs = await SharedPreferences.getInstance();
-    String? userUpdate = prefs.getString('name') ?? 'system';
+    String? userInput = prefs.getString('name') ?? 'system';
+
     try {
-      final response = await apiServiceTr.editProduk(
-          id, stok, hargaSatuan, hargaJual, userUpdate);
+      final response = await apiServiceTr.editProdukTrIn(
+          id,
+          nama,
+          barcode_barang,
+          gambar_barang,
+          id_kategori,
+          id_tipe,
+          id_mitra,
+          harga_pack,
+          jumlah_pcs,
+          hargaSatuan,
+          hargaJual,
+          stok,
+          userInput);
       if (response['status'] == true) {
-        print("Edit Berhasil" + response['message']);
+        Get.snackbar(
+          'Berhasil',
+          response['message'],
+          backgroundColor: Colors.green.withOpacity(0.8),
+          colorText: Colors.white,
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
       } else {
-        print("Edit Gagal" + response['message']);
+        Get.snackbar(
+          'Gagal',
+          response['message'],
+          backgroundColor: Colors.red.withOpacity(0.8),
+          colorText: Colors.white,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
       }
     } catch (e) {
       print(e);

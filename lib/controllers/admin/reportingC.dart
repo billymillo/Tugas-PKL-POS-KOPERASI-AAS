@@ -82,6 +82,30 @@ class ReportingController extends GetxController {
     return selected['nama'] ?? "Non Member";
   }
 
+  String ProdukName(String idProduk) {
+    var selected = produk.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'nama_barang': 'Produk Tidak Ditemukan'},
+    );
+    return selected['nama_barang'] ?? "Produk Tidak Ditemukan";
+  }
+
+  String GambarBarang(String idProduk) {
+    var selected = produk.firstWhere(
+      (m) => m['id'].toString() == idProduk,
+      orElse: () => {'gambar_barang': 'default.png'},
+    );
+    return selected['gambar_barang'] ?? "default.png";
+  }
+
+  String NoTransaksi(String idTransaksi) {
+    var selected = transaksi.firstWhere(
+      (m) => m['id'].toString() == idTransaksi,
+      orElse: () => {'no_transaksi_in': ''},
+    );
+    return selected['no_transaksi_in'] ?? "";
+  }
+
   void filterData() {
     final start = selectedStartDate.value;
     final end = selectedEndDate.value;
@@ -96,13 +120,17 @@ class ReportingController extends GetxController {
     transaksiOut.value = filtered;
     totalTransaksi.value = filtered.length;
     int jumlah = 0;
-    int totalPendapatan = 0;
 
     for (var item in filtered) {
       jumlah += int.tryParse(item['jumlah_produk'].toString()) ?? 0;
-      totalPendapatan += int.tryParse(item['total_transaksi'].toString()) ?? 0;
     }
     totalProduk.value = jumlah;
+
+    // PERUBAHAN: Hitung pendapatan dari transaksiOutDet yang sudah difilter
+    int totalPendapatan = 0;
+    for (var item in transaksiOutDet) {
+      totalPendapatan += int.tryParse(item['total_harga'].toString()) ?? 0;
+    }
     pendapatan.value = totalPendapatan;
   }
 
@@ -156,6 +184,13 @@ class ReportingController extends GetxController {
     }).toList();
 
     transaksiOutDet.value = filtered;
+
+    // PERUBAHAN: Update pendapatan setelah filter transaksiOutDet
+    int totalPendapatan = 0;
+    for (var item in filtered) {
+      totalPendapatan += int.tryParse(item['total_harga'].toString()) ?? 0;
+    }
+    pendapatan.value = totalPendapatan;
   }
 
   void filterTransaksiInDet() {
@@ -178,30 +213,6 @@ class ReportingController extends GetxController {
     }
 
     pengeluaran.value = totalPengeluaran;
-  }
-
-  String ProdukName(String idProduk) {
-    var selected = produk.firstWhere(
-      (m) => m['id'].toString() == idProduk,
-      orElse: () => {'nama_barang': 'Produk Tidak Ditemukan'},
-    );
-    return selected['nama_barang'] ?? "Produk Tidak Ditemukan";
-  }
-
-  String GambarBarang(String idProduk) {
-    var selected = produk.firstWhere(
-      (m) => m['id'].toString() == idProduk,
-      orElse: () => {'gambar_barang': 'default.png'},
-    );
-    return selected['gambar_barang'] ?? "default.png";
-  }
-
-  String NoTransaksi(String idTransaksi) {
-    var selected = transaksi.firstWhere(
-      (m) => m['id'].toString() == idTransaksi,
-      orElse: () => {'no_transaksi_in': ''},
-    );
-    return selected['no_transaksi_in'] ?? "";
   }
 
   List<FlSpot> get produkChartSpots {
@@ -229,12 +240,14 @@ class ReportingController extends GetxController {
   List<FlSpot> get pendapatanChartSpots {
     final Map<String, int> grouped = {};
 
-    for (var item in transaksiOut) {
+    // PERUBAHAN: Gunakan transaksiOutDet instead of transaksiOut
+    for (var item in transaksiOutDet) {
       final dateStr = item['input_date'];
       final date = DateTime.tryParse(dateStr);
       if (date != null) {
         final key = DateFormat('yyyy-MM-dd').format(date);
-        final jumlah = int.tryParse(item['total_transaksi'].toString()) ?? 0;
+        // PERUBAHAN: Gunakan total_harga dari detail transaksi
+        final jumlah = int.tryParse(item['total_harga'].toString()) ?? 0;
         grouped.update(key, (value) => value + jumlah, ifAbsent: () => jumlah);
       }
     }
@@ -292,7 +305,7 @@ class ReportingController extends GetxController {
   }
 
   Future<void> fetchTransaksiOut() async {
-    var url = ApiService.baseUrl + '/transaksi_out';
+    var url = ApiService.baseUrl + '/Transaksi_Out';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -303,6 +316,10 @@ class ReportingController extends GetxController {
               List<Map<String, dynamic>>.from(jsonData['data']);
           allTransaksiOut.value = data;
           filterData();
+          // PERUBAHAN: Panggil filterTransaksiOutDet untuk update pendapatan
+          if (allTransaksiOutDet.isNotEmpty) {
+            filterTransaksiOutDet();
+          }
         } else {
           throw Exception('Failed to load products');
         }
@@ -316,8 +333,9 @@ class ReportingController extends GetxController {
     }
   }
 
+// Ubah fetchTransaksiOutDet untuk memanggil filterData juga
   Future<void> fetchTransaksiOutDet() async {
-    var url = ApiService.baseUrl + '/transaksi_out/detail';
+    var url = ApiService.baseUrl + '/Transaksi_Out/detail';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -329,6 +347,10 @@ class ReportingController extends GetxController {
 
           allTransaksiOutDet.value = rawData;
           filterTransaksiOutDet();
+          // PERUBAHAN: Panggil filterData untuk update data lain jika transaksiOut sudah ada
+          if (allTransaksiOut.isNotEmpty) {
+            filterData();
+          }
         } else {
           throw Exception('Failed to load products');
         }
@@ -343,7 +365,7 @@ class ReportingController extends GetxController {
   }
 
   Future<void> fetchTransaksiInDet() async {
-    var url = ApiService.baseUrl + '/transaksi_in/detail';
+    var url = ApiService.baseUrl + '/Transaksi_In/detail';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -367,7 +389,7 @@ class ReportingController extends GetxController {
   }
 
   Future<void> fetchTransaksiIn() async {
-    var url = ApiService.baseUrl + '/transaksi_in';
+    var url = ApiService.baseUrl + '/Transaksi_In';
     try {
       isLoading(true);
       var response = await http.get(Uri.parse(url));
@@ -482,23 +504,76 @@ class ReportingController extends GetxController {
     final Map<String, List<Map<String, dynamic>>> groupedData = {};
     for (var item in transaksiOutDet) {
       final String date = item['input_date'].substring(0, 10);
-
-      if (groupedData.containsKey(date)) {
-        groupedData[date]!.add(item);
-      } else {
-        groupedData[date] = [item];
-      }
+      groupedData.putIfAbsent(date, () => []).add(item);
     }
 
+    // Load both logo images
+    final ByteData logoKiriData =
+        await rootBundle.load('assets/image/logo_kopindo.png');
+    final ByteData logoKananData =
+        await rootBundle.load('assets/image/aas_logo.png');
+
+    final Uint8List logoKiriBytes = logoKiriData.buffer.asUint8List();
+    final Uint8List logoKananBytes = logoKananData.buffer.asUint8List();
+
+    final logoKiri = pw.MemoryImage(logoKiriBytes);
+    final logoKanan = pw.MemoryImage(logoKananBytes);
+
+    final tanggalCetak =
+        DateFormat('dd MMMM yyyy hh:mm:ss', 'id_ID').format(DateTime.now());
+
     pdf.addPage(pw.Page(
+      pageFormat: PdfPageFormat.a4,
       build: (pw.Context context) {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Laporan Transaksi Out', style: pw.TextStyle(fontSize: 24)),
-            pw.SizedBox(height: 10),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Image(logoKiri, width: 70, height: 70),
+                pw.Expanded(
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text('KOPERASI KARYAWAN DIVISI TIC SARASWANTI',
+                          style: pw.TextStyle(fontSize: 10)),
+                      pw.Text('ANUGRAH ARTHA ABADI',
+                          style: pw.TextStyle(
+                              fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(
+                          'SK KEMENKUMHAM AHU-AHU-0000720.AH.01.38 TAHUN 2025',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text(
+                          'HEAD OFFICE: GRAHA AAS, G. Floor, Jl. Raya Jakarta-Bogor KM. 37',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text('Sukamaju, Cilodong, Kota Depok, Jawa Barat',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text('anugraharthaa@gmail.com | 082125931519',
+                          style: pw.TextStyle(fontSize: 9)),
+                    ],
+                  ),
+                ),
+                pw.Image(logoKanan, width: 70, height: 70),
+              ],
+            ),
+            pw.SizedBox(height: 8),
+            pw.Divider(),
+            pw.SizedBox(height: 12),
+
+            // Judul
+            pw.Text('Laporan Transaksi Out',
+                style:
+                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Tanggal Cetak: $tanggalCetak',
+            ),
+            pw.SizedBox(height: 8),
             pw.TableHelper.fromTextArray(
               context: context,
+              cellAlignment: pw.Alignment.centerLeft,
               data: [
                 [
                   'Tanggal',
@@ -558,15 +633,74 @@ class ReportingController extends GetxController {
 
     if (transaksiInDet.isEmpty) return;
 
+    // Load logo kiri dan kanan
+    final ByteData logoKiriData =
+        await rootBundle.load('assets/image/logo_kopindo.png');
+    final ByteData logoKananData =
+        await rootBundle.load('assets/image/aas_logo.png');
+
+    final Uint8List logoKiriBytes = logoKiriData.buffer.asUint8List();
+    final Uint8List logoKananBytes = logoKananData.buffer.asUint8List();
+
+    final logoKiri = pw.MemoryImage(logoKiriBytes);
+    final logoKanan = pw.MemoryImage(logoKananBytes);
+
+    final tanggalCetak =
+        DateFormat('dd MMMM yyyy hh:mm:ss', 'id_ID').format(DateTime.now());
+
     pdf.addPage(pw.Page(
+      pageFormat: PdfPageFormat.a4,
       build: (pw.Context context) {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Laporan Transaksi In', style: pw.TextStyle(fontSize: 24)),
-            pw.SizedBox(height: 10),
+            // Header dengan dua logo
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Image(logoKiri, width: 70, height: 70),
+                pw.Expanded(
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text('KOPERASI KARYAWAN DIVISI TIC SARASWANTI',
+                          style: pw.TextStyle(fontSize: 10)),
+                      pw.Text('ANUGRAH ARTHA ABADI',
+                          style: pw.TextStyle(
+                              fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(
+                          'SK KEMENKUMHAM AHU-AHU-0000720.AH.01.38 TAHUN 2025',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text(
+                          'HEAD OFFICE: GRAHA AAS, G. Floor, Jl. Raya Jakarta-Bogor KM. 37',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text('Sukamaju, Cilodong, Kota Depok, Jawa Barat',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text('anugraharthaa@gmail.com | 082125931519',
+                          style: pw.TextStyle(fontSize: 9)),
+                    ],
+                  ),
+                ),
+                pw.Image(logoKanan, width: 70, height: 70),
+              ],
+            ),
+            pw.SizedBox(height: 8),
+            pw.Divider(),
+            pw.SizedBox(height: 12),
+
+            // Judul
+            pw.Text('Laporan Transaksi In',
+                style:
+                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Tanggal Cetak: $tanggalCetak',
+            ),
+            pw.SizedBox(height: 8),
             pw.TableHelper.fromTextArray(
               context: context,
+              cellAlignment: pw.Alignment.centerLeft,
               data: [
                 [
                   'No',
@@ -607,15 +741,70 @@ class ReportingController extends GetxController {
 
     if (groupedProduk.isEmpty) return;
 
+    // Load logo kiri dan kanan
+    final ByteData logoKiriData =
+        await rootBundle.load('assets/image/logo_kopindo.png');
+    final ByteData logoKananData =
+        await rootBundle.load('assets/image/aas_logo.png');
+
+    final Uint8List logoKiriBytes = logoKiriData.buffer.asUint8List();
+    final Uint8List logoKananBytes = logoKananData.buffer.asUint8List();
+
+    final logoKiri = pw.MemoryImage(logoKiriBytes);
+    final logoKanan = pw.MemoryImage(logoKananBytes);
+    final tanggalCetak =
+        DateFormat('dd MMMM yyyy hh:mm:ss', 'id_ID').format(DateTime.now());
+
     pdf.addPage(pw.Page(
+      pageFormat: PdfPageFormat.a4,
       build: (pw.Context context) {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Laporan Produk', style: pw.TextStyle(fontSize: 24)),
-            pw.SizedBox(height: 10),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Image(logoKiri, width: 70, height: 70),
+                pw.Expanded(
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text('KOPERASI KARYAWAN DIVISI TIC SARASWANTI',
+                          style: pw.TextStyle(fontSize: 10)),
+                      pw.Text('ANUGRAH ARTHA ABADI',
+                          style: pw.TextStyle(
+                              fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(
+                          'SK KEMENKUMHAM AHU-AHU-0000720.AH.01.38 TAHUN 2025',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text(
+                          'HEAD OFFICE: GRAHA AAS, G. Floor, Jl. Raya Jakarta-Bogor KM. 37',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text('Sukamaju, Cilodong, Kota Depok, Jawa Barat',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text('anugraharthaa@gmail.com | 082125931519',
+                          style: pw.TextStyle(fontSize: 9)),
+                    ],
+                  ),
+                ),
+                pw.Image(logoKanan, width: 70, height: 70),
+              ],
+            ),
+            pw.SizedBox(height: 8),
+            pw.Divider(),
+            pw.SizedBox(height: 12),
+            pw.Text('Laporan Produk',
+                style:
+                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Tanggal Cetak: $tanggalCetak',
+            ),
+            pw.SizedBox(height: 8),
             pw.TableHelper.fromTextArray(
               context: context,
+              cellAlignment: pw.Alignment.centerLeft,
               data: [
                 [
                   'No',
@@ -627,7 +816,6 @@ class ReportingController extends GetxController {
                 ],
                 ...List.generate(groupedProduk.length, (index) {
                   final item = groupedProduk[index];
-
                   final jumlah = item['jumlah'] ?? 0;
                   final hargaDasar = item['total_harga_dasar'] ?? 0;
                   final totalHarga = item['total_harga'] ?? 0;
@@ -661,19 +849,74 @@ class ReportingController extends GetxController {
 
     if (kasbon.isEmpty) return;
 
+    // Load logo kiri dan kanan
+    final ByteData logoKiriData =
+        await rootBundle.load('assets/image/logo_kopindo.png');
+    final ByteData logoKananData =
+        await rootBundle.load('assets/image/aas_logo.png');
+
+    final Uint8List logoKiriBytes = logoKiriData.buffer.asUint8List();
+    final Uint8List logoKananBytes = logoKananData.buffer.asUint8List();
+
+    final logoKiri = pw.MemoryImage(logoKiriBytes);
+    final logoKanan = pw.MemoryImage(logoKananBytes);
+
     final sortedKasbon = [...kasbon];
     sortedKasbon.sort((a, b) => int.parse(b['total_kasbon'].toString())
         .compareTo(int.parse(a['total_kasbon'].toString())));
+    final tanggalCetak =
+        DateFormat('dd MMMM yyyy hh:mm:ss', 'id_ID').format(DateTime.now());
 
     pdf.addPage(pw.Page(
+      pageFormat: PdfPageFormat.a4,
       build: (pw.Context context) {
         return pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Laporan Kasbon Member', style: pw.TextStyle(fontSize: 24)),
-            pw.SizedBox(height: 10),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Image(logoKiri, width: 70, height: 70),
+                pw.Expanded(
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text('KOPERASI KARYAWAN DIVISI TIC SARASWANTI',
+                          style: pw.TextStyle(fontSize: 10)),
+                      pw.Text('ANUGRAH ARTHA ABADI',
+                          style: pw.TextStyle(
+                              fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(
+                          'SK KEMENKUMHAM AHU-AHU-0000720.AH.01.38 TAHUN 2025',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text(
+                          'HEAD OFFICE: GRAHA AAS, G. Floor, Jl. Raya Jakarta-Bogor KM. 37',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text('Sukamaju, Cilodong, Kota Depok, Jawa Barat',
+                          style: pw.TextStyle(fontSize: 9)),
+                      pw.Text('anugraharthaa@gmail.com | 082125931519',
+                          style: pw.TextStyle(fontSize: 9)),
+                    ],
+                  ),
+                ),
+                pw.Image(logoKanan, width: 70, height: 70),
+              ],
+            ),
+            pw.SizedBox(height: 8),
+            pw.Divider(),
+            pw.SizedBox(height: 12),
+            pw.Text('Laporan Kasbon Member',
+                style:
+                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Tanggal Cetak: $tanggalCetak',
+            ),
+            pw.SizedBox(height: 8),
             pw.TableHelper.fromTextArray(
               context: context,
+              cellAlignment: pw.Alignment.centerLeft,
               data: [
                 ['No', 'ID Member', 'Nama Member', 'Total Kasbon'],
                 ...List.generate(sortedKasbon.length, (index) {
@@ -681,7 +924,7 @@ class ReportingController extends GetxController {
                   return [
                     '${index + 1}',
                     item['id_member'].toString(),
-                    MemberName(item['id_member'].toString()), // Fungsi opsional
+                    MemberName(item['id_member'].toString()),
                     'Rp ${NumberFormat('#,##0', 'id_ID').format(item['total_kasbon'])}',
                   ];
                 }),

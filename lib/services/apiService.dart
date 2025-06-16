@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 // Fetch Api
 class ApiService {
-  static const String baseUrl = 'http://10.10.20.109/POS_CI/api/';
+  static const String baseUrl = 'https://api-koperasi.aaslabs.com/api';
 
   Future<List<dynamic>> fetchUsers({String? id}) async {
     final url = id == null ? '$baseUrl/users' : '$baseUrl/users?id=$id';
@@ -57,10 +57,10 @@ class ApiService {
       Uri.parse(url),
       body: {
         'tipe': tipe,
-        'userInput': userInput,
+        'user_input': userInput,
       },
     );
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return jsonDecode(response.body);
     } else {
       return jsonDecode(response.body);

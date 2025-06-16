@@ -494,6 +494,26 @@ class TransaksiInMitraP extends StatelessWidget {
                                                     Obx(
                                                       () => ElevatedButton(
                                                         onPressed: () async {
+                                                          print(
+                                                              'pilih product: ${cM.selectedProductM}');
+                                                          print(
+                                                              'nama product: ${cM.NamaBarang}');
+                                                          print(
+                                                              'barcode product: ${cM.BarcodeBarang}');
+                                                          print(
+                                                              'gambar product: ${cM.GambarBarang}');
+                                                          print(
+                                                              'id kategori product: ${cM.KategoriBarang}');
+                                                          print(
+                                                              'id tipe product: ${cM.TipeBarang}');
+                                                          print(
+                                                              'id mitra product: ${cM.MitraBarang}');
+                                                          print(
+                                                              'id harga pack product: ${cM.HargaPack}');
+                                                          print(
+                                                              'id jumlah pcs product: ${cM.JumlahPcs}');
+                                                          print(
+                                                              'id stok product: ${cM.StokBarang}');
                                                           int stok = int.tryParse(
                                                                   stokControllerM
                                                                       .text) ??
@@ -504,14 +524,35 @@ class TransaksiInMitraP extends StatelessWidget {
                                                                       .text
                                                                       .toString()) ??
                                                                   0;
-                                                          int totalStok = stok *
-                                                              produkSatuan;
+                                                          int totalHarga =
+                                                              stok *
+                                                                  produkSatuan;
                                                           if (cM.selectedProductM
                                                                   .value ==
                                                               null) {
                                                             Get.snackbar(
                                                               'Error',
                                                               'Produk Tidak Boleh Kosong, Pilih Produk Terlebih Dahulu!',
+                                                              backgroundColor:
+                                                                  Colors.red
+                                                                      .withOpacity(
+                                                                          0.8),
+                                                              colorText:
+                                                                  Colors.white,
+                                                              icon: Icon(
+                                                                  Icons.error,
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                            return;
+                                                          }
+                                                          if (stokControllerM
+                                                                      .text ==
+                                                                  '' ||
+                                                              stok == '0') {
+                                                            Get.snackbar(
+                                                              'Error',
+                                                              'Stok Tidak Boleh Kosong, Input Stok Terlebih Dahulu!',
                                                               backgroundColor:
                                                                   Colors.red
                                                                       .withOpacity(
@@ -532,7 +573,7 @@ class TransaksiInMitraP extends StatelessWidget {
                                                                 .toString(),
                                                             stokControllerM
                                                                 .text,
-                                                            totalStok
+                                                            totalHarga
                                                                 .toString(),
                                                             '1',
                                                           );
@@ -547,17 +588,31 @@ class TransaksiInMitraP extends StatelessWidget {
                                                               cM.jualMController
                                                                   .text
                                                                   .toString());
-                                                          cM.editProduk(
+                                                          if (cM.checkboxM
+                                                                  .value ==
+                                                              true) {
+                                                            await cM.editProduk(
                                                               cM.selectedProductM
                                                                   .value
                                                                   .toString(),
-                                                              stokControllerM
-                                                                  .text,
+                                                              cM.NamaBarang,
+                                                              cM.BarcodeBarang,
+                                                              cM.GambarBarang,
+                                                              cM.KategoriBarang,
+                                                              cM.TipeBarang,
+                                                              cM.MitraBarang,
+                                                              cM.HargaPack,
+                                                              cM.JumlahPcs,
                                                               cM.satuanMController
                                                                   .text,
                                                               cM.jualMController
-                                                                  .text
-                                                                  .toString());
+                                                                  .text,
+                                                              stokControllerM
+                                                                  .text,
+                                                            );
+
+                                                            return;
+                                                          }
                                                           await cM
                                                               .fetchTransaksiDetMitra();
                                                           stokControllerM
@@ -568,8 +623,6 @@ class TransaksiInMitraP extends StatelessWidget {
                                                               .fetchProduk();
                                                           stokControllerM
                                                               .clear();
-                                                          cM.selectedProductM
-                                                              .value = null;
                                                           cM.toggleCheckbox(
                                                               false);
                                                           cM.clearSearch();

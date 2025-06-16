@@ -43,7 +43,7 @@ class DetailProdukP extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
                       image: NetworkImage(
-                        "http://10.10.20.109/POS_CI/uploads/${item['gambar_barang']}",
+                        "https://api-koperasi.aaslabs.com/uploads/${item['gambar_barang']}",
                       ),
                       fit: BoxFit.cover,
                     ),
@@ -76,11 +76,17 @@ class DetailProdukP extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  item['nama_barang'] ?? '',
-                                  style: TextStyle(
+                                Expanded(
+                                  child: Text(
+                                    item['nama_barang'] ?? '',
+                                    style: TextStyle(
                                       fontSize: 22,
-                                      fontWeight: FontWeight.bold),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    softWrap: true,
+                                    overflow: TextOverflow.visible,
+                                    maxLines: null,
+                                  ),
                                 ),
                               ],
                             ),

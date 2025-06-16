@@ -174,7 +174,7 @@ class _KategoriPState extends State<KategoriP> {
             decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
-                    "http://10.10.20.109/POS_CI/kategori/${item['gambar_kategori']}",
+                    "https://api-koperasi.aaslabs.com/kategori/${item['gambar_kategori']}",
                   ),
                   fit: BoxFit.cover,
                 ),
@@ -246,7 +246,7 @@ class _KategoriPState extends State<KategoriP> {
                                   context,
                                   item['id'],
                                   item['kategori'],
-                                  "http://10.10.20.109/POS_CI/kategori/${item['gambar_kategori']}",
+                                  "https://api-koperasi.aaslabs.com/uploads/${item['gambar_kategori']}",
                                 );
                               },
                             ),
@@ -563,8 +563,26 @@ class _KategoriPState extends State<KategoriP> {
               decoration:
                   BoxDecoration(borderRadius: BorderRadius.circular(16)),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.add_circled,
+                        color: PrimaryColor().blue,
+                        size: 24,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        "Edit Kategori",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
                   AdminW().buildInputLabel('Nama Kategori', ' *'),
                   AdminW().buildTextField(
                     controller: editKategoriController,

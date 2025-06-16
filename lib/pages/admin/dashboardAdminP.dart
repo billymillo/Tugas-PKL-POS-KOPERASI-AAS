@@ -67,7 +67,7 @@ class DashboardAdminP extends StatelessWidget {
                           ),
                           const SizedBox(width: 20),
                           AdminW().buildInfoBox(
-                            title: 'Laba Kotor',
+                            title: 'Saldo Koperasi',
                             value: Obx(() => Text(
                                   'Rp ${NumberFormat('#,##0', 'id_ID').format(int.tryParse(c.totalSaldo.value.toString()) ?? 0)}',
                                   style: GoogleFonts.roboto(
@@ -273,8 +273,9 @@ class DashboardAdminP extends StatelessWidget {
                                                               .orientation ==
                                                           Orientation.landscape
                                                       ? MediaQuery.of(context)
-                                                          .size
-                                                          .width * 1.5
+                                                              .size
+                                                              .width *
+                                                          1.5
                                                       : null,
                                                   height: 300,
                                                   padding:
@@ -617,7 +618,10 @@ class DashboardAdminP extends StatelessWidget {
                                   double cashPercent = total == 0
                                       ? 0
                                       : (c.totalCash.value / total) * 100;
-
+                                  double saldoPercent = total == 0
+                                      ? 0
+                                      : (c.totalSaldoMetode.value / total) *
+                                          100;
                                   return Column(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
@@ -652,6 +656,19 @@ class DashboardAdminP extends StatelessWidget {
                                                   color: Colors.white,
                                                 ),
                                               ),
+                                              PieChartSectionData(
+                                                value: c.totalSaldoMetode.value
+                                                    .toDouble(),
+                                                color: PrimaryColor().red,
+                                                title:
+                                                    '${saldoPercent.toStringAsFixed(1)}%',
+                                                radius: 45,
+                                                titleStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
                                             ],
                                             centerSpaceRadius: 20,
                                             sectionsSpace: 1,
@@ -660,7 +677,7 @@ class DashboardAdminP extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 10),
                                       SizedBox(
-                                        height: 40,
+                                        height: 70,
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -680,6 +697,15 @@ class DashboardAdminP extends StatelessWidget {
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 14,
                                                 color: PrimaryColor().blue,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              'Saldo = ${c.totalSaldoMetode.value} Transaksi',
+                                              style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                                color: PrimaryColor().red,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -743,7 +769,7 @@ class DashboardAdminP extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 10),
                                       SizedBox(
-                                        height: 40,
+                                        height: 70,
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
